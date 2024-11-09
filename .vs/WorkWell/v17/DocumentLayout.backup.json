@@ -1,0 +1,301 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\User\\source\\repos\\WorkWell\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{D6590FF1-D90F-4D65-B0D2-61300F6738DE}|WorkWell.Server\\WorkWell.Server.csproj|c:\\users\\user\\source\\repos\\workwell\\workwell.server\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D6590FF1-D90F-4D65-B0D2-61300F6738DE}|WorkWell.Server\\WorkWell.Server.csproj|solutionrelative:workwell.server\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D6590FF1-D90F-4D65-B0D2-61300F6738DE}|WorkWell.Server\\WorkWell.Server.csproj|c:\\users\\user\\source\\repos\\workwell\\workwell.server\\controllers\\exercisescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D6590FF1-D90F-4D65-B0D2-61300F6738DE}|WorkWell.Server\\WorkWell.Server.csproj|solutionrelative:workwell.server\\controllers\\exercisescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D6590FF1-D90F-4D65-B0D2-61300F6738DE}|WorkWell.Server\\WorkWell.Server.csproj|c:\\users\\user\\source\\repos\\workwell\\workwell.server\\services\\exerciseservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D6590FF1-D90F-4D65-B0D2-61300F6738DE}|WorkWell.Server\\WorkWell.Server.csproj|solutionrelative:workwell.server\\services\\exerciseservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D6590FF1-D90F-4D65-B0D2-61300F6738DE}|WorkWell.Server\\WorkWell.Server.csproj|c:\\users\\user\\source\\repos\\workwell\\workwell.server\\models\\exercise.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D6590FF1-D90F-4D65-B0D2-61300F6738DE}|WorkWell.Server\\WorkWell.Server.csproj|solutionrelative:workwell.server\\models\\exercise.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D6590FF1-D90F-4D65-B0D2-61300F6738DE}|WorkWell.Server\\WorkWell.Server.csproj|c:\\users\\user\\source\\repos\\workwell\\workwell.server\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{D6590FF1-D90F-4D65-B0D2-61300F6738DE}|WorkWell.Server\\WorkWell.Server.csproj|solutionrelative:workwell.server\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D6590FF1-D90F-4D65-B0D2-61300F6738DE}|WorkWell.Server\\WorkWell.Server.csproj|c:\\users\\user\\source\\repos\\workwell\\workwell.server\\helpers\\firebasehelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D6590FF1-D90F-4D65-B0D2-61300F6738DE}|WorkWell.Server\\WorkWell.Server.csproj|solutionrelative:workwell.server\\helpers\\firebasehelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D6590FF1-D90F-4D65-B0D2-61300F6738DE}|WorkWell.Server\\WorkWell.Server.csproj|c:\\users\\user\\source\\repos\\workwell\\workwell.server\\controllers\\weatherforecastcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D6590FF1-D90F-4D65-B0D2-61300F6738DE}|WorkWell.Server\\WorkWell.Server.csproj|solutionrelative:workwell.server\\controllers\\weatherforecastcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D6590FF1-D90F-4D65-B0D2-61300F6738DE}|WorkWell.Server\\WorkWell.Server.csproj|c:\\users\\user\\source\\repos\\workwell\\workwell.server\\controllers\\routinescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D6590FF1-D90F-4D65-B0D2-61300F6738DE}|WorkWell.Server\\WorkWell.Server.csproj|solutionrelative:workwell.server\\controllers\\routinescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D6590FF1-D90F-4D65-B0D2-61300F6738DE}|WorkWell.Server\\WorkWell.Server.csproj|c:\\users\\user\\source\\repos\\workwell\\workwell.server\\models\\routine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D6590FF1-D90F-4D65-B0D2-61300F6738DE}|WorkWell.Server\\WorkWell.Server.csproj|solutionrelative:workwell.server\\models\\routine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D6590FF1-D90F-4D65-B0D2-61300F6738DE}|WorkWell.Server\\WorkWell.Server.csproj|c:\\users\\user\\source\\repos\\workwell\\workwell.server\\weatherforecast.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D6590FF1-D90F-4D65-B0D2-61300F6738DE}|WorkWell.Server\\WorkWell.Server.csproj|solutionrelative:workwell.server\\weatherforecast.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DF30D363-442B-460C-ADA6-9B290ACE510E}|workwell.client\\workwell.client.esproj|c:\\users\\user\\source\\repos\\workwell\\workwell.client\\src\\main.jsx||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{DF30D363-442B-460C-ADA6-9B290ACE510E}|workwell.client\\workwell.client.esproj|solutionrelative:workwell.client\\src\\main.jsx||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DF30D363-442B-460C-ADA6-9B290ACE510E}|workwell.client\\workwell.client.esproj|c:\\users\\user\\source\\repos\\workwell\\workwell.client\\src\\index.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{DF30D363-442B-460C-ADA6-9B290ACE510E}|workwell.client\\workwell.client.esproj|solutionrelative:workwell.client\\src\\index.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DF30D363-442B-460C-ADA6-9B290ACE510E}|workwell.client\\workwell.client.esproj|c:\\users\\user\\source\\repos\\workwell\\workwell.client\\src\\app.jsx||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{DF30D363-442B-460C-ADA6-9B290ACE510E}|workwell.client\\workwell.client.esproj|solutionrelative:workwell.client\\src\\app.jsx||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DF30D363-442B-460C-ADA6-9B290ACE510E}|workwell.client\\workwell.client.esproj|c:\\users\\user\\source\\repos\\workwell\\workwell.client\\vite.config.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{DF30D363-442B-460C-ADA6-9B290ACE510E}|workwell.client\\workwell.client.esproj|solutionrelative:workwell.client\\vite.config.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DF30D363-442B-460C-ADA6-9B290ACE510E}|workwell.client\\workwell.client.esproj|c:\\users\\user\\source\\repos\\workwell\\workwell.client\\index.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{DF30D363-442B-460C-ADA6-9B290ACE510E}|workwell.client\\workwell.client.esproj|solutionrelative:workwell.client\\index.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 282,
+          "SelectedChildIndex": 8,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\WorkWell\\WorkWell.Server\\appsettings.json",
+              "RelativeDocumentMoniker": "WorkWell.Server\\appsettings.json",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\WorkWell\\WorkWell.Server\\appsettings.json",
+              "RelativeToolTip": "WorkWell.Server\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2024-11-09T14:22:30.586Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Exercise.cs",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\WorkWell\\WorkWell.Server\\Models\\Exercise.cs",
+              "RelativeDocumentMoniker": "WorkWell.Server\\Models\\Exercise.cs",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\WorkWell\\WorkWell.Server\\Models\\Exercise.cs",
+              "RelativeToolTip": "WorkWell.Server\\Models\\Exercise.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAABEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-09T14:00:51.473Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ExerciseService.cs",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\WorkWell\\WorkWell.Server\\Services\\ExerciseService.cs",
+              "RelativeDocumentMoniker": "WorkWell.Server\\Services\\ExerciseService.cs",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\WorkWell\\WorkWell.Server\\Services\\ExerciseService.cs",
+              "RelativeToolTip": "WorkWell.Server\\Services\\ExerciseService.cs",
+              "ViewState": "AgIAABQAAAAAAAAAAAAAABQAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-09T14:02:49.646Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ExercisesController.cs",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\WorkWell\\WorkWell.Server\\Controllers\\ExercisesController.cs",
+              "RelativeDocumentMoniker": "WorkWell.Server\\Controllers\\ExercisesController.cs",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\WorkWell\\WorkWell.Server\\Controllers\\ExercisesController.cs",
+              "RelativeToolTip": "WorkWell.Server\\Controllers\\ExercisesController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAFUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-09T14:03:01.159Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\WorkWell\\WorkWell.Server\\Program.cs",
+              "RelativeDocumentMoniker": "WorkWell.Server\\Program.cs",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\WorkWell\\WorkWell.Server\\Program.cs",
+              "RelativeToolTip": "WorkWell.Server\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-09T14:08:15.31Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "FirebaseHelper.cs",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\WorkWell\\WorkWell.Server\\Helpers\\FirebaseHelper.cs",
+              "RelativeDocumentMoniker": "WorkWell.Server\\Helpers\\FirebaseHelper.cs",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\WorkWell\\WorkWell.Server\\Helpers\\FirebaseHelper.cs",
+              "RelativeToolTip": "WorkWell.Server\\Helpers\\FirebaseHelper.cs",
+              "ViewState": "AgIAABMAAAAAAAAAAAAAADgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-09T14:14:59.937Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "WeatherForecastController.cs",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\WorkWell\\WorkWell.Server\\Controllers\\WeatherForecastController.cs",
+              "RelativeDocumentMoniker": "WorkWell.Server\\Controllers\\WeatherForecastController.cs",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\WorkWell\\WorkWell.Server\\Controllers\\WeatherForecastController.cs",
+              "RelativeToolTip": "WorkWell.Server\\Controllers\\WeatherForecastController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAQAAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-09T13:38:44.932Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "RoutinesController.cs",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\WorkWell\\WorkWell.Server\\Controllers\\RoutinesController.cs",
+              "RelativeDocumentMoniker": "WorkWell.Server\\Controllers\\RoutinesController.cs",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\WorkWell\\WorkWell.Server\\Controllers\\RoutinesController.cs",
+              "RelativeToolTip": "WorkWell.Server\\Controllers\\RoutinesController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-09T13:56:42.156Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Routine.cs",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\WorkWell\\WorkWell.Server\\Models\\Routine.cs",
+              "RelativeDocumentMoniker": "WorkWell.Server\\Models\\Routine.cs",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\WorkWell\\WorkWell.Server\\Models\\Routine.cs",
+              "RelativeToolTip": "WorkWell.Server\\Models\\Routine.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-09T13:58:16.777Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "WeatherForecast.cs",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\WorkWell\\WorkWell.Server\\WeatherForecast.cs",
+              "RelativeDocumentMoniker": "WorkWell.Server\\WeatherForecast.cs",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\WorkWell\\WorkWell.Server\\WeatherForecast.cs",
+              "RelativeToolTip": "WorkWell.Server\\WeatherForecast.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-09T13:57:52.958Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "index.css",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\WorkWell\\workwell.client\\src\\index.css",
+              "RelativeDocumentMoniker": "workwell.client\\src\\index.css",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\WorkWell\\workwell.client\\src\\index.css",
+              "RelativeToolTip": "workwell.client\\src\\index.css",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2024-11-09T13:52:15.433Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "App.jsx",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\WorkWell\\workwell.client\\src\\App.jsx",
+              "RelativeDocumentMoniker": "workwell.client\\src\\App.jsx",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\WorkWell\\workwell.client\\src\\App.jsx",
+              "RelativeToolTip": "workwell.client\\src\\App.jsx",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003663|",
+              "WhenOpened": "2024-11-09T13:38:57.123Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "main.jsx",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\WorkWell\\workwell.client\\src\\main.jsx",
+              "RelativeDocumentMoniker": "workwell.client\\src\\main.jsx",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\WorkWell\\workwell.client\\src\\main.jsx",
+              "RelativeToolTip": "workwell.client\\src\\main.jsx",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003663|",
+              "WhenOpened": "2024-11-09T13:38:49.147Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "vite.config.js",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\WorkWell\\workwell.client\\vite.config.js",
+              "RelativeDocumentMoniker": "workwell.client\\vite.config.js",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\WorkWell\\workwell.client\\vite.config.js",
+              "RelativeToolTip": "workwell.client\\vite.config.js",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2024-11-09T13:32:14.831Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "index.html",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\WorkWell\\workwell.client\\index.html",
+              "RelativeDocumentMoniker": "workwell.client\\index.html",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\WorkWell\\workwell.client\\index.html",
+              "RelativeToolTip": "workwell.client\\index.html",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
+              "WhenOpened": "2024-11-09T12:45:25.086Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 311,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{eefa5220-e298-11d0-8f78-00a0c9110057}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

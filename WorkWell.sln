@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35327.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkWell.Server", "WorkWell.Server\WorkWell.Server.csproj", "{D6590FF1-D90F-4D65-B0D2-61300F6738DE}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "workwell.client", "workwell.client\workwell.client.esproj", "{DF30D363-442B-460C-ADA6-9B290ACE510E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D6590FF1-D90F-4D65-B0D2-61300F6738DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6590FF1-D90F-4D65-B0D2-61300F6738DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6590FF1-D90F-4D65-B0D2-61300F6738DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6590FF1-D90F-4D65-B0D2-61300F6738DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF30D363-442B-460C-ADA6-9B290ACE510E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF30D363-442B-460C-ADA6-9B290ACE510E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF30D363-442B-460C-ADA6-9B290ACE510E}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{DF30D363-442B-460C-ADA6-9B290ACE510E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF30D363-442B-460C-ADA6-9B290ACE510E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF30D363-442B-460C-ADA6-9B290ACE510E}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9D9D2644-9C07-48E5-89F6-BBB044E68C26}
+	EndGlobalSection
+EndGlobal
