@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WorkWell.Server")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cfc16958ec14afd905c3e2f1b1299ef087bfbbb4")]
 [assembly: System.Reflection.AssemblyProductAttribute("WorkWell.Server")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WorkWell.Server")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

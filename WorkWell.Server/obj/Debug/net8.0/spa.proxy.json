@@ -3,7 +3,7 @@
 "ServerUrl": "https://localhost:5173",
 "RedirectUrl": "",
 "LaunchCommand": "npm run dev",
-"WorkingDirectory": "C:\\Users\\User\\source\\repos\\WorkWell\\WorkWell.Server\\..\\workwell.client",
+"WorkingDirectory": "C:\\Users\\User\\Documents\\0ReactGithub\\workwell-admin\\WorkWell.Server\\..\\workwell.client",
 "MaxTimeoutInSeconds": "120",
 "KeepRunning": "false"
 }
