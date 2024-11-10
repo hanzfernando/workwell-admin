@@ -1,24 +1,48 @@
-﻿namespace WorkWell.Server.Models
+﻿using Google.Cloud.Firestore;
+using System.Text.Json.Serialization;
+
+namespace WorkWell.Server.Models
 {
+    [FirestoreData]  // Marks the class as a Firestore document
     public class Routine
     {
-        public required string RoutineId { get; set; } // Routine ID, e.g., "routine123"
+        [FirestoreProperty]  // Marks this property to be saved in Firestore
+        public string? RoutineId { get; set; } // Routine ID, e.g., "routine123"
+
+        [FirestoreProperty]
         public required string Name { get; set; }
-        public required string TargetArea { get; set; }
+
+        [FirestoreProperty]
+        [JsonConverter(typeof(JsonStringEnumConverter))] // Ensure this converts strings to enum
+        public required TargetArea TargetArea { get; set; }
+
+        [FirestoreProperty]
         public string? AssignedTo { get; set; } // User ID reference
-        public DateTime CreatedAt { get; set; }
+
+        [FirestoreProperty]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // List of exercises in the routine
+        [FirestoreProperty]
         public List<RoutineExercise> Exercises { get; set; } = new List<RoutineExercise>();
     }
 
     // Sub-model for each exercise in the routine
+    [FirestoreData]  // Marks this class as a Firestore document
     public class RoutineExercise
     {
+        [FirestoreProperty]
         public required string ExerciseId { get; set; } // Reference to Exercise ID, e.g., "E001"
+
+        [FirestoreProperty]
         public int Reps { get; set; }
+
+        [FirestoreProperty]
         public int Sets { get; set; }
+
+        [FirestoreProperty]
         public int Rest { get; set; } // Rest time in seconds
     }
+
 
 }

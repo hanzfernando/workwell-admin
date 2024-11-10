@@ -1,5 +1,6 @@
 ﻿using Google.Cloud.Firestore;
 using System;
+using System.Text.Json.Serialization;
 
 namespace WorkWell.Server.Models
 {
@@ -16,9 +17,17 @@ namespace WorkWell.Server.Models
         public required string Description { get; set; }
 
         [FirestoreProperty]
-        public required string TargetArea { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))] // Ensure this converts strings to enum
+        public required TargetArea TargetArea { get; set; }
 
         [FirestoreProperty]  // Optional: Store `CreatedDate` if it's part of the document
-        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    }
+
+    public enum TargetArea
+    {
+        Neck,       // 0
+        Shoulder,   // 1
+        LowerBack,  // 2
     }
 }

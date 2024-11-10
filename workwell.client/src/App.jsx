@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 function App() {
     return (
-        <h1>Hello World</h1>
+        <h1 className="text-4xl">Hello World</h1>
     )
         
 

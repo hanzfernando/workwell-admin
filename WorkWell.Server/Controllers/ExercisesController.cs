@@ -6,17 +6,17 @@ namespace WorkWell.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ExerciseController : ControllerBase
+    public class ExercisesController : ControllerBase
     {
         private readonly ExerciseService _exerciseService;
 
         // Constructor with dependency injection
-        public ExerciseController(ExerciseService exerciseService)
+        public ExercisesController(ExerciseService exerciseService)
         {
             _exerciseService = exerciseService;
         }
 
-        // GET: api/exercise/{id}
+        // GET: api/exercises/{id}
         [HttpGet("{exerciseId}")]
         public async Task<ActionResult<Exercise>> GetExercise(string exerciseId)
         {
@@ -28,7 +28,7 @@ namespace WorkWell.Server.Controllers
             return Ok(exercise);
         }
 
-        // GET: api/exercise
+        // GET: api/exercises
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Exercise>>> GetAllExercises()
         {
@@ -36,26 +36,32 @@ namespace WorkWell.Server.Controllers
             return Ok(exercises);
         }
 
-        // POST: api/exercise
+        // POST: api/exercises
         [HttpPost]
         public async Task<ActionResult> AddExercise([FromBody] Exercise exercise)
         {
             if (exercise == null)
             {
-                return BadRequest();
+                return BadRequest("Invalid input data.");
+            }
+
+            // Check for invalid enum parsing
+            if (!Enum.IsDefined(typeof(TargetArea), exercise.TargetArea))
+            {
+                return BadRequest($"Invalid exercise type: {exercise.TargetArea}");
             }
 
             await _exerciseService.AddExerciseAsync(exercise);
             return CreatedAtAction(nameof(GetExercise), new { exerciseId = exercise.ExerciseId }, exercise);
         }
 
-        // PUT: api/exercise/{id}
+        // PUT: api/exercises/{id}
         [HttpPut("{exerciseId}")]
         public async Task<ActionResult> UpdateExercise(string exerciseId, [FromBody] Exercise exercise)
         {
             if (exerciseId != exercise.ExerciseId)
             {
-                return BadRequest();
+                return BadRequest("Exercise ID mismatch.");
             }
 
             var existingExercise = await _exerciseService.GetExerciseAsync(exerciseId);
@@ -64,11 +70,17 @@ namespace WorkWell.Server.Controllers
                 return NotFound();
             }
 
+            // Check for invalid enum parsing
+            if (!Enum.IsDefined(typeof(TargetArea), exercise.TargetArea))
+            {
+                return BadRequest($"Invalid exercise type: {exercise.TargetArea}");
+            }
+
             await _exerciseService.UpdateExerciseAsync(exercise);
             return NoContent();
         }
 
-        // DELETE: api/exercise/{id}
+        // DELETE: api/exercises/{id}
         [HttpDelete("{exerciseId}")]
         public async Task<ActionResult> DeleteExercise(string exerciseId)
         {

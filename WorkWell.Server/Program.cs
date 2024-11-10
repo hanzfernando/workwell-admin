@@ -31,6 +31,8 @@ builder.Services.AddSingleton(FirestoreDb.Create(projectId));  // Replace "your-
 
 // Register ExerciseService for Dependency Injection
 builder.Services.AddScoped<ExerciseService>();
+builder.Services.AddScoped<RoutineService>();
+builder.Services.AddScoped<AuthService>();
 
 var app = builder.Build();
 
