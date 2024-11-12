@@ -50,13 +50,13 @@ const logIn = async (email, password) => {
 
         // Get the Firebase ID token
         const idToken = await user.getIdToken();
-        setToken(idToken);
+        //setToken(idToken);
 
         // Call the verifyToken method to verify the ID token and get user info
-        const userInfo = await verifyToken(idToken);
+        //const userInfo = await verifyToken(idToken);
 
         // Return both the userInfo and the idToken
-        return { userInfo, idToken };
+        return { idToken };
     } catch (error) {
         console.error('Error logging in:', error);
         throw new Error(error.message);

@@ -11,19 +11,19 @@ const LoginPage = () => {
     const { user } = useAuthContext();
     const navigate = useNavigate();
 
-    useEffect(() => {
-        // Redirect if user is logged in and has role 0
-        if (user && user.role === 0) {
-            navigate('/dashboard');
-        }
-    }, [user, navigate]);
+    //useEffect(() => {
+    //    // Redirect if user is logged in and has role 0
+    //    if (user && user.role === 0) {
+    //        navigate('/dashboard');
+    //    }
+    //}, [user, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
             await login(email, password)
             console.log("Log successful")
-            //navigate("/login") // Redirect to login page after successful signup
+            navigate("/dashboard")
         } catch (error) {
             console.log(error)
         }

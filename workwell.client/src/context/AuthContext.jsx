@@ -16,7 +16,6 @@ const authReducer = (state, action) => {
     switch (action.type) {
         case 'LOGIN':
             return {
-                ...state,
                 user: action.payload?.user || null,  // Safely access user property
                 token: action.payload?.token || null,
                 loading: false,
@@ -25,7 +24,7 @@ const authReducer = (state, action) => {
         case 'LOGOUT':
             return { ...initialState };
         case 'SET_LOADING':
-            return { ...state, loading: action.payload };
+            return { loading: action.payload };
         default:
             return state;
     }
