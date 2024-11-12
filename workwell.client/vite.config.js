@@ -43,12 +43,20 @@ export default defineConfig({
     },
     server: {
         proxy: {
-            '^/weatherforecast': {
-                target,
-                secure: false
-            }
+            '^/api/auth': {
+                target: 'https://localhost:7054', 
+                secure: false,
+            },
+            '^/api/exercises': {
+                target: 'https://localhost:7054', 
+                secure: false,
+            },
+            '^/api/routines': {
+                target: 'https://localhost:7054', 
+                secure: false,
+            },
         },
-        port: 5173,
+        port: 5174,
         https: {
             key: fs.readFileSync(keyFilePath),
             cert: fs.readFileSync(certFilePath),

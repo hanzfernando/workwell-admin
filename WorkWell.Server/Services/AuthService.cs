@@ -3,6 +3,7 @@ using Google.Cloud.Firestore;
 using WorkWell.Server.Models;
 using System.Threading.Tasks;
 using WorkWell.Server.Models.WorkWell.Server.Models;
+using System.Diagnostics;
 
 namespace WorkWell.Server.Services
 {
@@ -16,33 +17,34 @@ namespace WorkWell.Server.Services
         }
 
         // Method for signup (Create new user in Firebase Authentication and Firestore)
-        public async Task<string> SignUpAsync(string email, string password, UserRole role, string firstName, string lastName)
+        public async Task<string> SignUpAsync(SignUpRequest request)
         {
+            Debug.WriteLine("Service");
+
             try
             {
                 // Create user with Firebase Authentication
-                var userRecord = await FirebaseAuth.DefaultInstance.CreateUserAsync(new UserRecordArgs
-                {
-                    Email = email,
-                    Password = password,
-                });
+                //var userRecord = await FirebaseAuth.DefaultInstance.CreateUserAsync(new UserRecordArgs
+                //{
+                //    Email = email,
+                //    Password = password,
+                //});
 
-                // Send email verification
-                //await SendEmailVerification(userRecord.Uid);
+
 
                 // Create a new user document in Firestore, including firstName, lastName, and role
-                var userRef = _firestoreDb.Collection("users").Document(userRecord.Uid);
+                var userRef = _firestoreDb.Collection("users").Document(request.Uid);
                 await userRef.SetAsync(new User
                 {
-                    Uid = userRecord.Uid,
-                    Email = email,
-                    FirstName = firstName,    // Save firstName in Firestore
-                    LastName = lastName,      // Save lastName in Firestore
-                    Role = role,              // Assign the role during user creation
+                    Uid = request.Uid,
+                    Email = request.Email,
+                    FirstName = request.FirstName,    // Save firstName in Firestore
+                    LastName = request.LastName,      // Save lastName in Firestore
+                    Role = request.Role,              // Assign the role during user creation
                 });
 
                 // Return the Firebase Custom Token
-                var customToken = await FirebaseAuth.DefaultInstance.CreateCustomTokenAsync(userRecord.Uid);
+                var customToken = await FirebaseAuth.DefaultInstance.CreateCustomTokenAsync(request.Uid);
                 return customToken;
             }
             catch (Exception ex)
@@ -50,19 +52,7 @@ namespace WorkWell.Server.Services
                 throw new Exception($"Error signing up: {ex.Message}");
             }
         }
-
-
-        private async Task SendEmailVerification(string uid)
-        {
-            var userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
-
-            // Here you would invoke Firebase's REST API to send the email verification link. 
-            // Since C# SDK doesn't have this feature, you could use the Firebase REST API.
-
-            var link = await FirebaseAuth.DefaultInstance.GenerateEmailVerificationLinkAsync(userRecord.Email);
-            // You can now send this link to the user via email manually or use a custom email service.
-        }
-
+    
         // Method for login (Verify user with Firebase Authentication)
         public async Task<string> LogInAsync(string email, string password)
         {
@@ -75,10 +65,10 @@ namespace WorkWell.Server.Services
                 }
 
                 // Check if the user's email is verified
-                //if (!userRecord.EmailVerified)
-                //{
-                //    throw new Exception("Please verify your email before logging in.");
-                //}
+                if (!userRecord.EmailVerified)
+                {
+                    throw new Exception("Please verify your email before logging in.");
+                }
 
                 // Return the Firebase Custom Token if email is verified
                 var customToken = await FirebaseAuth.DefaultInstance.CreateCustomTokenAsync(userRecord.Uid);
@@ -109,10 +99,13 @@ namespace WorkWell.Server.Services
 
                 // Combine FirstName and LastName into DisplayName and return the user info
                 var user = userDoc.ConvertTo<User>();
+                Debug.WriteLine("Role");
+                Debug.WriteLine(Enum.IsDefined(typeof(UserRole), user.Role) ? (UserRole)user.Role : UserRole.User);
                 return new FirebaseUser
                 {
                     UserId = uid,
                     Email = user.Email,
+                    Role = Enum.IsDefined(typeof(UserRole), user.Role) ? (UserRole)user.Role : UserRole.User,
                     DisplayName = $"{user.FirstName} {user.LastName}" // Set the concatenated FirstName and LastName
                 };
             }

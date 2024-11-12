@@ -3,6 +3,7 @@ using WorkWell.Server.Services;
 using WorkWell.Server.Models;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.Data;
+using System.Diagnostics;
 
 namespace WorkWell.Server.Controllers
 {
@@ -17,10 +18,13 @@ namespace WorkWell.Server.Controllers
             _authService = authService;
         }
 
-        // POST: api/Auth/signup
+        // POST: api/auth/signup
         [HttpPost("signup")]
         public async Task<IActionResult> SignUp([FromBody] SignUpRequest request)
         {
+
+            Debug.WriteLine($"Email: {request.Email}, FirstName: {request.FirstName}, LastName: {request.LastName}");
+
             if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
             {
                 return BadRequest("Email and Password are required.");
@@ -29,10 +33,10 @@ namespace WorkWell.Server.Controllers
             try
             {
                 // Default role to User if not passed
-                var role = request.Role == UserRole.Admin ? request.Role : UserRole.User;
+                request.Role = request.Role == UserRole.Admin ? request.Role : UserRole.User;
 
                 // Ensure the correct number of arguments is passed
-                var token = await _authService.SignUpAsync(request.Email, request.Password, role, request.FirstName, request.LastName);
+                var token = await _authService.SignUpAsync(request);
                 return Ok(new { Token = token });
             }
             catch (Exception ex)
@@ -40,6 +44,7 @@ namespace WorkWell.Server.Controllers
                 return BadRequest($"Error during signup: {ex.Message}");
             }
         }
+
 
 
         // POST: api/Auth/login
@@ -66,6 +71,7 @@ namespace WorkWell.Server.Controllers
         [HttpPost("verifyToken")]
         public async Task<IActionResult> VerifyToken([FromBody] VerifyTokenRequest request)
         {
+            Console.WriteLine(request.IdToken);
             if (string.IsNullOrEmpty(request.IdToken))
             {
                 return BadRequest("ID Token is required.");
@@ -74,6 +80,7 @@ namespace WorkWell.Server.Controllers
             try
             {
                 var user = await _authService.VerifyTokenAsync(request.IdToken);
+                Debug.WriteLine(user.Role);
                 return Ok(user);
             }
             catch (Exception ex)

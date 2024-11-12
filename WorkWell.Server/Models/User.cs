@@ -23,12 +23,13 @@ namespace WorkWell.Server.Models
             public UserRole Role { get; set; } = UserRole.User; // Role of the user (Admin, User)
 
             [FirestoreProperty]
-            public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+            public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
         }
     }
 
     public class SignUpRequest
     {
+        public required string Uid { get; set; }
         public required string Email { get; set; }
         public required string Password { get; set; }
         public UserRole Role { get; set; } = UserRole.User; // Default to 'User' if not provided
@@ -52,6 +53,7 @@ namespace WorkWell.Server.Models
     {
         public required string UserId { get; set; }
         public required string Email { get; set; }
+        public UserRole Role { get; set; } 
         public required string DisplayName { get; set; }
     }
 
