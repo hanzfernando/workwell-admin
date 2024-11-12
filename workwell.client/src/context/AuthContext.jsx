@@ -16,8 +16,8 @@ const authReducer = (state, action) => {
     switch (action.type) {
         case 'LOGIN':
             return {
-                user: action.payload?.user || null,  // Safely access user property
-                token: action.payload?.token || null,
+                user: action.payload?.user,
+                token: action.payload?.token,
                 loading: false,
                 error: null,
             };
@@ -37,44 +37,33 @@ const AuthProvider = ({ children }) => {
     const [state, dispatch] = useReducer(authReducer, initialState);
 
     useEffect(() => {
-        const idToken = getToken(); // Get the token from localStorage or another source
-        if (idToken) {
-            // Verify the token and fetch the user details
-            verifyToken(idToken) 
-                .then(user => {
+        const checkToken = async () => {
+            const token = getToken();
+            if (token) {
+                try {
+                    const user = await verifyToken(token);
                     if (user) {
-                        // Dispatch LOGIN action with the user details
-                        console.log(user)
-                        dispatch({
-                            type: 'LOGIN',
-                            payload: { user, token: idToken },
-                        });
+                        dispatch({ type: 'LOGIN', payload: { user, token } });
                     } else {
-                        // Handle case where user is not found or token is invalid
-                        dispatch({
-                            type: 'SET_LOADING',
-                            payload: false,
-                        });
+                        removeToken(); // If verification fails, clear the token
+                        dispatch({ type: 'SET_LOADING', payload: false });
                     }
-                })
-                .catch(error => {
-                    console.error('Failed to verify token:', error);
-                    dispatch({
-                        type: 'SET_LOADING',
-                        payload: false,
-                    });
-                });
-        } else {
-            dispatch({
-                type: 'SET_LOADING',
-                payload: false,
-            });
-        }
+                } catch (error) {
+                    console.error('Error verifying token:', error);
+                    removeToken();
+                    dispatch({ type: 'SET_LOADING', payload: false });
+                }
+            } else {
+                dispatch({ type: 'SET_LOADING', payload: false });
+            }
+        };
+
+        checkToken(); // Run on app load
     }, []);
 
     return (
         <AuthContext.Provider value={{ ...state, dispatch }}>
-            {children}
+            {!state.loading && children}
         </AuthContext.Provider>
     );
 };

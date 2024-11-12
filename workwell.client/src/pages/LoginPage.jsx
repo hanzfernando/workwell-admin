@@ -9,7 +9,7 @@ const LoginPage = () => {
     const [password, setPassword] = useState('')
     const { login } = useLogin();
     const { user } = useAuthContext();
-    const navigate = useNavigate();
+    //const navigate = useNavigate();
 
     //useEffect(() => {
     //    // Redirect if user is logged in and has role 0
