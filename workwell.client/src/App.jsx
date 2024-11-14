@@ -3,33 +3,67 @@ import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider, N
 
 // Import Pages
 import DashboardPage from './pages/DashboardPage';
-import UsersPage from './pages/UsersPage';
+import UsersPage from './pages/PatientsPage';
 import RoutinesPage from './pages/RoutinesPage';
 import ExercisesPage from './pages/ExercisesPage';
 import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
+import NotFoundPage from './pages/NotFoundPage';
 
 // Import Layouts
 import MainLayout from './layouts/MainLayout';
 
-import { useAuthContext } from "./hooks/useAuthContext.js"
+// Import Auth Context
+import { useAuthContext } from './hooks/useAuthContext';
+
+// Protected Route Wrapper for Admins
+const AdminRoute = ({ children }) => {
+    const { user } = useAuthContext();
+
+    if (!user) {
+        return <Navigate to="/login" replace />;
+    }
+
+    if (user.role !== 0) {
+        return <Navigate to="/login" replace />;
+    }
+
+    return children;
+};
+
+// Public Route Wrapper
+const PublicRoute = ({ children }) => {
+    const { user } = useAuthContext();
+
+    if (user) {
+        // Redirect admins to dashboard and others to login (adjust as needed)
+        return <Navigate to={user.role === 0 ? '/dashboard' : '/login'} replace />;
+    }
+
+    return children;
+};
 
 const App = () => {
-    const { user } = useAuthContext();
-    console.log(user); // Add this line to log user data
-
     const router = createBrowserRouter(
         createRoutesFromElements(
             <>
-                {/* Public route for Login */}
-                <Route path="/login" element={<LoginPage />} />
+                {/* Public Routes */}
+                <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+                <Route path="/signup" element={<PublicRoute><SignupPage /></PublicRoute>} />
 
-                {/* Protected Routes within MainLayout */}
-                <Route path='/' element={user ? <MainLayout /> : <Navigate to='/login' />}>
-                    <Route path="/dashboard" element={user ? <DashboardPage /> : <Navigate to='/login' />} />
-                    <Route path="/users" element={user && user.role === 0 ? <UsersPage /> : <Navigate to='/login' />} />
-                    <Route path="/routines" element={user && user.role === 0 ? <RoutinesPage /> : <Navigate to='/login' />} />
-                    <Route path="/exercises" element={user && user.role === 0 ? <ExercisesPage /> : <Navigate to='/login' />} />
+                {/* Default Route */}
+                <Route path="/" element={<Navigate to="/login" replace />} />
+
+                {/* Protected Routes for Admins */}
+                <Route element={<AdminRoute><MainLayout /></AdminRoute>}>
+                    <Route path="/dashboard" element={<DashboardPage />} />
+                    <Route path="/users" element={<UsersPage />} />
+                    <Route path="/routines" element={<RoutinesPage />} />
+                    <Route path="/exercises" element={<ExercisesPage />} />
                 </Route>
+
+                {/* Catch-all Route for 404 - Not Found */}
+                <Route path="*" element={<NotFoundPage />} />
             </>
         )
     );

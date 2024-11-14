@@ -46,6 +46,7 @@ builder.Services.AddSingleton(FirestoreDb.Create(projectId));  // Replace "your-
 builder.Services.AddScoped<ExerciseService>();
 builder.Services.AddScoped<RoutineService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<UserService>();
 
 var app = builder.Build();
 app.UseHttpsRedirection();

@@ -1,17 +1,30 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { useLogout } from '../hooks/useLogout'; // Import the useLogout hook
+import { useAuthContext } from '../hooks/useAuthContext'; // To access user info
 
 const SideNavigationBar = () => {
+    const { logout } = useLogout();
+    const { user } = useAuthContext(); // Get user info
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+        } catch (error) {
+            console.error('Error during logout:', error);
+        }
+    };
+
     return (
         <div className="flex flex-col items-start">
             {/* Profile Section */}
             <div className="flex items-center mb-8">
-                <div className="w-12 h-12 bg-gray-400 rounded-full mr-3"></div>
-                <span className="text-lg font-medium">Clinic Admin</span>
+                <div className="w-12 h-12 rounded-full mr-3 bg-accent-aqua"></div>
+                <span className="text-lg font-medium">{user?.role === 0 ? 'Clinic Admin' : 'User'}</span>
             </div>
 
             {/* Greeting */}
-            <p className="mb-6 text-lg font-semibold">Hello, Display Name</p>
+            <p className="mb-6 text-lg font-semibold">Hello, {user?.displayName || 'Guest'}</p>
 
             {/* Navigation Links */}
             <nav className="space-y-4 w-full">
@@ -51,6 +64,14 @@ const SideNavigationBar = () => {
                     Exercises
                 </NavLink>
             </nav>
+
+            {/* Logout Button */}
+            <button
+                onClick={handleLogout}
+                className="mt-6 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 w-full"
+            >
+                Logout
+            </button>
         </div>
     );
 };

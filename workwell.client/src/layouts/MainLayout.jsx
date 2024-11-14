@@ -4,14 +4,14 @@ import SideNavigationBar from '../components/SideNavigationBar.jsx';
 
 const MainLayout = () => {
     return (
-        <div className="flex h-screen bg-gray-200">
+        <div className="flex h-screen  bg-neutral-light">
             {/* Sidebar */}
-            <div className="w-1/5 bg-gray-100 p-4">
+            <div className="w-1/5 p-4">
                 <SideNavigationBar />
             </div>
 
             {/* Main content */}
-            <div className="w-4/5 p-6 bg-gray-300">
+            <div className="w-4/5 p-6">
                 <Outlet />
             </div>
         </div>

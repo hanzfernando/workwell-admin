@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import { useAuthContext } from './useAuthContext';
-import { logIn, verifyToken, } from '../services/authService';
-//import { useNavigate } from "react-router-dom"
-
-import { setToken, getToken } from '../utils/authUtil';
+import { logIn, verifyToken } from '../services/authService';
+import { setToken } from '../utils/authUtil';
 
 const useLogin = () => {
     const { dispatch } = useAuthContext();
@@ -13,33 +11,27 @@ const useLogin = () => {
     const login = async (email, password) => {
         setLoading(true);
         setError(null);
-
         try {
             const { idToken } = await logIn(email, password);
-            // Store token and user UID in localStorage or context if needed
             setToken(idToken);
-            const storedToken = getToken();
-            const user = await verifyToken(storedToken);
-            //localStorage.setItem('userUid', user.uid);
 
-            // Dispatch login action
+            const user = await verifyToken(idToken);
+            if (user.role === 1) {
+                throw new Error('Unauthorized access: User role not permitted');
+            }
+
             dispatch({
                 type: 'LOGIN',
-                payload: { user, token: storedToken },
+                payload: { user, token: idToken },
             });
-
-            //setLoading(false);
-            //window.location.reload();
-            // Navigate to the dashboard after login
-            //navigate('/dashboard', { replace: true }); // Navigate after state is updated
         } catch (error) {
-            setError(error.message);
+            setError(error.message || 'Login failed');
+        } finally {
             setLoading(false);
         }
     };
 
-
     return { login, loading, error };
-}
+};
 
 export { useLogin };

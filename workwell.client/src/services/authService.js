@@ -44,18 +44,9 @@ const signUp = async (firstName, lastName, email, password) => {
 // Method to handle login
 const logIn = async (email, password) => {
     try {
-        // Sign in with Firebase Auth
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-
-        // Get the Firebase ID token
         const idToken = await user.getIdToken();
-        //setToken(idToken);
-
-        // Call the verifyToken method to verify the ID token and get user info
-        //const userInfo = await verifyToken(idToken);
-
-        // Return both the userInfo and the idToken
         return { idToken };
     } catch (error) {
         console.error('Error logging in:', error);

@@ -1,69 +1,74 @@
-import { createContext, useReducer, useEffect, useState } from 'react';
+import { createContext, useReducer, useEffect } from 'react';
 import { verifyToken } from '../services/authService.js';
-import { getToken } from '../utils/authUtil.js'; // Ensure this works
+import { getToken, removeToken, setToken } from '../utils/authUtil.js';
 import PropTypes from 'prop-types';
 
 // Initial state
 const initialState = {
     user: null,
     token: null,
-    loading: true, // Set loading to true initially
+    loading: true,
     error: null,
 };
 
-// Reducer to handle login, logout, and loading states
+// Reducer
 const authReducer = (state, action) => {
     switch (action.type) {
         case 'LOGIN':
             return {
-                user: action.payload?.user,
-                token: action.payload?.token,
+                ...state,
+                user: action.payload.user,
+                token: action.payload.token,
                 loading: false,
                 error: null,
             };
         case 'LOGOUT':
-            return { ...initialState };
+            return { ...initialState, loading: false };
         case 'SET_LOADING':
-            return { loading: action.payload };
+            return { ...state, loading: action.payload };
+        case 'SET_ERROR':
+            return { ...state, error: action.payload, loading: false };
         default:
             return state;
     }
 };
 
-
+// Context creation
 const AuthContext = createContext();
 
+// Provider
 const AuthProvider = ({ children }) => {
     const [state, dispatch] = useReducer(authReducer, initialState);
 
     useEffect(() => {
-        const checkToken = async () => {
+        const initializeAuth = async () => {
             const token = getToken();
             if (token) {
                 try {
                     const user = await verifyToken(token);
-                    if (user) {
-                        dispatch({ type: 'LOGIN', payload: { user, token } });
+                    if (user.role === 1) {
+                        console.warn('Unauthorized user. Logging out...');
+                        await auth.signOut();
+                        removeToken();
+                        dispatch({ type: 'LOGOUT' });
                     } else {
-                        removeToken(); // If verification fails, clear the token
-                        dispatch({ type: 'SET_LOADING', payload: false });
+                        dispatch({ type: 'LOGIN', payload: { user, token } });
                     }
                 } catch (error) {
-                    console.error('Error verifying token:', error);
+                    console.error('Error during token verification:', error);
                     removeToken();
-                    dispatch({ type: 'SET_LOADING', payload: false });
+                    dispatch({ type: 'SET_ERROR', payload: 'Session expired. Please log in again.' });
                 }
-            } else {
-                dispatch({ type: 'SET_LOADING', payload: false });
             }
+            dispatch({ type: 'SET_LOADING', payload: false });
         };
 
-        checkToken(); // Run on app load
+        initializeAuth();
     }, []);
 
     return (
         <AuthContext.Provider value={{ ...state, dispatch }}>
-            {!state.loading && children}
+            {state.loading ? null : children}
         </AuthContext.Provider>
     );
 };
