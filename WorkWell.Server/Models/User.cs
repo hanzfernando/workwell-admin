@@ -24,6 +24,9 @@ namespace WorkWell.Server.Models
 
             [FirestoreProperty]
             public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+
+            //// Computed property for full name
+            //public string FullName => $"{FirstName} {LastName}";
         }
     }
 
@@ -55,6 +58,11 @@ namespace WorkWell.Server.Models
         public required string Email { get; set; }
         public UserRole Role { get; set; } 
         public required string DisplayName { get; set; }
+    }
+
+    public class AssignUserRequest
+    {
+        public required string AssignedTo { get; set; } // User ID to assign to the routine
     }
 
     public enum UserRole {

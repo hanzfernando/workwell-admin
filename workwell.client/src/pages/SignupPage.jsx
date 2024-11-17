@@ -14,7 +14,7 @@ const SignupPage = () => {
         e.preventDefault()
         try {
             await signup(firstName, lastName, email, password)
-            console.log("Signup successful")
+            //console.log("Signup successful")
             //navigate("/login") // Redirect to login page after successful signup
         } catch (error) {
             console.log(error)

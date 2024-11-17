@@ -18,6 +18,8 @@ namespace WorkWell.Server.Models
 
         [FirestoreProperty]
         public string? AssignedTo { get; set; } // User ID reference
+        // populate this field with the user ID of the user who the routine is assigned to
+        public string? AssignedName { get; set; } // User name reference
 
         [FirestoreProperty]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -33,6 +35,10 @@ namespace WorkWell.Server.Models
     {
         [FirestoreProperty]
         public required string ExerciseId { get; set; } // Reference to Exercise ID, e.g., "E001"
+
+        // populate this field with the exercise detaail of the exercise in the routine
+        public string? ExerciseName { get; set; } // Exercise name reference
+        public string? ExerciseDescription { get; set; } // Exercise description reference
 
         [FirestoreProperty]
         public int Reps { get; set; }

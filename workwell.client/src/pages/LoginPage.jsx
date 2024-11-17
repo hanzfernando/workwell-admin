@@ -19,7 +19,7 @@ const LoginPage = () => {
         try {
             // Try logging in
             await login(email, password);
-            console.log("Login successful");
+            //console.log("Login successful");
 
             // Check if the user is an admin
             if (user?.role === 0) {
@@ -29,7 +29,7 @@ const LoginPage = () => {
                 throw new Error('Unauthorized access: User role not permitted');
             }
         } catch (error) {
-            console.error(error);
+            //console.error(error);
 
             // Handle specific error message
             if (error.message === 'Unauthorized access: User role not permitted') {

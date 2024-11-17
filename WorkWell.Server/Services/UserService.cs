@@ -1,5 +1,7 @@
 ﻿using Google.Cloud.Firestore;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using WorkWell.Server.Models;
 using WorkWell.Server.Models.WorkWell.Server.Models;
@@ -14,14 +16,20 @@ namespace WorkWell.Server.Services
         {
             _firestoreDb = firestoreDb;
         }
-        // GET /api/users
+
+        // GET /api/users - Filtered to return only users with role 'User'
         public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
             try
             {
                 var query = _firestoreDb.Collection("users");
                 var snapshot = await query.GetSnapshotAsync();
-                return snapshot.Documents.Select(doc => doc.ConvertTo<User>());
+                var users = snapshot.Documents.Select(doc => doc.ConvertTo<User>());
+
+                // Filter users based on role 'User'
+                var filteredUsers = users.Where(u => u.Role == UserRole.User).ToList();
+
+                return filteredUsers;
             }
             catch (Exception ex)
             {
@@ -30,14 +38,25 @@ namespace WorkWell.Server.Services
             }
         }
 
-        // GET /api/users/{uid}
+        // GET /api/users/{uid} - Fetch single user, ensure role is 'User'
         public async Task<User?> GetUserAsync(string uid)
         {
             try
             {
                 var docRef = _firestoreDb.Collection("users").Document(uid);
                 var snapshot = await docRef.GetSnapshotAsync();
-                return snapshot.Exists ? snapshot.ConvertTo<User>() : null;
+
+                if (!snapshot.Exists) return null;
+
+                var user = snapshot.ConvertTo<User>();
+
+                // Check if the user has role 'User'
+                if (user.Role == UserRole.User)
+                {
+                    return user;
+                }
+
+                return null;  // Return null if user role is not 'User'
             }
             catch (Exception ex)
             {
@@ -46,6 +65,4 @@ namespace WorkWell.Server.Services
             }
         }
     }
-
-
 }

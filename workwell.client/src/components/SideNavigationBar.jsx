@@ -18,13 +18,10 @@ const SideNavigationBar = () => {
     return (
         <div className="flex flex-col items-start">
             {/* Profile Section */}
-            <div className="flex items-center mb-8">
+            <div className="flex items-center w-full pb-4 mb-4 border-b border-gray-300">
                 <div className="w-12 h-12 rounded-full mr-3 bg-accent-aqua"></div>
                 <span className="text-lg font-medium">{user?.role === 0 ? 'Clinic Admin' : 'User'}</span>
-            </div>
-
-            {/* Greeting */}
-            <p className="mb-6 text-lg font-semibold">Hello, {user?.displayName || 'Guest'}</p>
+            </div>           
 
             {/* Navigation Links */}
             <nav className="space-y-4 w-full">

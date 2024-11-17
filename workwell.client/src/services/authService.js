@@ -8,7 +8,7 @@ const signUp = async (firstName, lastName, email, password) => {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         // Get the signed-in user
         const user = userCredential.user;
-        console.log("User created and verification email sent.");
+        //console.log("User created and verification email sent.");
         //await sendEmailVerification(user)
 
 
@@ -29,7 +29,7 @@ const signUp = async (firstName, lastName, email, password) => {
     
 
         const result = await response.json();
-        console.log("User created and verification email sent.");
+        //console.log("User created and verification email sent.");
         await sendEmailVerification(user);
 
         return result;
@@ -74,7 +74,7 @@ const verifyToken = async (idToken) => {
         const userInfo = await response.json();
 
         // Log userInfo to check what it contains
-        console.log(userInfo);
+        //console.log(userInfo);
 
         // Return userInfo
         return userInfo;

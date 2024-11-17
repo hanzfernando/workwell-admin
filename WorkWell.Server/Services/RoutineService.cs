@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WorkWell.Server.Models.WorkWell.Server.Models;
 
 namespace WorkWell.Server.Services
 {
@@ -41,7 +42,12 @@ namespace WorkWell.Server.Services
             {
                 var docRef = _firestoreDb.Collection("routines").Document(routineId);
                 var snapshot = await docRef.GetSnapshotAsync();
-                return snapshot.Exists ? snapshot.ConvertTo<Routine>() : null;
+
+                if (!snapshot.Exists) return null;
+
+                var routine = snapshot.ConvertTo<Routine>();
+                routine = await PopulateAssignedUserDetailsAsync(routine);
+                return await PopulateExerciseDetailsAsync(routine);
             }
             catch (Exception ex)
             {
@@ -57,7 +63,16 @@ namespace WorkWell.Server.Services
             {
                 var query = _firestoreDb.Collection("routines");
                 var snapshot = await query.GetSnapshotAsync();
-                return snapshot.Documents.Select(doc => doc.ConvertTo<Routine>());
+                var routines = snapshot.Documents.Select(doc => doc.ConvertTo<Routine>()).ToList();
+
+                // Populate user and exercise details for each routine
+                var tasks = routines.Select(async routine =>
+                {
+                    routine = await PopulateAssignedUserDetailsAsync(routine);
+                    return await PopulateExerciseDetailsAsync(routine);
+                });
+
+                return await Task.WhenAll(tasks); // Populate details in parallel
             }
             catch (Exception ex)
             {
@@ -95,5 +110,95 @@ namespace WorkWell.Server.Services
                 throw new Exception("Failed to delete routine. Please try again later.");
             }
         }
+
+        // Helper Method: Populate Assigned User Details
+        private async Task<Routine> PopulateAssignedUserDetailsAsync(Routine routine)
+        {
+            if (string.IsNullOrEmpty(routine.AssignedTo))
+                return routine; // No user assigned, skip population
+
+            try
+            {
+                var userDocRef = _firestoreDb.Collection("users").Document(routine.AssignedTo);
+                var userSnapshot = await userDocRef.GetSnapshotAsync();
+
+                if (userSnapshot.Exists)
+                {
+                    var user = userSnapshot.ConvertTo<User>();
+                    routine.AssignedName = $"{user.FirstName} {user.LastName}";
+                }
+                else
+                {
+                    Console.WriteLine($"User with UID {routine.AssignedTo} not found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error populating user details for UID {routine.AssignedTo}: {ex.Message}");
+            }
+
+            return routine;
+        }
+
+        // Helper Method: Populate Exercise Details for Each Exercise in the Routine
+        private async Task<Routine> PopulateExerciseDetailsAsync(Routine routine)
+        {
+            foreach (var routineExercise in routine.Exercises)
+            {
+                try
+                {
+                    var exerciseDocRef = _firestoreDb.Collection("exercises").Document(routineExercise.ExerciseId);
+                    var exerciseSnapshot = await exerciseDocRef.GetSnapshotAsync();
+
+                    if (exerciseSnapshot.Exists)
+                    {
+                        var exercise = exerciseSnapshot.ConvertTo<Exercise>();
+                        routineExercise.ExerciseName = exercise.Name;
+                        routineExercise.ExerciseDescription = exercise.Description;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Exercise with ID {routineExercise.ExerciseId} not found.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error populating exercise details for ID {routineExercise.ExerciseId}: {ex.Message}");
+                }
+            }
+
+            return routine;
+        }
+
+        // PATCH /api/routines/{id}/assign
+        public async Task UpdateAssignedUserAsync(string routineId, string assignedTo)
+        {
+            try
+            {
+                var docRef = _firestoreDb.Collection("routines").Document(routineId);
+                var routine = await docRef.GetSnapshotAsync();
+
+                if (routine.Exists)
+                {
+                    // Update the assignedTo field
+                    var updateData = new Dictionary<string, object>
+                    {
+                        { "AssignedTo", assignedTo }
+                    };
+
+                    await docRef.UpdateAsync(updateData);
+                }
+                else
+                {
+                    throw new Exception("Routine not found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating assigned user for routine {routineId}: {ex.Message}");
+                throw new Exception("Failed to assign user. Please try again later.");
+            }
+        }
+
     }
 }

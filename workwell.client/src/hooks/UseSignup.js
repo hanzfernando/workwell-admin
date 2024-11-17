@@ -13,9 +13,9 @@ const useSignup = () => {
         setError(null);
 
         try {
-            console.log(firstName, lastName, email, password);
+            //console.log(firstName, lastName, email, password);
             const idToken = await signUp(firstName, lastName, email, password); // Make sure signUp is defined in your authService
-            console.log(idToken);
+            //console.log(idToken);
             setToken(idToken);
 
             // Optionally verify the token

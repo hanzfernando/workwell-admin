@@ -1,59 +1,61 @@
-import { createContext, useReducer } from 'react';
+import { createContext, useReducer, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { getPatients } from '../services/patientService'; // Assume this is your API call to fetch patients
 
 const initialState = {
-    users: [],
-    loading: false,
+    patients: [],
+    loading: true,
     error: null
-}
+};
 
-const userReducer = (state, action) => {
+const patientReducer = (state, action) => {
     switch (action.type) {
-        case 'SET_USERS':
+        case 'SET_PATIENTS':
             return {
                 ...state,
-                users: action.payload,
+                patients: action.payload,
                 loading: false,
                 error: null
-            }
-        case 'CREATE_USER':
+            };
+        case 'ERROR':
             return {
                 ...state,
-                users: [...state.users, action.payload],
-                loading: false,
-                error: null
-            }
-        case 'UPDATE_USER':
-            return {
-                ...state,
-                users: state.users.map(user =>
-                    user.id === action.payload.id ? action.payload : user
-                ),
-            }
-        case 'DELETE_USER':
-            return {
-                ...state,
-                users: state.users.filter(user => user.id !== action.payload)
-            }
+                error: action.payload,
+                loading: false
+            };
         default:
             return state;
     }
-}
+};
 
-const UserContext = createContext();
+const PatientContext = createContext();
 
-const UserProvider = ({ children }) => {
-    const [state, dispatch] = useReducer(userReducer, initialState);
+const PatientProvider = ({ children }) => {
+    const [state, dispatch] = useReducer(patientReducer, initialState);
+
+    // Fetch patients when the provider is mounted
+    useEffect(() => {
+        const fetchPatients = async () => {
+            try {
+                const result = await getPatients(); // API call to fetch patients
+                dispatch({ type: 'SET_PATIENTS', payload: result });
+            } catch (error) {
+                dispatch({ type: 'ERROR', payload: error.message });
+            }
+        };
+
+        fetchPatients();
+    }, []); // Run only once when the provider is mounted
 
     return (
-        <UserContext.Provider value={{ state, dispatch }}>
+        <PatientContext.Provider value={{ state, dispatch }}>
             {children}
-        </UserContext.Provider>
-    )
-}
+        </PatientContext.Provider>
+    );
+};
 
-UserProvider.propTypes = {
+PatientProvider.propTypes = {
     children: PropTypes.node.isRequired
-}
+};
 
 export { PatientContext, PatientProvider };

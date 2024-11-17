@@ -1,14 +1,14 @@
-import { UserContext } from "../context/UserContext";
+import { PatientContext } from "../context/PatientContext";
 import { useContext } from "react";
 
-const useUserContext = () => {
-    const context = useContext(UserContext);
+const usePatientContext = () => {
+    const context = useContext(PatientContext);
 
     if (!context) {
-        throw new Error('useAuthContext must be used within an UserProvider');
+        throw new Error('usePatientContext must be used within an PatientProvider');
     }
 
     return context;
 }
 
-export { useUserContext };
+export { usePatientContext };
