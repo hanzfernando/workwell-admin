@@ -34,9 +34,9 @@ namespace WorkWell.Server.Models
     public class RoutineExercise
     {
         [FirestoreProperty]
-        public required string ExerciseId { get; set; } // Reference to Exercise ID, e.g., "E001"
+        public required string ExerciseId { get; set; } 
 
-        // populate this field with the exercise detaail of the exercise in the routine
+        // populate this field with the exercise detail of the exercise in the routine
         public string? ExerciseName { get; set; } // Exercise name reference
         public string? ExerciseDescription { get; set; } // Exercise description reference
 
@@ -47,7 +47,7 @@ namespace WorkWell.Server.Models
         public int Sets { get; set; }
 
         [FirestoreProperty]
-        public int Rest { get; set; } // Rest time in seconds
+        public int Rest { get; set; } 
     }
 
 

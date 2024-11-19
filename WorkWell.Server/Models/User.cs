@@ -25,8 +25,6 @@ namespace WorkWell.Server.Models
             [FirestoreProperty]
             public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
 
-            //// Computed property for full name
-            //public string FullName => $"{FirstName} {LastName}";
         }
     }
 

@@ -17,42 +17,35 @@ namespace WorkWell.Server.Services
         }
 
         // Method for signup (Create new user in Firebase Authentication and Firestore)
-        public async Task<string> SignUpAsync(SignUpRequest request)
+        public async Task<User> SignUpAsync(SignUpRequest request)
         {
             Debug.WriteLine("Service");
 
             try
             {
-                // Create user with Firebase Authentication
-                //var userRecord = await FirebaseAuth.DefaultInstance.CreateUserAsync(new UserRecordArgs
-                //{
-                //    Email = email,
-                //    Password = password,
-                //});
-
-
-
                 // Create a new user document in Firestore, including firstName, lastName, and role
-                var userRef = _firestoreDb.Collection("users").Document(request.Uid);
-                await userRef.SetAsync(new User
+                var user = new User
                 {
                     Uid = request.Uid,
                     Email = request.Email,
                     FirstName = request.FirstName,    // Save firstName in Firestore
                     LastName = request.LastName,      // Save lastName in Firestore
-                    Role = request.Role,              // Assign the role during user creation
-                });
+                    Role = request.Role               // Assign the role during user creation
+                };
 
-                // Return the Firebase Custom Token
-                var customToken = await FirebaseAuth.DefaultInstance.CreateCustomTokenAsync(request.Uid);
-                return customToken;
+                var userRef = _firestoreDb.Collection("users").Document(request.Uid);
+                await userRef.SetAsync(user);
+
+                // Return the full user object
+                return user;
             }
             catch (Exception ex)
             {
                 throw new Exception($"Error signing up: {ex.Message}");
             }
         }
-    
+
+
         // Method for login (Verify user with Firebase Authentication)
         public async Task<string> LogInAsync(string email, string password)
         {

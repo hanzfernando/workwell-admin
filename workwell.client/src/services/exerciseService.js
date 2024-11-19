@@ -1,4 +1,7 @@
-const BASE_URL = "https://localhost:7054/api/exercises";
+import { backendLink } from '../utils/ngrokLink.js';
+const BASE_URL = `${backendLink}/api/exercises`;
+//const BASE_URL = "http://localhost:7054/api/exercises";
+
 
 const getExercise = async (exerciseId) => {
     try {

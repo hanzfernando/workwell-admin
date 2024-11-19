@@ -65,14 +65,16 @@ const RoutineTable = ({ routines, onViewRoutine, onAssignRoutine }) => {
                             <tr key={routine.routineId}>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{routine.name}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{routine.targetArea}</td>
-                                <td
-                                    className={`px-6 py-4 whitespace-nowrap text-sm ${assignedUsers[routine.routineId] === "Unassigned"
-                                        ? "text-red-500 font-bold"
-                                        : "text-gray-700"
-                                        }`}
-                                >
-                                    {assignedUsers[routine.routineId] || "Loading..."}
-                                </td>
+                                {/*<td*/}
+                                {/*    className={`px-6 py-4 whitespace-nowrap text-sm ${assignedUsers[routine.routineId] === "Unassigned"*/}
+                                {/*        ? "text-red-500 font-bold"*/}
+                                {/*        : "text-gray-700"*/}
+                                {/*        }`}*/}
+                                {/*>*/}
+                                {/*    {assignedUsers[routine.routineId] || "Loading..."}*/}
+                                {/*</td>*/}
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{routine.assignedName}</td>
+
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                     {new Date(routine.createdAt).toLocaleDateString()}
                                 </td>
@@ -83,14 +85,14 @@ const RoutineTable = ({ routines, onViewRoutine, onAssignRoutine }) => {
                                     >
                                         <img src={ic_eye} alt="View" className="h-6 w-6" />
                                     </button>
-                                    <button
-                                        onClick={() => onAssignRoutine(routine)}
-                                        disabled={!!routine.assignedTo} // Disable button if assignedTo has a value
-                                        className={`bg-accent-aqua p-1 rounded-lg hover:bg-teal-500 ${routine.assignedTo ? "opacity-50 cursor-not-allowed" : ""
-                                            }`}
-                                    >
-                                        <img src={ic_assign} alt="Assign" className="h-6 w-6 text-white" />
-                                    </button>
+                                    {/*<button*/}
+                                    {/*    onClick={() => onAssignRoutine(routine)}*/}
+                                    {/*    disabled={!!routine.assignedTo} // Disable button if assignedTo has a value*/}
+                                    {/*    className={`bg-accent-aqua p-1 rounded-lg hover:bg-teal-500 ${routine.assignedTo ? "opacity-50 cursor-not-allowed" : ""*/}
+                                    {/*        }`}*/}
+                                    {/*>*/}
+                                    {/*    <img src={ic_assign} alt="Assign" className="h-6 w-6 text-white" />*/}
+                                    {/*</button>*/}
 
                                 </td>
                             </tr>

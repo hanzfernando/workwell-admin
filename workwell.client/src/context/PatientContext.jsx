@@ -17,6 +17,12 @@ const patientReducer = (state, action) => {
                 loading: false,
                 error: null
             };
+        case 'ADD_PATIENT': 
+            return {
+                ...state,
+                patients: [...state.patients, action.payload],
+                error: null
+            };
         case 'ERROR':
             return {
                 ...state,

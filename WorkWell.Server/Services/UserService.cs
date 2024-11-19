@@ -20,6 +20,7 @@ namespace WorkWell.Server.Services
         // GET /api/users - Filtered to return only users with role 'User'
         public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
+            Console.WriteLine("Get All Users");
             try
             {
                 var query = _firestoreDb.Collection("users");

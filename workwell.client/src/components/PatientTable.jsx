@@ -1,7 +1,8 @@
 import React from 'react';
 import ic_eye from '../assets/ic_eye.svg';
 
-const PatientTable = ({ patients }) => {
+const PatientTable = ({ patients, onViewRoutine }) => {
+
     return (
         <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
@@ -16,9 +17,6 @@ const PatientTable = ({ patients }) => {
                         <th className="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
                             Email
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
-                            Status
-                        </th>
                         <th className="px-6 py-3 text-center text-xs font-medium text-neutral-dark uppercase tracking-wider">
                             Actions
                         </th>
@@ -26,15 +24,16 @@ const PatientTable = ({ patients }) => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                     {patients.length > 0 ? (
-                        
-                        patients.map((patient) => (                            
+                        patients.map((patient) => (
                             <tr key={patient.uid}>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{patient.firstName}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{patient.lastName}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{patient.email}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-semibold">{patient.status}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-center">
-                                    <button className="bg-accent-aqua p-1 rounded-lg">
+                                    <button
+                                        className="bg-accent-aqua p-1 rounded-lg"
+                                        onClick={() => onViewRoutine(patient)} // Call onViewRoutine when clicked
+                                    >
                                         <img src={ic_eye} alt="View" className="h-6 w-6" />
                                     </button>
                                 </td>

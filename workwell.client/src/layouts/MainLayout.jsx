@@ -11,7 +11,7 @@ const MainLayout = () => {
             </div>
 
             {/* Main content */}
-            <div className="w-4/5 p-6">
+            <div className="w-4/5 p-6 overflow-y-auto">
                 <Outlet />
             </div>
         </div>

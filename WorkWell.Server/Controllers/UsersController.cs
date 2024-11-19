@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using WorkWell.Server.Models;
 using WorkWell.Server.Models.WorkWell.Server.Models;
@@ -19,6 +20,7 @@ namespace WorkWell.Server.Controllers
 
         // GET: api/users
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             var users = await _userService.GetAllUsersAsync();

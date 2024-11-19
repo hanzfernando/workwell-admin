@@ -1,5 +1,6 @@
-import { createContext, useReducer } from 'react';
+import { createContext, useReducer, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { getAllRoutines } from '../services/routineService';
 
 const initialState = {
     routines: [],
@@ -44,6 +45,20 @@ const RoutineContext = createContext();
 
 const RoutineProvider = ({ children }) => {
     const [state, dispatch] = useReducer(routineReducer, initialState);
+
+    // Fetch routines on initialization
+    useEffect(() => {
+        const fetchRoutines = async () => {
+            try {
+                const routines = await getAllRoutines(); // Fetch all routines
+                dispatch({ type: 'SET_ROUTINES', payload: routines });
+            } catch (error) {
+                dispatch({ type: 'SET_ERROR', payload: error.message });
+            }
+        };
+
+        fetchRoutines();
+    }, []);
 
     return (
         <RoutineContext.Provider value={{ state, dispatch }}>

@@ -22,10 +22,21 @@ namespace WorkWell.Server.Services
         {
             try
             {
+                // Create a new document reference with a unique ID
                 var docRef = _firestoreDb.Collection("routines").Document();
-                routine.RoutineId = docRef.Id; // Assign a unique ID for the routine
+                routine.RoutineId = docRef.Id; // Assign the generated document ID to the routine
+
                 Console.WriteLine($"Adding routine with ID: {routine.RoutineId}");
+
+                // Save the routine to Firestore
                 await docRef.SetAsync(routine);
+
+                // Populate additional details after saving the routine
+                routine = await PopulateAssignedUserDetailsAsync(routine);
+                routine = await PopulateExerciseDetailsAsync(routine);
+
+                // Update Firestore with the populated routine
+                await docRef.SetAsync(routine, SetOptions.Overwrite);
             }
             catch (Exception ex)
             {
@@ -34,6 +45,7 @@ namespace WorkWell.Server.Services
                 throw new Exception("Failed to add routine. Please try again later.");
             }
         }
+
 
         // GET /api/routines/:id
         public async Task<Routine?> GetRoutineAsync(string routineId)

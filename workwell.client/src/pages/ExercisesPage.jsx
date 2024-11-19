@@ -49,9 +49,9 @@ const ExercisesPage = () => {
                 <div className="flex justify-between items-center pb-4 mb-4 border-b">
                     <h2 className="text-xl font-semibold">Exercises</h2>
                     <div className="flex space-x-2">
-                        <button className="flex items-center bg-accent-aqua text-white px-4 py-2 rounded hover:bg-teal-600">
-                            <span className="text-lg mr-2">+</span> Add Exercise
-                        </button>
+                        {/*<button className="flex items-center bg-accent-aqua text-white px-4 py-2 rounded hover:bg-teal-600">*/}
+                        {/*    <span className="text-lg mr-2">+</span> Add Exercise*/}
+                        {/*</button>*/}
                         <input
                             type="text"
                             placeholder="Search exercises..."

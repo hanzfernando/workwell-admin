@@ -100,7 +100,10 @@ const AddRoutineModal = ({ isOpen, onClose, onAddRoutine }) => {
                         <label className="block text-sm font-medium mb-2">Target Area</label>
                         <select
                             value={targetArea}
-                            onChange={(e) => setTargetArea(e.target.value)}
+                            onChange={(e) => {
+                                setTargetArea(e.target.value);
+                                setSelectedExercises([]); // Clear selected exercises
+                            }}
                             className="w-full px-3 py-2 border rounded focus:outline-none focus:border-teal-500"
                         >
                             <option value="">Select Target Area</option>
@@ -108,6 +111,7 @@ const AddRoutineModal = ({ isOpen, onClose, onAddRoutine }) => {
                             <option value="Shoulder">Shoulder</option>
                             <option value="LowerBack">Lower Back</option>
                         </select>
+
                     </div>
 
                     <div>
@@ -274,7 +278,7 @@ const AddRoutineModal = ({ isOpen, onClose, onAddRoutine }) => {
                     </button>
                     <button
                         onClick={handleAddRoutine}
-                        className="bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600"
+                        className="bg-accent-aqua text-white px-4 py-2 rounded hover:bg-teal-600"
                     >
                         Add Routine
                     </button>

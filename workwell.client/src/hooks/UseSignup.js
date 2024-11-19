@@ -14,14 +14,7 @@ const useSignup = () => {
 
         try {
             //console.log(firstName, lastName, email, password);
-            const idToken = await signUp(firstName, lastName, email, password); // Make sure signUp is defined in your authService
-            //console.log(idToken);
-            setToken(idToken);
-
-            // Optionally verify the token
-            // const storedToken = getToken();
-
-            dispatch({ type: 'LOGIN', payload: { firstName, lastName, email } });
+            const idToken = await signUp(firstName, lastName, email, password); // Make sure signUp is defined in your authService                     
             setLoading(false);
         } catch (error) {
             setError(error);

@@ -26,10 +26,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyOrigin, policy =>
     {
-        policy.WithOrigins("https://localhost:5174")  // Allow requests from your frontend
-              .AllowAnyMethod()                    // Allow any HTTP method
-              .AllowAnyHeader()                    // Allow any headers
-              .AllowCredentials();                 // Allow credentials (cookies, tokens)
+        policy.WithOrigins("https://localhost:5174")  // Allow the frontend Ngrok URL and local URL
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();  // Allow credentials (cookies, tokens)
     });
 });
 
@@ -49,7 +49,7 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
 
 var app = builder.Build();
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 //app.UseDefaultFiles();
 app.UseStaticFiles();
 app.UseRouting();

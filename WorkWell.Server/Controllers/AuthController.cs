@@ -22,7 +22,6 @@ namespace WorkWell.Server.Controllers
         [HttpPost("signup")]
         public async Task<IActionResult> SignUp([FromBody] SignUpRequest request)
         {
-
             Debug.WriteLine($"Email: {request.Email}, FirstName: {request.FirstName}, LastName: {request.LastName}");
 
             if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
@@ -35,15 +34,18 @@ namespace WorkWell.Server.Controllers
                 // Default role to User if not passed
                 request.Role = request.Role == UserRole.Admin ? request.Role : UserRole.User;
 
-                // Ensure the correct number of arguments is passed
-                var token = await _authService.SignUpAsync(request);
-                return Ok(new { Token = token });
+                // Call the SignUpAsync method and get the user object
+                var user = await _authService.SignUpAsync(request);
+
+                // Return the user information
+                return Ok(user);
             }
             catch (Exception ex)
             {
                 return BadRequest($"Error during signup: {ex.Message}");
             }
         }
+
 
 
 

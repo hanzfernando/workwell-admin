@@ -23,7 +23,7 @@ const LoginPage = () => {
 
             // Check if the user is an admin
             if (user?.role === 0) {
-                navigate('/dashboard');
+                navigate('/users');
             } else if (user?.role !== 0) {
                 // If user is not an admin (role is not 0), show error message
                 throw new Error('Unauthorized access: User role not permitted');

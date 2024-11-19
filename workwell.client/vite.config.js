@@ -30,8 +30,8 @@ if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
     }
 }
 
-const target = env.ASPNETCORE_HTTPS_PORT ? `https://localhost:${env.ASPNETCORE_HTTPS_PORT}` :
-    env.ASPNETCORE_URLS ? env.ASPNETCORE_URLS.split(';')[0] : 'https://localhost:7054';
+const target = env.ASPNETCORE_HTTPS_PORT ? `http://localhost:${env.ASPNETCORE_HTTPS_PORT}` :
+    env.ASPNETCORE_URLS ? env.ASPNETCORE_URLS.split(';')[0] : 'http://localhost:7054';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -44,15 +44,15 @@ export default defineConfig({
     server: {
         proxy: {
             '^/api/auth': {
-                target: 'https://localhost:7054', 
+                target: 'http://localhost:7054', 
                 secure: false,
             },
             '^/api/exercises': {
-                target: 'https://localhost:7054', 
+                target: 'http://localhost:7054', 
                 secure: false,
             },
             '^/api/routines': {
-                target: 'https://localhost:7054', 
+                target: 'http://localhost:7054', 
                 secure: false,
             },
         },

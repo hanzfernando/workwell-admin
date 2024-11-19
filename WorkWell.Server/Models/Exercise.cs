@@ -7,8 +7,8 @@ namespace WorkWell.Server.Models
     [FirestoreData]  // Indicates that this class is a Firestore document
     public class Exercise
     {
-        [FirestoreProperty]  // This will be saved to Firestore
-        public string? ExerciseId { get; set; } // Exercise ID, e.g., "E001"
+        [FirestoreProperty] 
+        public string? ExerciseId { get; set; } 
 
         [FirestoreProperty]
         public required string Name { get; set; }
@@ -17,10 +17,10 @@ namespace WorkWell.Server.Models
         public required string Description { get; set; }
 
         [FirestoreProperty]
-        [JsonConverter(typeof(JsonStringEnumConverter))] // Ensure this converts strings to enum
+        [JsonConverter(typeof(JsonStringEnumConverter))] 
         public required TargetArea TargetArea { get; set; }
 
-        [FirestoreProperty]  // Optional: Store `CreatedDate` if it's part of the document
+        [FirestoreProperty]  
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 

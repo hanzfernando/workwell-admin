@@ -2,7 +2,7 @@ import React from 'react';
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider, Navigate } from 'react-router-dom';
 
 // Import Pages
-import DashboardPage from './pages/DashboardPage';
+//import DashboardPage from './pages/DashboardPage';
 import UsersPage from './pages/PatientsPage';
 import RoutinesPage from './pages/RoutinesPage';
 import ExercisesPage from './pages/ExercisesPage';
@@ -37,7 +37,7 @@ const PublicRoute = ({ children }) => {
 
     if (user) {
         // Redirect admins to dashboard and others to login (adjust as needed)
-        return <Navigate to={user.role === 0 ? '/dashboard' : '/login'} replace />;
+        return <Navigate to={user.role === 0 ? '/users' : '/login'} replace />;
     }
 
     return children;
@@ -56,7 +56,7 @@ const App = () => {
 
                 {/* Protected Routes for Admins */}
                 <Route element={<AdminRoute><MainLayout /></AdminRoute>}>
-                    <Route path="/dashboard" element={<DashboardPage />} />
+                    {/*<Route path="/dashboard" element={<DashboardPage />} />*/}
                     <Route path="/users" element={<UsersPage />} />
                     <Route path="/routines" element={<RoutinesPage />} />
                     <Route path="/exercises" element={<ExercisesPage />} />

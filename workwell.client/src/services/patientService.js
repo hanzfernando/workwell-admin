@@ -1,9 +1,11 @@
-const BASE_URL = "https://localhost:7054/api/users";
+import { backendLink } from '../utils/ngrokLink.js';
+const BASE_URL = `${backendLink}/api/users`;
+//const BASE_URL = "http://localhost:7054/api/users";
 
 // Get all patients
 const getPatients = async () => {
     try {
-        const response = await fetch(`${BASE_URL}`);
+        const response = await fetch(BASE_URL);
         if (!response.ok) {
             throw new Error("Failed to fetch patients.");
         }

@@ -1,6 +1,9 @@
 import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification } from '../firebase/firebaseConfig.js';
-const BASE_URL = "https://localhost:7054/api/auth";
-import { getToken, setToken} from '../utils/authUtil.js';
+import { getToken, setToken } from '../utils/authUtil.js';
+import { backendLink } from '../utils/ngrokLink.js';
+const BASE_URL = `${backendLink}/api/auth`;
+//const BASE_URL = "http://localhost:7054/api/auth";
+
 
 
 const signUp = async (firstName, lastName, email, password) => {
@@ -29,6 +32,7 @@ const signUp = async (firstName, lastName, email, password) => {
     
 
         const result = await response.json();
+
         //console.log("User created and verification email sent.");
         await sendEmailVerification(user);
 

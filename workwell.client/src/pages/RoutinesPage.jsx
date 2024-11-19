@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthContext } from '../hooks/useAuthContext';
 import RoutineTable from '../components/RoutineTable';
-import { getAllRoutines, assignUserToRoutine } from '../services/routineService';
+import { getAllRoutines, assignUserToRoutine, addRoutine } from '../services/routineService';
 import RoutineDetailsModal from '../components/RoutineDetailsModal'; // Import the modal
 import AssignRoutineModal from '../components/AssignRoutineModal';
 import AddRoutineModal from '../components/AddRoutineModal';
+import { useRoutineContext } from '../hooks/useRoutineContext';
 
 const RoutinesPage = () => {
     const { user } = useAuthContext();
-    const [routines, setRoutines] = useState([]);
+    const { state: { routines }, dispatch } = useRoutineContext();
     const [filteredRoutines, setFilteredRoutines] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -25,8 +26,7 @@ const RoutinesPage = () => {
         const fetchRoutines = async () => {
             try {
                 const result = await getAllRoutines(); // Fetch all routines
-                setRoutines(result); // Save all routines in state
-                setFilteredRoutines(result); // Initially show all routines
+                dispatch({ type: 'SET_ROUTINES', payload: result }); // Update context state})
             } catch (error) {
                 console.error("Error fetching routines:", error);
             }
@@ -40,6 +40,7 @@ const RoutinesPage = () => {
         const filtered = routines.filter((routine) => {
             return (
                 routine.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                routine.assignedName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 routine.targetArea.toLowerCase().includes(searchQuery.toLowerCase())
             );
         });
@@ -116,12 +117,25 @@ const RoutinesPage = () => {
     };
     
 
-    const handleRoutineAdded = (newRoutine) => {
+    const handleRoutineAdded = async (newRoutine) => {
         console.log('New routine added:', newRoutine);
-        //setRoutines((prevRoutines) => [...prevRoutines, newRoutine]); // Add the new routine to state
-        //setFilteredRoutines((prevFilteredRoutines) => [...prevFilteredRoutines, newRoutine]); // Update filtered routines
-        handleCloseAddRoutineModal(); // Close modal
+
+        // Call addRoutine to send the new routine to the backend
+        const addedRoutine = await addRoutine(newRoutine);
+        console.log(addedRoutine);
+        if (addedRoutine) {
+            // Once the routine is successfully added, update state with the routine returned from the backend
+            dispatch({ type: 'CREATE_ROUTINE', payload: addedRoutine });
+            setFilteredRoutines((prevFilteredRoutines) => [...prevFilteredRoutines, addedRoutine]);
+
+            // Optionally close the modal or perform other actions
+            handleCloseAddRoutineModal();
+        } else {
+            console.error("Failed to add routine");
+            // Handle the error (optional)
+        }
     };
+
 
 
     return (
