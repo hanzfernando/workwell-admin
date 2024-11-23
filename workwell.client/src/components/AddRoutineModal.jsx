@@ -1,24 +1,15 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { usePatientContext } from '../hooks/usePatientContext';
 import { useExerciseContext } from '../hooks/useExerciseContext';
 
 const AddRoutineModal = ({ isOpen, onClose, onAddRoutine }) => {
-    const { state: { patients } } = usePatientContext();
     const { state: { exercises } } = useExerciseContext();
 
     const [routineName, setRoutineName] = useState('');
     const [targetArea, setTargetArea] = useState('');
-    const [searchQuery, setSearchQuery] = useState('');
-    const [selectedPatient, setSelectedPatient] = useState(null);
     const [selectedExercises, setSelectedExercises] = useState([]); // Store full exercise data
 
     if (!isOpen) return null;
-
-    const filteredPatients = patients.filter((patient) =>
-        patient.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        patient.lastName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
 
     const exercisesForTargetArea = exercises.filter(
         (exercise) => exercise.targetArea === targetArea
@@ -34,27 +25,22 @@ const AddRoutineModal = ({ isOpen, onClose, onAddRoutine }) => {
                 } else {
                     return [
                         ...prevSelectedExercises,
-                        { exerciseId: exercise.exerciseId, name: exercise.name, reps: '', sets: '', rest: '' },
-                    ]; // Select
+                        { exerciseId: exercise.exerciseId, name: exercise.name, reps: 10, duration: 60 }, // Default values
+                    ];
                 }
             }
             return prevSelectedExercises;
         });
     };
 
-    const handleExerciseInputChange = (exerciseId, field, value) => {
-        // Convert value to a number (or keep it as is if it's already a valid number)
-        const parsedValue = value ? parseInt(value, 10) : '';
-
-        setSelectedExercises((prevExercises) =>
-            prevExercises.map((ex) =>
-                ex.exerciseId === exerciseId ? { ...ex, [field]: parsedValue } : ex
-            )
-        );
+    const handleInputChange = (index, field, value) => {
+        const updatedExercises = [...selectedExercises];
+        updatedExercises[index][field] = value ? parseInt(value, 10) : 0; // Ensure numeric input
+        setSelectedExercises(updatedExercises);
     };
 
     const handleAddRoutine = () => {
-        if (!routineName || !targetArea || !selectedPatient || selectedExercises.length === 0) {
+        if (!routineName || !targetArea || selectedExercises.length === 0) {
             alert('Please fill all fields and make selections.');
             return;
         }
@@ -62,16 +48,20 @@ const AddRoutineModal = ({ isOpen, onClose, onAddRoutine }) => {
         const newRoutine = {
             name: routineName,
             targetArea,
-            assignedTo: selectedPatient.uid,
-            exercises: selectedExercises.map(({ exerciseId, reps, sets, rest }) => ({
+            exercises: selectedExercises.map(({ exerciseId, reps, duration }) => ({
                 exerciseId,
-                reps: reps ? reps : 0,  // Ensure it defaults to 0 if empty
-                sets: sets ? sets : 0,
-                rest: rest ? rest : 0,
+                reps: reps || 0,
+                duration: duration || 0, // Ensure default values
             })),
         };
 
         onAddRoutine(newRoutine);
+
+        // Reset fields
+        setRoutineName('');
+        setTargetArea('');
+        setSelectedExercises([]);
+
         onClose(); // Close the modal
     };
 
@@ -111,61 +101,6 @@ const AddRoutineModal = ({ isOpen, onClose, onAddRoutine }) => {
                             <option value="Shoulder">Shoulder</option>
                             <option value="LowerBack">Lower Back</option>
                         </select>
-
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium mb-2">Assign to Patient</label>
-                        <input
-                            type="text"
-                            placeholder="Search patients..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full px-3 py-2 border rounded focus:outline-none focus:border-teal-500 mb-2"
-                        />
-                        <div className="overflow-y-auto max-h-40 border rounded">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-100">
-                                    <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                            First Name
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                            Last Name
-                                        </th>
-                                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                            Select
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
-                                    {filteredPatients.map((patient) => (
-                                        <tr key={patient.uid}>
-                                            <td className="px-6 py-4 text-sm text-gray-700">
-                                                {patient.firstName}
-                                            </td>
-                                            <td className="px-6 py-4 text-sm text-gray-700">
-                                                {patient.lastName}
-                                            </td>
-                                            <td className="px-6 py-4 text-center">
-                                                <input
-                                                    type="radio"
-                                                    name="selectedPatient"
-                                                    onChange={() => setSelectedPatient(patient)}
-                                                />
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {filteredPatients.length === 0 && (
-                                        <tr>
-                                            <td colSpan="3" className="text-center py-4 text-sm text-gray-500">
-                                                No patients found.
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
                     </div>
 
                     {targetArea && (
@@ -204,59 +139,41 @@ const AddRoutineModal = ({ isOpen, onClose, onAddRoutine }) => {
                         </div>
                     )}
 
-                    {/* Display selected exercises with input fields */}
                     {selectedExercises.length > 0 && (
                         <div>
-                            <label className="block text-sm font-medium mb-2">Selected Exercises</label>
+                            <h5 className="block text-sm font-medium mb-2">Selected Exercises</h5>
                             <div className="overflow-y-auto max-h-40 border rounded p-2">
                                 <table className="min-w-full divide-y divide-gray-200">
                                     <thead className="bg-gray-100">
                                         <tr>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                                Exercise
+                                                Exercise Name
                                             </th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                                                 Reps
                                             </th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                                Sets
-                                            </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                                Rest
+                                                Duration (sec)
                                             </th>
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
-                                        {selectedExercises.map((exercise) => (
+                                        {selectedExercises.map((exercise, index) => (
                                             <tr key={exercise.exerciseId}>
                                                 <td className="px-6 py-4 text-sm text-gray-700">{exercise.name}</td>
-                                                <td className="px-6 py-4">
+                                                <td className="px-6 py-4 text-sm text-gray-700">
                                                     <input
                                                         type="number"
-                                                        value={exercise.reps || ''}
-                                                        onChange={(e) =>
-                                                            handleExerciseInputChange(exercise.exerciseId, 'reps', e.target.value)
-                                                        }
+                                                        value={exercise.reps}
+                                                        onChange={(e) => handleInputChange(index, 'reps', e.target.value)}
                                                         className="w-full px-2 py-1 border rounded"
                                                     />
                                                 </td>
-                                                <td className="px-6 py-4">
+                                                <td className="px-6 py-4 text-sm text-gray-700">
                                                     <input
                                                         type="number"
-                                                        value={exercise.sets || ''}
-                                                        onChange={(e) =>
-                                                            handleExerciseInputChange(exercise.exerciseId, 'sets', e.target.value)
-                                                        }
-                                                        className="w-full px-2 py-1 border rounded"
-                                                    />
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <input
-                                                        type="number"
-                                                        value={exercise.rest || ''}
-                                                        onChange={(e) =>
-                                                            handleExerciseInputChange(exercise.exerciseId, 'rest', e.target.value)
-                                                        }
+                                                        value={exercise.duration}
+                                                        onChange={(e) => handleInputChange(index, 'duration', e.target.value)}
                                                         className="w-full px-2 py-1 border rounded"
                                                     />
                                                 </td>

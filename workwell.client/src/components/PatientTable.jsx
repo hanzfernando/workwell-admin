@@ -17,6 +17,12 @@ const PatientTable = ({ patients, onViewRoutine }) => {
                         <th className="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
                             Email
                         </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
+                            Age
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
+                            Medical Condition
+                        </th>
                         <th className="px-6 py-3 text-center text-xs font-medium text-neutral-dark uppercase tracking-wider">
                             Actions
                         </th>
@@ -28,6 +34,8 @@ const PatientTable = ({ patients, onViewRoutine }) => {
                             <tr key={patient.uid}>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{patient.firstName}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{patient.lastName}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{patient.age}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{patient.medicalCondition}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{patient.email}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-center">
                                     <button

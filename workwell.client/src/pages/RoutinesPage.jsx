@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthContext } from '../hooks/useAuthContext';
 import RoutineTable from '../components/RoutineTable';
-import { getAllRoutines, assignUserToRoutine, addRoutine } from '../services/routineService';
+import { getAllRoutines, assignUsersToRoutine, addRoutine } from '../services/routineService';
 import RoutineDetailsModal from '../components/RoutineDetailsModal'; // Import the modal
 import AssignRoutineModal from '../components/AssignRoutineModal';
 import AddRoutineModal from '../components/AddRoutineModal';
 import { useRoutineContext } from '../hooks/useRoutineContext';
+import { useExerciseContext } from '../hooks/useExerciseContext';
 
 const RoutinesPage = () => {
     const { user } = useAuthContext();
     const { state: { routines }, dispatch } = useRoutineContext();
+    const { state: { exercises } } = useExerciseContext();
     const [filteredRoutines, setFilteredRoutines] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -52,9 +54,30 @@ const RoutinesPage = () => {
     };
 
     const handleViewRoutine = (routine) => {
-        setSelectedRoutine(routine); // Set the selected routine data
+        // Fetch exercise details from `exerciseContext`
+        const detailedExercises = routine.exercises.map((exercise) => {
+            // Find the exercise by its ID in the context
+            const detailedExercise = exercises.find((ex) => ex.exerciseId === exercise.exerciseId);
+
+            if (detailedExercise) {
+                // Merge context details into the routine's exercise
+                return {
+                    ...exercise,
+                    exerciseName: detailedExercise.name,
+                    exerciseDescription: detailedExercise.description,
+                    targetArea: detailedExercise.targetArea, // Add additional details if needed
+                };
+            } else {
+                // If no matching exercise is found in context, return the original
+                return { ...exercise };
+            }
+        });
+
+        // Pass the detailed exercises to the selected routine
+        setSelectedRoutine({ ...routine, exercises: detailedExercises });
         setIsRoutineDetailsModalOpen(true); // Open the routine details modal
     };
+
 
     const handleCloseRoutineDetailsModal = () => {
         setIsRoutineDetailsModalOpen(false); // Close the routine details modal
@@ -71,41 +94,35 @@ const RoutinesPage = () => {
         setRoutineToAssign(null); // Clear selected routine for assignment
     };
 
-    const handleRoutineAssigned = async (routine, patient) => {
-        console.log(patient);
-        console.log(`Routine "${routine.routineId}" assigned to patient "${patient.uid}".`);
+    const handleRoutineAssigned = async (routine, userIds) => {
+        console.log(userIds);
+        console.log(`Routine "${routine.routineId}" assigned to users: ${userIds.join(', ')}`);
 
         try {
-            const success = await assignUserToRoutine(routine.routineId, patient.uid);
+            const success = await assignUsersToRoutine(routine.routineId, userIds);
             if (success) {
-                console.log(`Routine "${routine.name}" successfully assigned to patient "${patient.lastName}".`);
+                console.log(`Routine "${routine.name}" successfully updated with new user assignments.`);
 
-                // Update the assigned routine in the state
-                setRoutines((prevRoutines) =>
-                    prevRoutines.map((r) =>
-                        r.routineId === routine.routineId
-                            ? { ...r, assignedTo: patient.uid }
-                            : r
-                    )
-                );
+                // Update the local state to reflect the new assignment
+                dispatch({
+                    type: 'UPDATE_ROUTINE',
+                    payload: { ...routine, users: userIds },
+                });
 
                 setFilteredRoutines((prevFilteredRoutines) =>
                     prevFilteredRoutines.map((r) =>
-                        r.routineId === routine.routineId
-                            ? { ...r, assignedTo: patient.uid }
-                            : r
+                        r.routineId === routine.routineId ? { ...r, users: userIds } : r
                     )
                 );
-
-                // Optionally close the modal
-                handleCloseAssignModal();
             } else {
-                console.error(`Failed to assign routine "${routine.name}" to patient "${patient.lastName}".`);
+                console.error(`Failed to update routine "${routine.name}" with user assignments.`);
             }
         } catch (error) {
-            console.error(`An error occurred while assigning routine "${routine.name}" to patient "${patient.lastName}":`, error);
+            console.error(`An error occurred while updating routine "${routine.name}" with user assignments:`, error);
         }
     };
+
+
 
 
     const handleAddRoutine = () => {

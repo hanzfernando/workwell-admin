@@ -27,10 +27,16 @@ const routineReducer = (state, action) => {
         case 'UPDATE_ROUTINE':
             return {
                 ...state,
-                routines: state.routines.map(routine =>
-                    routine.id === action.payload.id ? action.payload : routine
+                routines: state.routines.map((routine) =>
+                    routine.routineId === action.payload.routineId
+                        ? { ...action.payload, users: action.payload.users || [] } // Ensure `users` is always defined
+                        : routine
                 ),
-            }
+                loading: false,
+                error: null,
+            };
+
+
         case 'DELETE_ROUTINE':
             return {
                 ...state,

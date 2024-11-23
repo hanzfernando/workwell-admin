@@ -16,12 +16,12 @@ const ExerciseTable = ({ exercises }) => {
                         <th className="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
                             Target Area
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
-                            Created Date
-                        </th>
-                        <th className="px-6 py-3 text-center text-xs font-medium text-neutral-dark uppercase tracking-wider">
-                            Actions
-                        </th>
+                        {/*<th className="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">*/}
+                        {/*    Created Date*/}
+                        {/*</th>*/}
+                        {/*<th className="px-6 py-3 text-center text-xs font-medium text-neutral-dark uppercase tracking-wider">*/}
+                        {/*    Actions*/}
+                        {/*</th>*/}
                     </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -31,12 +31,12 @@ const ExerciseTable = ({ exercises }) => {
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{exercise.name}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{exercise.description}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{exercise.targetArea}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{new Date(exercise.createdAt).toLocaleDateString()}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-center">
-                                    <button className="bg-accent-aqua p-1 rounded-lg">
-                                        <img src={ic_eye} alt="View" className="h-6 w-6" />
-                                    </button>
-                                </td>
+                                {/*<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{new Date(exercise.createdAt).toLocaleDateString()}</td>*/}
+                                {/*<td className="px-6 py-4 whitespace-nowrap text-center">*/}
+                                {/*    <button className="bg-accent-aqua p-1 rounded-lg">*/}
+                                {/*        <img src={ic_eye} alt="View" className="h-6 w-6" />*/}
+                                {/*    </button>*/}
+                                {/*</td>*/}
                             </tr>
                         ))
                     ) : (

@@ -14,29 +14,44 @@ namespace WorkWell.Server.Models
             public required string Email { get; set; }
 
             [FirestoreProperty]
-            public required string FirstName { get; set; } 
+            public required string FirstName { get; set; }
 
             [FirestoreProperty]
-            public required string LastName { get; set; } 
+            public required string LastName { get; set; }
 
             [FirestoreProperty]
             public UserRole Role { get; set; } = UserRole.User; // Role of the user (Admin, User)
 
             [FirestoreProperty]
-            public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+            public int Age { get; set; } // New: Age of the user
 
+            [FirestoreProperty]
+            public string? MedicalCondition { get; set; } // New: Medical condition of the user (optional)
+
+            [FirestoreProperty]
+            public List<string> Routines { get; set; } = new List<string>();
         }
     }
 
     public class SignUpRequest
     {
         public required string Uid { get; set; }
+
         public required string Email { get; set; }
+
         public required string Password { get; set; }
+
         public UserRole Role { get; set; } = UserRole.User; // Default to 'User' if not provided
+
         public required string FirstName { get; set; }
+
         public required string LastName { get; set; }
+
+        public int Age { get; set; } // New: Age of the user
+
+        public string? MedicalCondition { get; set; } // New: Medical condition of the user (optional)
     }
+
 
     public class LogInRequest
     {

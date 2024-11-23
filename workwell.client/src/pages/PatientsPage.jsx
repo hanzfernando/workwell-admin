@@ -69,7 +69,7 @@ const PatientsPage = () => {
     const handlePatientAdded = async (newPatient) => {
         console.log('Adding patient:', newPatient);
 
-        const addedPatient = await signUp(newPatient.firstName, newPatient.lastName, newPatient.email, newPatient.password);
+        const addedPatient = await signUp(newPatient.firstName, newPatient.lastName, newPatient.email, newPatient.password, newPatient.age, newPatient.medicalCondition);
         //const addedPatient = {
         //    firstName: newPatient.firstName,
         //    lastName: newPatient.lastName,
@@ -126,7 +126,8 @@ const PatientsPage = () => {
                 <ViewUserRoutineModal
                     isOpen={isViewUserRoutineModalOpen}
                     onClose={handleCloseModal}
-                    userId={selectedPatient.uid} // Pass the patient ID to the modal
+                    userId={selectedPatient.uid}
+                    patientRoutineIds={selectedPatient.routines} // Pass the patient's routine IDs
                 />
             )}
 

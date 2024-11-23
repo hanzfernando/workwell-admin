@@ -83,22 +83,22 @@ const deleteRoutine = async (routineId) => {
         return false;
     }
 };
-const assignUserToRoutine = async (routineId, assignedTo) => {
+const assignUsersToRoutine = async (routineId, userIds) => {
     try {
-        const response = await fetch(`${BASE_URL}/${routineId}/assign`, {
+        const response = await fetch(`${BASE_URL}/${routineId}/assign-users`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ assignedTo }),
+            body: JSON.stringify(userIds),
         });
 
         if (!response.ok) {
             const message = await response.text();
-            throw new Error(`Error assigning user to routine: ${message}`);
+            throw new Error(`Error assigning users to routine: ${message}`);
         }
 
-        return true; // Return true if the assignment is successful
+        return true; // Return true if assignment is successful
     } catch (error) {
         console.error(error);
         return false;
@@ -107,4 +107,4 @@ const assignUserToRoutine = async (routineId, assignedTo) => {
 
 
 
-export { getRoutine, getAllRoutines, addRoutine, updateRoutine, deleteRoutine, assignUserToRoutine };
+export { getRoutine, getAllRoutines, addRoutine, updateRoutine, deleteRoutine, assignUsersToRoutine };

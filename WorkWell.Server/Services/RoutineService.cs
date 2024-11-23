@@ -30,22 +30,13 @@ namespace WorkWell.Server.Services
 
                 // Save the routine to Firestore
                 await docRef.SetAsync(routine);
-
-                // Populate additional details after saving the routine
-                routine = await PopulateAssignedUserDetailsAsync(routine);
-                routine = await PopulateExerciseDetailsAsync(routine);
-
-                // Update Firestore with the populated routine
-                await docRef.SetAsync(routine, SetOptions.Overwrite);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error adding routine: {ex.Message}");
-                Console.WriteLine($"Error adding routine: {ex.StackTrace}");
                 throw new Exception("Failed to add routine. Please try again later.");
             }
         }
-
 
         // GET /api/routines/:id
         public async Task<Routine?> GetRoutineAsync(string routineId)
@@ -57,9 +48,7 @@ namespace WorkWell.Server.Services
 
                 if (!snapshot.Exists) return null;
 
-                var routine = snapshot.ConvertTo<Routine>();
-                routine = await PopulateAssignedUserDetailsAsync(routine);
-                return await PopulateExerciseDetailsAsync(routine);
+                return snapshot.ConvertTo<Routine>();
             }
             catch (Exception ex)
             {
@@ -75,16 +64,7 @@ namespace WorkWell.Server.Services
             {
                 var query = _firestoreDb.Collection("routines");
                 var snapshot = await query.GetSnapshotAsync();
-                var routines = snapshot.Documents.Select(doc => doc.ConvertTo<Routine>()).ToList();
-
-                // Populate user and exercise details for each routine
-                var tasks = routines.Select(async routine =>
-                {
-                    routine = await PopulateAssignedUserDetailsAsync(routine);
-                    return await PopulateExerciseDetailsAsync(routine);
-                });
-
-                return await Task.WhenAll(tasks); // Populate details in parallel
+                return snapshot.Documents.Select(doc => doc.ConvertTo<Routine>()).ToList();
             }
             catch (Exception ex)
             {
@@ -122,93 +102,60 @@ namespace WorkWell.Server.Services
                 throw new Exception("Failed to delete routine. Please try again later.");
             }
         }
-
-        // Helper Method: Populate Assigned User Details
-        private async Task<Routine> PopulateAssignedUserDetailsAsync(Routine routine)
+        public async Task AssignUsersToRoutineAsync(string routineId, List<string> userIds)
         {
-            if (string.IsNullOrEmpty(routine.AssignedTo))
-                return routine; // No user assigned, skip population
-
             try
             {
-                var userDocRef = _firestoreDb.Collection("users").Document(routine.AssignedTo);
-                var userSnapshot = await userDocRef.GetSnapshotAsync();
+                var routineRef = _firestoreDb.Collection("routines").Document(routineId);
+                var routineSnapshot = await routineRef.GetSnapshotAsync();
 
-                if (userSnapshot.Exists)
+                if (!routineSnapshot.Exists) throw new Exception("Routine not found.");
+
+                var routine = routineSnapshot.ConvertTo<Routine>();
+
+                // Update the routine's Users list (allow empty list to unassign everyone)
+                routine.Users = userIds;
+                await routineRef.SetAsync(routine, SetOptions.Overwrite);
+
+                // Clear each user's Routines list if unassigned
+                if (userIds.Count == 0)
                 {
-                    var user = userSnapshot.ConvertTo<User>();
-                    routine.AssignedName = $"{user.FirstName} {user.LastName}";
+                    // Remove this routine from all users
+                    var userQuery = _firestoreDb.Collection("users")
+                                                .WhereArrayContains("Routines", routineId);
+                    var userSnapshots = await userQuery.GetSnapshotAsync();
+
+                    foreach (var userDoc in userSnapshots.Documents)
+                    {
+                        var user = userDoc.ConvertTo<User>();
+                        user.Routines.Remove(routineId);
+                        await _firestoreDb.Collection("users").Document(userDoc.Id).SetAsync(user, SetOptions.Overwrite);
+                    }
                 }
                 else
                 {
-                    Console.WriteLine($"User with UID {routine.AssignedTo} not found.");
+                    // Update each user's Routines list
+                    foreach (var userId in userIds)
+                    {
+                        var userRef = _firestoreDb.Collection("users").Document(userId);
+                        var userSnapshot = await userRef.GetSnapshotAsync();
+
+                        if (!userSnapshot.Exists) throw new Exception($"User {userId} not found.");
+
+                        var user = userSnapshot.ConvertTo<User>();
+
+                        if (!user.Routines.Contains(routineId))
+                        {
+                            user.Routines.Add(routineId);
+                            await userRef.SetAsync(user, SetOptions.Overwrite);
+                        }
+                    }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error populating user details for UID {routine.AssignedTo}: {ex.Message}");
-            }
-
-            return routine;
-        }
-
-        // Helper Method: Populate Exercise Details for Each Exercise in the Routine
-        private async Task<Routine> PopulateExerciseDetailsAsync(Routine routine)
-        {
-            foreach (var routineExercise in routine.Exercises)
-            {
-                try
-                {
-                    var exerciseDocRef = _firestoreDb.Collection("exercises").Document(routineExercise.ExerciseId);
-                    var exerciseSnapshot = await exerciseDocRef.GetSnapshotAsync();
-
-                    if (exerciseSnapshot.Exists)
-                    {
-                        var exercise = exerciseSnapshot.ConvertTo<Exercise>();
-                        routineExercise.ExerciseName = exercise.Name;
-                        routineExercise.ExerciseDescription = exercise.Description;
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Exercise with ID {routineExercise.ExerciseId} not found.");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error populating exercise details for ID {routineExercise.ExerciseId}: {ex.Message}");
-                }
-            }
-
-            return routine;
-        }
-
-        // PATCH /api/routines/{id}/assign
-        public async Task UpdateAssignedUserAsync(string routineId, string assignedTo)
-        {
-            try
-            {
-                var docRef = _firestoreDb.Collection("routines").Document(routineId);
-                var routine = await docRef.GetSnapshotAsync();
-
-                if (routine.Exists)
-                {
-                    // Update the assignedTo field
-                    var updateData = new Dictionary<string, object>
-                    {
-                        { "AssignedTo", assignedTo }
-                    };
-
-                    await docRef.UpdateAsync(updateData);
-                }
-                else
-                {
-                    throw new Exception("Routine not found.");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error updating assigned user for routine {routineId}: {ex.Message}");
-                throw new Exception("Failed to assign user. Please try again later.");
+                Console.WriteLine($"Error assigning users to routine {routineId}: {ex.Message}");
+                throw new Exception("Failed to assign users to routine. Please try again later.");
             }
         }
 

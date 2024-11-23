@@ -7,6 +7,8 @@ const AddPatientModal = ({ isOpen, onClose, onAddPatient }) => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
+    const [age, setAge] = useState(''); // New age state
+    const [medicalCondition, setMedicalCondition] = useState(''); // New medical condition state
     const { dispatch } = usePatientContext();
     const [error, setError] = useState(null);
 
@@ -18,23 +20,40 @@ const AddPatientModal = ({ isOpen, onClose, onAddPatient }) => {
             return;
         }
 
+        // Validate age (optional)
+        if (isNaN(age) || age <= 0) {
+            setError("Please enter a valid age.");
+            return;
+        }
+
         try {
-            //const newPatient = await signUp(firstName, lastName, email, password);
-            //console.log(newPatient); // Log the new patient object (optional)
-            //dispatch({ type: 'ADD_PATIENT', payload: newPatient });
             const newPatient = {
                 firstName,
                 lastName,
                 email,
-                password
-            }
+                password,
+                age: parseInt(age), // Ensure age is sent as a number
+                medicalCondition
+            };
             onAddPatient(newPatient);
+
+            // Reset all input fields
+            setEmail('');
+            setPassword('');
+            setConfirmPassword('');
+            setFirstName('');
+            setLastName('');
+            setAge('');
+            setMedicalCondition('');
+            setError(null);
+
             onClose(); // Close modal on successful submission
         } catch (error) {
             console.error(error);
             setError(error.message || "An error occurred.");
         }
     };
+
 
     if (!isOpen) return null; // Don't render if modal is closed
 
@@ -96,6 +115,26 @@ const AddPatientModal = ({ isOpen, onClose, onAddPatient }) => {
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             required
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="age">Age</label>
+                        <input
+                            type="number"
+                            id="age"
+                            value={age}
+                            onChange={(e) => setAge(e.target.value)}
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            required
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="medicalCondition">Medical Condition</label>
+                        <textarea
+                            id="medicalCondition"
+                            value={medicalCondition}
+                            onChange={(e) => setMedicalCondition(e.target.value)}
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         />
                     </div>
                     {error && (

@@ -17,14 +17,8 @@ namespace WorkWell.Server.Models
         public required TargetArea TargetArea { get; set; }
 
         [FirestoreProperty]
-        public string? AssignedTo { get; set; } // User ID reference
-        // populate this field with the user ID of the user who the routine is assigned to
-        public string? AssignedName { get; set; } // User name reference
+        public List<string> Users { get; set; } = new List<string>();
 
-        [FirestoreProperty]
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-        // List of exercises in the routine
         [FirestoreProperty]
         public List<RoutineExercise> Exercises { get; set; } = new List<RoutineExercise>();
     }
@@ -36,18 +30,12 @@ namespace WorkWell.Server.Models
         [FirestoreProperty]
         public required string ExerciseId { get; set; } 
 
-        // populate this field with the exercise detail of the exercise in the routine
-        public string? ExerciseName { get; set; } // Exercise name reference
-        public string? ExerciseDescription { get; set; } // Exercise description reference
-
         [FirestoreProperty]
         public int Reps { get; set; }
 
         [FirestoreProperty]
-        public int Sets { get; set; }
+        public int Duration { get; set; }
 
-        [FirestoreProperty]
-        public int Rest { get; set; } 
     }
 
 

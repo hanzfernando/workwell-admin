@@ -6,7 +6,7 @@ const BASE_URL = `${backendLink}/api/auth`;
 
 
 
-const signUp = async (firstName, lastName, email, password) => {
+const signUp = async (firstName, lastName, email, password, age, medicalCondition) => {
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         // Get the signed-in user
@@ -27,6 +27,8 @@ const signUp = async (firstName, lastName, email, password) => {
                 firstName,
                 lastName,
                 password,
+                medicalCondition,
+                age
             }),
         });
     

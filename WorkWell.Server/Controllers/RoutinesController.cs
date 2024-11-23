@@ -95,29 +95,20 @@ namespace WorkWell.Server.Controllers
             await _routineService.DeleteRoutineAsync(routineId);
             return NoContent();
         }
-        // PATCH: api/routines/{id}/assign
-        [HttpPatch("{routineId}/assign")]
-        public async Task<ActionResult> AssignUserToRoutine(string routineId, [FromBody] AssignUserRequest request)
+
+        [HttpPatch("{routineId}/assign-users")]
+        public async Task<ActionResult> AssignUsersToRoutine(string routineId, [FromBody] List<string> userIds)
         {
-            if (string.IsNullOrEmpty(request.AssignedTo))
+            try
             {
-                return BadRequest("AssignedTo cannot be null or empty.");
+                // Allow empty userIds to unassign all users
+                await _routineService.AssignUsersToRoutineAsync(routineId, userIds);
+                return NoContent(); // Success
             }
-
-            // Retrieve the existing routine
-            var routine = await _routineService.GetRoutineAsync(routineId);
-            if (routine == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                return StatusCode(500, ex.Message); // Internal Server Error
             }
-
-            // Update the AssignedTo field
-            routine.AssignedTo = request.AssignedTo;
-
-            // Update the routine in Firestore
-            await _routineService.UpdateRoutineAsync(routine);
-
-            return NoContent(); // Success
         }
 
 

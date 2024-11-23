@@ -1,28 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePatientContext } from '../hooks/usePatientContext';
 
 const AssignRoutineModal = ({ isOpen, onClose, routine, onAssign }) => {
     const { state: { patients } } = usePatientContext();
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedPatient, setSelectedPatient] = useState(null);
+    const [selectedPatients, setSelectedPatients] = useState([]);
+
+    // Set initial selected patients based on already assigned users in the routine
+    useEffect(() => {
+        if (routine && routine.users) {
+            const initiallySelected = patients.filter((patient) =>
+                routine.users.includes(patient.uid)
+            );
+            setSelectedPatients(initiallySelected);
+        }
+    }, [routine, patients]);
 
     if (!isOpen) return null;
-
-    console.log(patients);
 
     const filteredPatients = patients.filter((patient) =>
         patient.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         patient.lastName.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const handleAssign = () => {
-        if (selectedPatient) {
-            onAssign(routine, selectedPatient);
-            onClose();
-        } else {
-            alert('Please select a patient.');
-        }
+    const handlePatientSelection = (patient) => {
+        setSelectedPatients((prevSelected) => {
+            if (prevSelected.some((p) => p.uid === patient.uid)) {
+                // If already selected, remove the patient
+                return prevSelected.filter((p) => p.uid !== patient.uid);
+            } else {
+                // Otherwise, add the patient
+                return [...prevSelected, patient];
+            }
+        });
     };
+
+    const handleAssign = () => {
+        const selectedUids = selectedPatients.map((patient) => patient.uid);
+        onAssign(routine, selectedUids);
+        onClose();
+    };
+
 
     return (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
@@ -58,6 +76,12 @@ const AssignRoutineModal = ({ isOpen, onClose, routine, onAssign }) => {
                                         Last Name
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                        Age
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                        Medical Condition
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                                         Select
                                     </th>
                                 </tr>
@@ -67,11 +91,13 @@ const AssignRoutineModal = ({ isOpen, onClose, routine, onAssign }) => {
                                     <tr key={patient.uid}>
                                         <td className="px-6 py-4 text-sm text-gray-700">{patient.firstName}</td>
                                         <td className="px-6 py-4 text-sm text-gray-700">{patient.lastName}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-700">{patient.age}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-700">{patient.medicalCondition}</td>
                                         <td className="px-6 py-4 text-center">
                                             <input
-                                                type="radio"
-                                                name="selectedPatient"
-                                                onChange={() => setSelectedPatient(patient)}
+                                                type="checkbox"
+                                                checked={selectedPatients.some((p) => p.uid === patient.uid)}
+                                                onChange={() => handlePatientSelection(patient)}
                                             />
                                         </td>
                                     </tr>

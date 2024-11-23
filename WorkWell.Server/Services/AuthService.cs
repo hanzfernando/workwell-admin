@@ -30,7 +30,9 @@ namespace WorkWell.Server.Services
                     Email = request.Email,
                     FirstName = request.FirstName,    // Save firstName in Firestore
                     LastName = request.LastName,      // Save lastName in Firestore
-                    Role = request.Role               // Assign the role during user creation
+                    Role = request.Role,
+                    MedicalCondition = request.MedicalCondition,     
+                    Age = request.Age
                 };
 
                 var userRef = _firestoreDb.Collection("users").Document(request.Uid);
