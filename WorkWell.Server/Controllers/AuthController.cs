@@ -73,16 +73,15 @@ namespace WorkWell.Server.Controllers
         [HttpPost("verifyToken")]
         public async Task<IActionResult> VerifyToken([FromBody] VerifyTokenRequest request)
         {
-            Console.WriteLine(request.IdToken);
+            Console.WriteLine("Received Token: " + request.IdToken);
             if (string.IsNullOrEmpty(request.IdToken))
             {
-                return BadRequest("ID Token is required.");
+                return BadRequest("ID Token is required."); // This may be the reason for the 400 error
             }
 
             try
             {
                 var user = await _authService.VerifyTokenAsync(request.IdToken);
-                Debug.WriteLine(user.Role);
                 return Ok(user);
             }
             catch (Exception ex)
@@ -90,5 +89,6 @@ namespace WorkWell.Server.Controllers
                 return BadRequest($"Error verifying token: {ex.Message}");
             }
         }
+
     }
 }

@@ -62,33 +62,26 @@ const logIn = async (email, password) => {
 
 const verifyToken = async (idToken) => {
     try {
-        // Send the ID token to your backend for verification
         const response = await fetch(`${BASE_URL}/verifyToken`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ idToken }),
+            body: JSON.stringify({ idToken }), // Ensure idToken is passed
         });
 
-        // Check if the response is OK
         if (!response.ok) {
             throw new Error('Failed to verify token');
         }
 
-        // Parse the response body to get the FirebaseUser data
         const userInfo = await response.json();
-
-        // Log userInfo to check what it contains
-        //console.log(userInfo);
-
-        // Return userInfo
         return userInfo;
     } catch (error) {
         console.error('Error verifying token:', error);
-        throw new Error(error.message);
+        throw error;
     }
 };
+
 
 
 export { signUp, logIn, verifyToken };

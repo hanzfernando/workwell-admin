@@ -47,6 +47,7 @@ builder.Services.AddScoped<ExerciseService>();
 builder.Services.AddScoped<RoutineService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<AdminAccountService>();
 
 var app = builder.Build();
 //app.UseHttpsRedirection();

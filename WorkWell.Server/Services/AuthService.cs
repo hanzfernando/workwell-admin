@@ -19,24 +19,27 @@ namespace WorkWell.Server.Services
         // Method for signup (Create new user in Firebase Authentication and Firestore)
         public async Task<User> SignUpAsync(SignUpRequest request)
         {
-            Debug.WriteLine("Service");
-
             try
             {
-                // Create a new user document in Firestore, including firstName, lastName, and role
+                // Create a new user document in Firestore
                 var user = new User
                 {
                     Uid = request.Uid,
                     Email = request.Email,
-                    FirstName = request.FirstName,    // Save firstName in Firestore
-                    LastName = request.LastName,      // Save lastName in Firestore
+                    FirstName = request.FirstName,
+                    LastName = request.LastName,
                     Role = request.Role,
-                    MedicalCondition = request.MedicalCondition,     
+                    MedicalCondition = request.MedicalCondition,
                     Age = request.Age
                 };
 
+                // Save user to Firestore
                 var userRef = _firestoreDb.Collection("users").Document(request.Uid);
                 await userRef.SetAsync(user);
+
+                // Set custom claims for the user in Firebase Authentication
+                var claims = new Dictionary<string, object> { { "Role", (int)request.Role } };
+                await FirebaseAuth.DefaultInstance.SetCustomUserClaimsAsync(request.Uid, claims);
 
                 // Return the full user object
                 return user;
@@ -46,6 +49,7 @@ namespace WorkWell.Server.Services
                 throw new Exception($"Error signing up: {ex.Message}");
             }
         }
+
 
 
         // Method for login (Verify user with Firebase Authentication)
@@ -65,9 +69,10 @@ namespace WorkWell.Server.Services
                     throw new Exception("Please verify your email before logging in.");
                 }
 
-                // Return the Firebase Custom Token if email is verified
-                var customToken = await FirebaseAuth.DefaultInstance.CreateCustomTokenAsync(userRecord.Uid);
-                return customToken;
+                // Retrieve ID token with custom claims
+                var decodedToken = await FirebaseAuth.DefaultInstance.CreateCustomTokenAsync(userRecord.Uid);
+
+                return decodedToken;
             }
             catch (Exception ex)
             {
@@ -76,32 +81,34 @@ namespace WorkWell.Server.Services
         }
 
 
+
         // Verify the ID token from client-side to authenticate user
         public async Task<FirebaseUser> VerifyTokenAsync(string idToken)
         {
             try
             {
-                // Verify the ID token and get the UID
+                // Validate the token
                 var decodedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(idToken);
+
+                // Log token claims
+                Console.WriteLine("Token Claims: " + decodedToken.Claims);
+
                 var uid = decodedToken.Uid;
 
-                // Retrieve user data from Firestore in a single step
+                // Fetch user details from Firestore
                 var userDoc = await _firestoreDb.Collection("users").Document(uid).GetSnapshotAsync();
-
-                // Ensure that the Firestore user document exists
                 if (!userDoc.Exists)
+                {
                     throw new Exception("User not found in Firestore.");
+                }
 
-                // Combine FirstName and LastName into DisplayName and return the user info
                 var user = userDoc.ConvertTo<User>();
-                Debug.WriteLine("Role");
-                Debug.WriteLine(Enum.IsDefined(typeof(UserRole), user.Role) ? (UserRole)user.Role : UserRole.User);
                 return new FirebaseUser
                 {
                     UserId = uid,
                     Email = user.Email,
                     Role = Enum.IsDefined(typeof(UserRole), user.Role) ? (UserRole)user.Role : UserRole.User,
-                    DisplayName = $"{user.FirstName} {user.LastName}" // Set the concatenated FirstName and LastName
+                    DisplayName = $"{user.FirstName} {user.LastName}"
                 };
             }
             catch (Exception ex)
@@ -109,6 +116,8 @@ namespace WorkWell.Server.Services
                 throw new Exception($"Error verifying token: {ex.Message}");
             }
         }
+
+
 
 
     }
