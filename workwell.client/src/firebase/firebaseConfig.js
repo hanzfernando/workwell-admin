@@ -8,14 +8,24 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, se
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+//const firebaseConfig = {
+//    apiKey: "AIzaSyBZ187hvCszahmyLMKoEGVodMPY46JokjI",
+//    authDomain: "workwell-1306b.firebaseapp.com",
+//    projectId: "workwell-1306b",
+//    storageBucket: "workwell-1306b.firebasestorage.app",
+//    messagingSenderId: "150453512409",
+//    appId: "1:150453512409:web:fad4e834028dcbe42df6c8",
+//    measurementId: "G-20SQKGNXMT"
+//};
+
 const firebaseConfig = {
-    apiKey: "AIzaSyBZ187hvCszahmyLMKoEGVodMPY46JokjI",
-    authDomain: "workwell-1306b.firebaseapp.com",
-    projectId: "workwell-1306b",
-    storageBucket: "workwell-1306b.firebasestorage.app",
-    messagingSenderId: "150453512409",
-    appId: "1:150453512409:web:fad4e834028dcbe42df6c8",
-    measurementId: "G-20SQKGNXMT"
+    apiKey: "AIzaSyAvCC6E6nSkB5O0y4KILplpMBHEov1v3Vs",
+    authDomain: "workwell-f3985.firebaseapp.com",
+    projectId: "workwell-f3985",
+    storageBucket: "workwell-f3985.firebasestorage.app",
+    messagingSenderId: "410309064043",
+    appId: "1:410309064043:web:2c3c913b148575a17d882e",
+    measurementId: "G-3ML3Y8678L"
 };
 
 // Initialize Firebase

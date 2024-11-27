@@ -4,6 +4,10 @@ import { AuthProvider } from './context/AuthContext.jsx'
 import { PatientProvider } from './context/PatientContext.jsx'
 import { RoutineProvider } from './context/RoutineContext.jsx'
 import { ExerciseProvider } from './context/ExerciseContext.jsx' 
+import { RoutineLogProvider } from './context/RoutineLogContext.jsx'
+import { VideoProvider } from './context/VideoContext.jsx';
+import { SelfAssessmentProvider } from './context/SelfAssessmentContext.jsx';
+import { JournalProvider } from './context/JournalContext.jsx';
 import './index.css'
 import App from './App.jsx'
 
@@ -13,7 +17,15 @@ createRoot(document.getElementById('root')).render(
             <PatientProvider>
                 <RoutineProvider>
                     <ExerciseProvider>
-                        <App />
+                        <RoutineLogProvider>
+                            <VideoProvider>
+                                <SelfAssessmentProvider>
+                                    <JournalProvider>
+                                        <App />
+                                    </JournalProvider>
+                                </SelfAssessmentProvider>
+                            </VideoProvider>
+                        </RoutineLogProvider>    
                     </ExerciseProvider>
                 </RoutineProvider>               
             </PatientProvider>

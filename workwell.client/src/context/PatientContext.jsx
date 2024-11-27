@@ -23,6 +23,35 @@ const patientReducer = (state, action) => {
                 patients: [...state.patients, action.payload],
                 error: null
             };
+        case 'ADD_ROUTINE_TO_USER':
+            const { userId, routineId } = action.payload;
+            return {
+                ...state,
+                patients: state.patients.map((patient) =>
+                    patient.uid === userId
+                        ? {
+                            ...patient,
+                            routines: [...new Set([...(patient.routines || []), routineId])],
+                        }
+                        : patient
+                ),
+            };
+        case 'REMOVE_ROUTINE_FROM_USER': {
+            const { userId, routineId } = action.payload;
+
+            return {
+                ...state,
+                patients: state.patients.map((patient) =>
+                    patient.uid === userId
+                        ? {
+                            ...patient,
+                            routines: (patient.routines || []).filter((id) => id !== routineId),
+                        }
+                        : patient
+                ),
+            };
+        }
+
         case 'ERROR':
             return {
                 ...state,

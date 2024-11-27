@@ -15,14 +15,14 @@ const PatientTable = ({ patients, onViewRoutine }) => {
                             Last Name
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
-                            Email
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
                             Age
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
                             Medical Condition
                         </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
+                            Email
+                        </th>                   
                         <th className="px-6 py-3 text-center text-xs font-medium text-neutral-dark uppercase tracking-wider">
                             Actions
                         </th>

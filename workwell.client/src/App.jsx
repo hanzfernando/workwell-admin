@@ -8,6 +8,7 @@ import RoutinesPage from './pages/RoutinesPage';
 import ExercisesPage from './pages/ExercisesPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
+import RoutineLogsPage from './pages/RoutineLogsPage'
 import NotFoundPage from './pages/NotFoundPage';
 
 // Import Layouts
@@ -60,6 +61,7 @@ const App = () => {
                     <Route path="/users" element={<UsersPage />} />
                     <Route path="/routines" element={<RoutinesPage />} />
                     <Route path="/exercises" element={<ExercisesPage />} />
+                    <Route path="/routinelogs" element={<RoutineLogsPage /> } />
                 </Route>
 
                 {/* Catch-all Route for 404 - Not Found */}

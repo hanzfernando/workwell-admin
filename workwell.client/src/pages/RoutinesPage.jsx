@@ -7,9 +7,11 @@ import AssignRoutineModal from '../components/AssignRoutineModal';
 import AddRoutineModal from '../components/AddRoutineModal';
 import { useRoutineContext } from '../hooks/useRoutineContext';
 import { useExerciseContext } from '../hooks/useExerciseContext';
+import { usePatientContext } from '../hooks/usePatientContext';
 
 const RoutinesPage = () => {
     const { user } = useAuthContext();
+    const { state: { patients }, dispatch: patientDispatch } = usePatientContext();
     const { state: { routines }, dispatch } = useRoutineContext();
     const { state: { exercises } } = useExerciseContext();
     const [filteredRoutines, setFilteredRoutines] = useState([]);
@@ -114,6 +116,31 @@ const RoutinesPage = () => {
                         r.routineId === routine.routineId ? { ...r, users: userIds } : r
                     )
                 );
+
+                // Get the current users assigned to the routine
+                const currentUserIds = routine.users || [];
+
+                // Identify added and removed user IDs
+                const addedUserIds = userIds.filter((userId) => !currentUserIds.includes(userId));
+                const removedUserIds = currentUserIds.filter((userId) => !userIds.includes(userId));
+
+                // Dispatch action to update users' `Routines` list in context
+                addedUserIds.forEach((userId) => {
+                    console.log(`Adding routine ${routine.routineId} to user ${userId}`);
+                    patientDispatch({
+                        type: 'ADD_ROUTINE_TO_USER',
+                        payload: { userId, routineId: routine.routineId },
+                    });
+                });
+
+                // Dispatch action to remove routine from users' `Routines` list in context
+                removedUserIds.forEach((userId) => {
+                    console.log(`Removing routine ${routine.routineId} from user ${userId}`);
+                    patientDispatch({
+                        type: 'REMOVE_ROUTINE_FROM_USER',
+                        payload: { userId, routineId: routine.routineId },
+                    });
+                });
             } else {
                 console.error(`Failed to update routine "${routine.name}" with user assignments.`);
             }
@@ -121,6 +148,7 @@ const RoutinesPage = () => {
             console.error(`An error occurred while updating routine "${routine.name}" with user assignments:`, error);
         }
     };
+
 
 
 

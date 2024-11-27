@@ -48,6 +48,10 @@ builder.Services.AddScoped<RoutineService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AdminAccountService>();
+builder.Services.AddScoped<RoutineLogService>();
+builder.Services.AddScoped<VideoService>();
+builder.Services.AddScoped<SelfAssessmentService>();
+builder.Services.AddScoped<JournalService>();
 
 var app = builder.Build();
 //app.UseHttpsRedirection();
