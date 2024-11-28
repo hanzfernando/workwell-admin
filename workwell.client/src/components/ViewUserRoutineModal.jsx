@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useRoutineContext } from '../hooks/useRoutineContext';
 import { useExerciseContext } from '../hooks/useExerciseContext'; // Import the exercise context
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for routing
 import ic_eye from '../assets/ic_eye.svg';
 
 const ViewUserRoutineModal = ({ isOpen, onClose, userId, patientRoutineIds }) => {
@@ -9,6 +10,8 @@ const ViewUserRoutineModal = ({ isOpen, onClose, userId, patientRoutineIds }) =>
     const { state: { exercises } } = useExerciseContext(); // Access exercises from context
     const [patientRoutines, setPatientRoutines] = useState([]); // Routines for the patient
     const [expandedRoutineId, setExpandedRoutineId] = useState(null); // Track expanded routine
+
+    const navigate = useNavigate(); // Hook for navigation
 
     // Filter routines for the selected patient based on routineId
     useEffect(() => {
@@ -29,6 +32,8 @@ const ViewUserRoutineModal = ({ isOpen, onClose, userId, patientRoutineIds }) =>
     const handleToggleExercises = (routineId) => {
         setExpandedRoutineId(prevState => (prevState === routineId ? null : routineId)); // Toggle expansion
     };
+
+
 
     // Helper function to get exercise details
     const getExerciseDetails = (exerciseId) => {
@@ -63,6 +68,12 @@ const ViewUserRoutineModal = ({ isOpen, onClose, userId, patientRoutineIds }) =>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                                     Target Area
                                 </th>
+                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                    Start Date
+                                </th>
+                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                    End Date
+                                </th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                                     Actions
                                 </th>
@@ -79,17 +90,24 @@ const ViewUserRoutineModal = ({ isOpen, onClose, userId, patientRoutineIds }) =>
                                             {routine.targetArea}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                            {routine.startDateFormatted}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                            {routine.endDateFormatted}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 flex gap-2">
                                             <button
                                                 onClick={() => handleToggleExercises(routine.routineId)}
                                                 className="bg-accent-aqua p-1 rounded-lg hover:bg-teal-500"
                                             >
-                                                <img src={ic_eye} alt="View" className="h-6 w-6" />
+                                                <img src={ic_eye} alt="View Exercises" className="h-6 w-6" />
                                             </button>
+                                            
                                         </td>
                                     </tr>
                                     {expandedRoutineId === routine.routineId && (
                                         <tr>
-                                            <td colSpan="3" className="px-6 py-2 border-b">
+                                            <td colSpan="5" className="px-6 py-2 border-b">
                                                 <div className="overflow-hidden transition-all duration-500 ease-in-out">
                                                     <table className="min-w-full divide-y divide-gray-200 bg-gray-50">
                                                         <thead className="bg-gray-200">
@@ -101,7 +119,7 @@ const ViewUserRoutineModal = ({ isOpen, onClose, userId, patientRoutineIds }) =>
                                                                     Reps
                                                                 </th>
                                                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                                                    Duration (sec)
+                                                                    Duration (millisecond)
                                                                 </th>
                                                             </tr>
                                                         </thead>

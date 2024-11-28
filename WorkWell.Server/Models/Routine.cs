@@ -1,5 +1,7 @@
 ﻿using Google.Cloud.Firestore;
+using Microsoft.AspNetCore.Http.HttpResults;
 using System.Text.Json.Serialization;
+using WorkWell.Server.Utils;
 
 namespace WorkWell.Server.Models
 {
@@ -21,22 +23,35 @@ namespace WorkWell.Server.Models
 
         [FirestoreProperty]
         public List<RoutineExercise> Exercises { get; set; } = new List<RoutineExercise>();
+
+        [FirestoreProperty]
+        [JsonConverter(typeof(FirestoreTimestampJsonConverter))]
+        public Timestamp StartDate { get; set; }
+
+        [FirestoreProperty]
+        [JsonConverter(typeof(FirestoreTimestampJsonConverter))]
+        public Timestamp EndDate{ get; set; }
+
+        [JsonPropertyName("startDateFormatted")] // Use this property for JSON serialization
+        public string StartDateFormatted => StartDate.ToDateTime().ToLocalTime().ToString("yyyy-MM-dd");
+        
+        [JsonPropertyName("endDateFormatted")] // Use this property for JSON serialization
+        public string EndDateFormatted => EndDate.ToDateTime().ToLocalTime().ToString("yyyy-MM-dd");
+
+        // Sub-model for each exercise in the routine
+        [FirestoreData]  // Marks this class as a Firestore document
+        public class RoutineExercise
+        {
+            [FirestoreProperty]
+            public required string ExerciseId { get; set; }
+
+            [FirestoreProperty]
+            public int Reps { get; set; }
+
+            [FirestoreProperty]
+            public int Duration { get; set; }
+
+        }
     }
-
-    // Sub-model for each exercise in the routine
-    [FirestoreData]  // Marks this class as a Firestore document
-    public class RoutineExercise
-    {
-        [FirestoreProperty]
-        public required string ExerciseId { get; set; } 
-
-        [FirestoreProperty]
-        public int Reps { get; set; }
-
-        [FirestoreProperty]
-        public int Duration { get; set; }
-
-    }
-
 
 }

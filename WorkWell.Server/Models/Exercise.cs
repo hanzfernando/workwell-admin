@@ -29,5 +29,6 @@ namespace WorkWell.Server.Models
         Neck,       // 0
         Shoulder,   // 1
         LowerBack,  // 2
+        Thigh       // 3
     }
 }

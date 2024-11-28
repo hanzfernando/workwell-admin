@@ -1,13 +1,19 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useExerciseContext } from '../hooks/useExerciseContext';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const AddRoutineModal = ({ isOpen, onClose, onAddRoutine }) => {
     const { state: { exercises } } = useExerciseContext();
 
     const [routineName, setRoutineName] = useState('');
     const [targetArea, setTargetArea] = useState('');
-    const [selectedExercises, setSelectedExercises] = useState([]); // Store full exercise data
+    const [selectedExercises, setSelectedExercises] = useState([]);
+    const [startDate, setStartDate] = useState(null); // State for StartDate
+    const [endDate, setEndDate] = useState(null); // State for EndDate
+
+    const [errorMessage, setErrorMessage] = useState(''); // State for error messages
 
     if (!isOpen) return null;
 
@@ -21,11 +27,11 @@ const AddRoutineModal = ({ isOpen, onClose, onAddRoutine }) => {
             if (exercise) {
                 const isSelected = prevSelectedExercises.some((ex) => ex.exerciseId === exerciseId);
                 if (isSelected) {
-                    return prevSelectedExercises.filter((ex) => ex.exerciseId !== exerciseId); // Deselect
+                    return prevSelectedExercises.filter((ex) => ex.exerciseId !== exerciseId);
                 } else {
                     return [
                         ...prevSelectedExercises,
-                        { exerciseId: exercise.exerciseId, name: exercise.name, reps: 10, duration: 60 }, // Default values
+                        { exerciseId: exercise.exerciseId, name: exercise.name, reps: 10, duration: 60 },
                     ];
                 }
             }
@@ -35,34 +41,50 @@ const AddRoutineModal = ({ isOpen, onClose, onAddRoutine }) => {
 
     const handleInputChange = (index, field, value) => {
         const updatedExercises = [...selectedExercises];
-        updatedExercises[index][field] = value ? parseInt(value, 10) : 0; // Ensure numeric input
+        updatedExercises[index][field] = value ? parseInt(value, 10) : 0;
         setSelectedExercises(updatedExercises);
     };
 
     const handleAddRoutine = () => {
-        if (!routineName || !targetArea || selectedExercises.length === 0) {
-            alert('Please fill all fields and make selections.');
+        // Validation for routine name, target area, and exercises
+        if (!routineName || !targetArea || selectedExercises.length === 0 || !startDate || !endDate) {
+            setErrorMessage('Please fill all fields and make selections.');
             return;
         }
+
+        // Ensure start date is before or the same as end date
+        if (endDate < startDate) {
+            setErrorMessage('End Date cannot be before Start Date.');
+            return;
+        }
+
+        // Ensure both dates are valid and formatted in ISO 8601
+        const formattedStartDate = startDate.toISOString(); // 
+        const formattedEndDate = endDate.toISOString(); //
 
         const newRoutine = {
             name: routineName,
             targetArea,
+            startDate: formattedStartDate,
+            endDate: formattedEndDate,
             exercises: selectedExercises.map(({ exerciseId, reps, duration }) => ({
                 exerciseId,
                 reps: reps || 0,
-                duration: duration || 0, // Ensure default values
+                duration: duration || 0,
             })),
         };
 
         onAddRoutine(newRoutine);
 
-        // Reset fields
+        // Reset state
         setRoutineName('');
         setTargetArea('');
         setSelectedExercises([]);
+        setStartDate(null);
+        setEndDate(null);
+        setErrorMessage('');
 
-        onClose(); // Close the modal
+        onClose();
     };
 
     return (
@@ -76,6 +98,13 @@ const AddRoutineModal = ({ isOpen, onClose, onAddRoutine }) => {
                 </div>
 
                 <div className="space-y-4">
+                    {/* Error message display */}
+                    {errorMessage && (
+                        <div className="text-red-500 text-sm mb-4">
+                            {errorMessage}
+                        </div>
+                    )}
+
                     <div>
                         <label className="block text-sm font-medium mb-2">Routine Name</label>
                         <input
@@ -92,7 +121,7 @@ const AddRoutineModal = ({ isOpen, onClose, onAddRoutine }) => {
                             value={targetArea}
                             onChange={(e) => {
                                 setTargetArea(e.target.value);
-                                setSelectedExercises([]); // Clear selected exercises
+                                setSelectedExercises([]);
                             }}
                             className="w-full px-3 py-2 border rounded focus:outline-none focus:border-teal-500"
                         >
@@ -100,7 +129,30 @@ const AddRoutineModal = ({ isOpen, onClose, onAddRoutine }) => {
                             <option value="Neck">Neck</option>
                             <option value="Shoulder">Shoulder</option>
                             <option value="LowerBack">Lower Back</option>
+                            <option value="Thigh">Thigh</option>
                         </select>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-2">Start Date</label>
+                        <DatePicker
+                            selected={startDate}
+                            onChange={(date) => setStartDate(date)}
+                            dateFormat="yyyy-MM-dd"
+                            placeholderText="Select start date"
+                            className="w-full px-3 py-2 border rounded focus:outline-none focus:border-teal-500"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-2">End Date</label>
+                        <DatePicker
+                            selected={endDate}
+                            onChange={(date) => setEndDate(date)}
+                            dateFormat="yyyy-MM-dd"
+                            placeholderText="Select end date"
+                            className="w-full px-3 py-2 border rounded focus:outline-none focus:border-teal-500"
+                        />
                     </div>
 
                     {targetArea && (
@@ -153,7 +205,7 @@ const AddRoutineModal = ({ isOpen, onClose, onAddRoutine }) => {
                                                 Reps
                                             </th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                                Duration (sec)
+                                                Duration (millisecond)
                                             </th>
                                         </tr>
                                     </thead>

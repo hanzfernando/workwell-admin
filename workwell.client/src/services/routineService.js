@@ -30,6 +30,7 @@ const getAllRoutines = async () => {
 };
 
 const addRoutine = async (routine) => {
+    console.log(routine)
     try {
         const response = await fetch(BASE_URL, {
             method: 'POST',

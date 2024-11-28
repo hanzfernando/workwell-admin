@@ -24,7 +24,6 @@ namespace WorkWell.Server.Models
         [FirestoreProperty]
         public required string VideoId { get; set; }
 
-
         [FirestoreProperty]
         public required string Uid { get; set; }
 
@@ -33,6 +32,7 @@ namespace WorkWell.Server.Models
         public Timestamp CreatedAt { get; set; }
 
         [JsonPropertyName("createdAtDateTime")] // Use this property for JSON serialization
-        public string CreatedAtFormatted => CreatedAt.ToDateTime().ToString("yyyy-MM-dd hh:mm tt");
+        public string CreatedAtFormatted => CreatedAt.ToDateTime().ToLocalTime().ToString("yyyy-MM-dd hh:mm tt");
+
     }
 }

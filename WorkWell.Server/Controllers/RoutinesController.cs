@@ -53,6 +53,10 @@ namespace WorkWell.Server.Controllers
                 return BadRequest($"Invalid target area: {routine.TargetArea}");
             }
 
+            Console.WriteLine("_________________________________________");
+            Console.WriteLine("Adding routine:");
+            Console.WriteLine(routine);
+
             await _routineService.AddRoutineAsync(routine);
             return CreatedAtAction(nameof(GetRoutine), new { routineId = routine.RoutineId }, routine);
         }

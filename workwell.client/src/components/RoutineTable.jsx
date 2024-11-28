@@ -48,6 +48,12 @@ const RoutineTable = ({ routines, onViewRoutine, onAssignRoutine }) => {
                         <th className="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
                             Target Area
                         </th>                     
+                         <th className="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
+                            Start Date
+                        </th>                     
+                         <th className="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
+                            End Date
+                        </th>                     
                         <th className="px-6 py-3 text-center text-xs font-medium text-neutral-dark uppercase tracking-wider">
                             Actions
                         </th>
@@ -59,6 +65,8 @@ const RoutineTable = ({ routines, onViewRoutine, onAssignRoutine }) => {
                             <tr key={routine.routineId}>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{routine.name}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{routine.targetArea}</td>                                                            
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{routine.startDateFormatted}</td>                                                            
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{routine.endDateFormatted}</td>                                                            
                                 <td className="px-6 py-4 whitespace-nowrap text-center">
                                     <button
                                         onClick={() => onViewRoutine(routine)}
