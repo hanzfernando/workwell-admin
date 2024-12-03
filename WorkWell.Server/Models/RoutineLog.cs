@@ -29,10 +29,10 @@ namespace WorkWell.Server.Models
 
         [FirestoreProperty]
         [JsonIgnore]
-        public Timestamp CreatedAt { get; set; }
+        public Timestamp? CreatedAt { get; set; }
 
         [JsonPropertyName("createdAtDateTime")] // Use this property for JSON serialization
-        public string CreatedAtFormatted => CreatedAt.ToDateTime().ToLocalTime().ToString("yyyy-MM-dd hh:mm tt");
+        public string? CreatedAtFormatted => CreatedAt?.ToDateTime().ToLocalTime().ToString("yyyy-MM-dd hh:mm tt");
 
     }
 }
