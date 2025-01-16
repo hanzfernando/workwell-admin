@@ -1,11 +1,16 @@
 import { backendLink } from '../utils/ngrokLink.js';
+import { getToken } from '../utils/authUtil.js';
+
 const BASE_URL = `${backendLink}/api/users`;
-//const BASE_URL = "http://localhost:7054/api/users";
 
 // Get all patients
 const getPatients = async () => {
     try {
-        const response = await fetch(BASE_URL);
+        const response = await fetch(BASE_URL, {
+            headers: {
+                Authorization: `Bearer ${getToken()}`, // Add Authorization header
+            },
+        });
         if (!response.ok) {
             throw new Error("Failed to fetch patients.");
         }
@@ -20,7 +25,11 @@ const getPatients = async () => {
 // Get a specific patient by ID
 const getPatient = async (id) => {
     try {
-        const response = await fetch(`${BASE_URL}/${id}`);
+        const response = await fetch(`${BASE_URL}/${id}`, {
+            headers: {
+                Authorization: `Bearer ${getToken()}`, // Add Authorization header
+            },
+        });
         if (!response.ok) {
             throw new Error("Failed to fetch patient.");
         }

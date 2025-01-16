@@ -1,4 +1,6 @@
 import { backendLink } from '../utils/ngrokLink.js'; // Replace with your actual backend link
+import { getToken } from '../utils/authUtil.js';
+
 const BASE_URL = `${backendLink}/api/videos`;
 
 const getAllVideos = async () => {
@@ -7,6 +9,8 @@ const getAllVideos = async () => {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${getToken()}`, // Add Authorization header
+
             },
         });
 

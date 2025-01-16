@@ -1,11 +1,16 @@
 import { backendLink } from '../utils/ngrokLink.js';
-const BASE_URL = `${backendLink}/api/exercises`;
-//const BASE_URL = "http://localhost:7054/api/exercises";
+import { getToken } from '../utils/authUtil.js';
 
+const BASE_URL = `${backendLink}/api/exercises`;
+// const BASE_URL = "http://localhost:7054/api/exercises";
 
 const getExercise = async (exerciseId) => {
     try {
-        const response = await fetch(`${BASE_URL}/${exerciseId}`);
+        const response = await fetch(`${BASE_URL}/${exerciseId}`, {
+            headers: {
+                Authorization: `Bearer ${getToken()}`,
+            },
+        });
         if (!response.ok) {
             throw new Error(`Error fetching exercise with ID ${exerciseId}: ${response.statusText}`);
         }
@@ -18,7 +23,11 @@ const getExercise = async (exerciseId) => {
 
 const getExercises = async () => {
     try {
-        const response = await fetch(BASE_URL);
+        const response = await fetch(BASE_URL, {
+            headers: {
+                Authorization: `Bearer ${getToken()}`,
+            },
+        });
         if (!response.ok) {
             throw new Error(`Error fetching all exercises: ${response.statusText}`);
         }
@@ -35,6 +44,7 @@ const addExercise = async (exercise) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${getToken()}`,
             },
             body: JSON.stringify(exercise),
         });
@@ -55,6 +65,7 @@ const updateExercise = async (exerciseId, exercise) => {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${getToken()}`,
             },
             body: JSON.stringify(exercise),
         });
@@ -73,6 +84,9 @@ const deleteExercise = async (exerciseId) => {
     try {
         const response = await fetch(`${BASE_URL}/${exerciseId}`, {
             method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${getToken()}`,
+            },
         });
         if (!response.ok) {
             throw new Error(`Error deleting exercise with ID ${exerciseId}: ${response.statusText}`);

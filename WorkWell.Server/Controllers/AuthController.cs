@@ -4,6 +4,7 @@ using WorkWell.Server.Models;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.Data;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WorkWell.Server.Controllers
 {
@@ -50,6 +51,7 @@ namespace WorkWell.Server.Controllers
 
 
         // POST: api/Auth/login
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> LogIn([FromBody] LogInRequest request)
         {
@@ -70,6 +72,7 @@ namespace WorkWell.Server.Controllers
         }
 
         // POST: api/Auth/verifyToken
+        [AllowAnonymous]
         [HttpPost("verifyToken")]
         public async Task<IActionResult> VerifyToken([FromBody] VerifyTokenRequest request)
         {

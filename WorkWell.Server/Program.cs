@@ -2,6 +2,10 @@ using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Firestore;
 using WorkWell.Server.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 var MyOrigin = "AllowFrontend";
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Access Firebase settings from appsettings.json
 var firebaseConfig = builder.Configuration.GetSection("Firebase");
+var authAuthority = firebaseConfig["AuthAuthority"];
+var audience = firebaseConfig["Audience"];
 
 // Get the service account file path from configuration
 var serviceAccountPath = firebaseConfig.GetValue<string>("ServiceAccountPath");
@@ -32,6 +38,41 @@ builder.Services.AddCors(options =>
               .AllowCredentials();  // Allow credentials (cookies, tokens)
     });
 });
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = authAuthority;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = authAuthority,
+            ValidateAudience = true,
+            ValidAudience = audience,
+            ValidateLifetime = true
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = context =>
+            {
+                var claimsIdentity = context.Principal.Identity as ClaimsIdentity;
+
+                // Map the "Role" claim to "ClaimTypes.Role"
+                var roleClaim = claimsIdentity?.FindFirst("Role");
+                if (roleClaim != null)
+                {
+                    claimsIdentity?.AddClaim(new Claim(ClaimTypes.Role, roleClaim.Value));
+                }
+
+                return Task.CompletedTask;
+            }
+
+        };
+    });
+
+
+builder.Services.AddAuthorization();
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -73,7 +114,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//app.UseAuthentication();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

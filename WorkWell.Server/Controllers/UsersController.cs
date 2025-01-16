@@ -10,6 +10,8 @@ namespace WorkWell.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+
     public class UsersController : ControllerBase
     {
         private readonly UserService _userService;

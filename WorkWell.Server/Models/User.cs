@@ -80,6 +80,7 @@ namespace WorkWell.Server.Models
 
     public enum UserRole {
         Admin,
-        User
+        User,
+        SuperAdmin
     }
 }

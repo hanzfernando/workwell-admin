@@ -3,11 +3,13 @@ using System.Threading.Tasks;
 using WorkWell.Server.Services;
 using WorkWell.Server.Models;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WorkWell.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class RoutineLogsController : ControllerBase
     {
         private readonly RoutineLogService _routineLogService;

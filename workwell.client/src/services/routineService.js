@@ -1,11 +1,15 @@
 import { backendLink } from '../utils/ngrokLink.js';
-
+import { getToken } from '../utils/authUtil.js'
 const BASE_URL = `${backendLink}/api/routines`;
 //const BASE_URL = "http://localhost:7054/api/routines";
 
 const getRoutine = async (routineId) => {
     try {
-        const response = await fetch(`${BASE_URL}/${routineId}`);
+        const response = await fetch(`${BASE_URL}/${routineId}`, {
+            headers: {
+                Authorization: `Bearer ${getToken()}`, // Add Authorization header
+            },
+        });
         if (!response.ok) {
             throw new Error(`Error fetching routine with ID ${routineId}: ${response.statusText}`);
         }
@@ -18,7 +22,11 @@ const getRoutine = async (routineId) => {
 
 const getAllRoutines = async () => {
     try {
-        const response = await fetch(BASE_URL);
+        const response = await fetch(BASE_URL, {
+            headers: {
+                Authorization: `Bearer ${getToken()}`, // Add Authorization header
+            },
+        });
         if (!response.ok) {
             throw new Error(`Error fetching all routines: ${response.statusText}`);
         }
@@ -36,6 +44,8 @@ const addRoutine = async (routine) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${getToken()}`, // Add Authorization header
+
             },
             body: JSON.stringify(routine),
         });
@@ -56,6 +66,8 @@ const updateRoutine = async (routineId, routine) => {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${getToken()}`, // Add Authorization header
+
             },
             body: JSON.stringify(routine),
         });
@@ -74,6 +86,10 @@ const deleteRoutine = async (routineId) => {
     try {
         const response = await fetch(`${BASE_URL}/${routineId}`, {
             method: 'DELETE',
+            headers: {              
+                Authorization: `Bearer ${getToken()}`, // Add Authorization header
+
+            },
         });
         if (!response.ok) {
             throw new Error(`Error deleting routine with ID ${routineId}: ${response.statusText}`);
@@ -90,6 +106,8 @@ const assignUsersToRoutine = async (routineId, userIds) => {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${getToken()}`, // Add Authorization header
+
             },
             body: JSON.stringify(userIds),
         });

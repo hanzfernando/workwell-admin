@@ -4,11 +4,14 @@ using WorkWell.Server.Models;
 using WorkWell.Server.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WorkWell.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+
     public class RoutinesController : ControllerBase
     {
         private readonly RoutineService _routineService;
