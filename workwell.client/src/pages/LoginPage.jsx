@@ -20,14 +20,16 @@ const LoginPage = () => {
             // Try logging in
             await login(email, password);
             //console.log("Login successful");
-
-            // Check if the user is an admin
-            if (user?.role === 0) {
-                navigate('/users');
-            } else if (user?.role !== 0) {
-                // If user is not an admin (role is not 0), show error message
-                throw new Error('Unauthorized access: User role not permitted');
-            }
+            //window.reload();
+            //// Check if the user is an admin
+            //if (user?.role === "Admin") {
+            //    navigate('/users');
+            //} else if (user?.role === "SuperAdmin") {
+            //    navigate('/admins');
+            //} else if (user?.role !== "Admin" || (user?.role !== "SuperAdmin")) {
+            //    // If user is not an admin (role is not 0), show error message
+            //    throw new Error('Unauthorized access: User role not permitted');
+            //}
         } catch (error) {
             //console.error(error);
 

@@ -1,4 +1,7 @@
 ﻿using Google.Cloud.Firestore;
+using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
+using WorkWell.Server.Utils;
 
 namespace WorkWell.Server.Models
 {
@@ -19,11 +22,15 @@ namespace WorkWell.Server.Models
             [FirestoreProperty]
             public required string LastName { get; set; }
 
-            [FirestoreProperty]
+            [FirestoreProperty(ConverterType = typeof(FirestoreEnumConverter<UserRole>))]
+            [JsonConverter(typeof(Utils.JsonStringEnumConverter<UserRole>))]
+
             public UserRole Role { get; set; } = UserRole.User; // Role of the user (Admin, User)
 
             [FirestoreProperty]
-            public int Age { get; set; } // New: Age of the user
+            public int? Age { get; set; } // New: Age of the user
+            [FirestoreProperty]
+            public string? OrganizationId { get; set; } // New: Age of the user
 
             [FirestoreProperty]
             public string? MedicalCondition { get; set; } // New: Medical condition of the user (optional)
@@ -40,7 +47,7 @@ namespace WorkWell.Server.Models
         public required string Email { get; set; }
 
         public required string Password { get; set; }
-
+        [JsonConverter(typeof(Utils.JsonStringEnumConverter<UserRole>))]
         public UserRole Role { get; set; } = UserRole.User; // Default to 'User' if not provided
 
         public required string FirstName { get; set; }
@@ -69,8 +76,10 @@ namespace WorkWell.Server.Models
     {
         public required string UserId { get; set; }
         public required string Email { get; set; }
+        [JsonConverter(typeof(Utils.JsonStringEnumConverter<UserRole>))]
         public UserRole Role { get; set; } 
         public required string DisplayName { get; set; }
+        public string? OrganizationId { get; set; }
     }
 
     public class AssignUserRequest
@@ -79,8 +88,16 @@ namespace WorkWell.Server.Models
     }
 
     public enum UserRole {
+        [EnumMember(Value = "SuperAdmin")]
+        SuperAdmin,
+
+        [EnumMember(Value = "Admin")]
         Admin,
+        [EnumMember(Value = "AdminAssistant")]
+
+        AdminAssistant,
+
+        [EnumMember(Value = "User")]
         User,
-        SuperAdmin
     }
 }

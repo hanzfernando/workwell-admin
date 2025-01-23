@@ -103,12 +103,17 @@ namespace WorkWell.Server.Services
                 }
 
                 var user = userDoc.ConvertTo<User>();
+
+                // Handle cases where SuperAdmin does not have an organizationId
+                var organizationId = user.Role == UserRole.SuperAdmin ? null : user.OrganizationId;
+
                 return new FirebaseUser
                 {
                     UserId = uid,
                     Email = user.Email,
-                    Role = Enum.IsDefined(typeof(UserRole), user.Role) ? (UserRole)user.Role : UserRole.User,
-                    DisplayName = $"{user.FirstName} {user.LastName}"
+                    Role = user.Role,
+                    DisplayName = $"{user.FirstName} {user.LastName}",
+                    OrganizationId = organizationId // Set null if SuperAdmin
                 };
             }
             catch (Exception ex)

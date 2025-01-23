@@ -1,7 +1,8 @@
 import { createContext, useReducer, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { getAllJournals } from '../services/journalService';
-
+import { useAuthContext } from '../hooks/useAuthContext.js';
+import UserRole from '../utils/Roles'
 const initialState = {
     journals: [],
     loading: true,
@@ -23,6 +24,7 @@ const JournalContext = createContext();
 
 const JournalProvider = ({ children }) => {
     const [state, dispatch] = useReducer(journalReducer, initialState);
+    const { user } = useAuthContext(); // Get the authenticated user and role
 
     useEffect(() => {
         const fetchJournals = async () => {
@@ -33,8 +35,13 @@ const JournalProvider = ({ children }) => {
                 dispatch({ type: 'ERROR', payload: error.message });
             }
         };
-        fetchJournals();
-    }, []);
+        if (user?.role === UserRole.Admin) {
+            fetchJournals();
+        } else if (user) {
+            console.warn('Unauthorized: User is not a Admin.');
+            dispatch({ type: 'ERROR', payload: 'Unauthorized access.' });
+        }
+    }, [user]);
 
     return (
         <JournalContext.Provider value={{ state, dispatch }}>

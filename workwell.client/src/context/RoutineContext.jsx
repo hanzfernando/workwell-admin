@@ -1,6 +1,8 @@
 import { createContext, useReducer, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { getAllRoutines } from '../services/routineService';
+import { useAuthContext } from '../hooks/useAuthContext'; // Import the AuthContext hook
+import UserRole from '../utils/Roles'
 
 const initialState = {
     routines: [],
@@ -51,6 +53,7 @@ const RoutineContext = createContext();
 
 const RoutineProvider = ({ children }) => {
     const [state, dispatch] = useReducer(routineReducer, initialState);
+    const { user } = useAuthContext(); // Get the authenticated user and role
 
     // Fetch routines on initialization
     useEffect(() => {
@@ -63,8 +66,14 @@ const RoutineProvider = ({ children }) => {
             }
         };
 
-        fetchRoutines();
-    }, []);
+        // Check if user exists and their role is SuperAdmin
+        if (user?.role === UserRole.Admin) {
+            fetchRoutines();
+        } else if (user) {
+            console.warn('Unauthorized: User is not a Admin.');
+            dispatch({ type: 'ERROR', payload: 'Unauthorized access.' });
+        }
+    }, [user]);
 
     return (
         <RoutineContext.Provider value={{ state, dispatch }}>

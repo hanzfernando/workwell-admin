@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuthContext } from './useAuthContext';
 import { logIn, verifyToken } from '../services/authService';
 import { removeToken, setToken } from '../utils/authUtil';
+import UserRole from '../utils/Roles'
 
 const useLogin = () => {
     const { dispatch } = useAuthContext();
@@ -13,16 +14,25 @@ const useLogin = () => {
         setError(null);
         try {
             const { idToken } = await logIn(email, password);
+            setToken(idToken);
 
             const user = await verifyToken(idToken);
             //console.log(user)
-            if (user.role === 0) {
+            if (user.role === UserRole.Admin) {
                 console.log("admin")
                 setToken(idToken);
                 dispatch({
                     type: 'LOGIN',
                     payload: { user, token: idToken },
                 });
+            } else if (user.role === UserRole.SuperAdmin) {
+                console.log("superadmin")
+                setToken(idToken);
+                dispatch({
+                    type: 'LOGIN',
+                    payload: { user, token: idToken },
+                });
+                    
             } else {
                 throw new Error('Unauthorized access: User role not permitted');
                 console.log("not admin")

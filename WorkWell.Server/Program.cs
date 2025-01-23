@@ -65,6 +65,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     claimsIdentity?.AddClaim(new Claim(ClaimTypes.Role, roleClaim.Value));
                 }
 
+                // Map the "organizationId" claim to a custom claim type
+                var organizationIdClaim = claimsIdentity?.FindFirst("OrganizationId");
+                if (organizationIdClaim != null)
+                {
+                    claimsIdentity?.AddClaim(new Claim("OrganizationId", organizationIdClaim.Value));
+                }
+
                 return Task.CompletedTask;
             }
 
@@ -88,11 +95,13 @@ builder.Services.AddScoped<ExerciseService>();
 builder.Services.AddScoped<RoutineService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<AdminAccountService>();
+builder.Services.AddScoped<SuperAdminAccountService>();
 builder.Services.AddScoped<RoutineLogService>();
 builder.Services.AddScoped<VideoService>();
 builder.Services.AddScoped<SelfAssessmentService>();
 builder.Services.AddScoped<JournalService>();
+builder.Services.AddScoped<OrganizationService>();
+builder.Services.AddScoped<SuperAdminService>();
 
 var app = builder.Build();
 //app.UseHttpsRedirection();

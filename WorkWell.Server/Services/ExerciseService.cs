@@ -17,30 +17,45 @@ namespace WorkWell.Server.Services
         }
 
         // POST /api/exercises
-        public async Task AddExerciseAsync(Exercise exercise)
+        public async Task AddExerciseAsync(Exercise exercise, string organizationId)
         {
             try
             {
+                exercise.OrganizationId = organizationId; // Assign the organizationId from the token
                 var docRef = _firestoreDb.Collection("exercises").Document();
                 exercise.ExerciseId = docRef.Id;
                 await docRef.SetAsync(exercise);
             }
             catch (Exception ex)
             {
-                // Log the exception (consider using a logging framework)
-                Console.WriteLine($"Error adding exercise: {ex.Message}");
+                Console.WriteLine($"Error adding exercise for organization {organizationId}: {ex.Message}");
                 throw new Exception("Failed to add exercise. Please try again later.");
             }
         }
 
+
         // GET /api/exercises/:id
-        public async Task<Exercise?> GetExerciseAsync(string exerciseId)
+        public async Task<Exercise?> GetExerciseAsync(string exerciseId, string organizationId)
         {
             try
             {
                 var docRef = _firestoreDb.Collection("exercises").Document(exerciseId);
                 var snapshot = await docRef.GetSnapshotAsync();
-                return snapshot.Exists ? snapshot.ConvertTo<Exercise>() : null;
+
+                if (!snapshot.Exists)
+                {
+                    return null;
+                }
+
+                var exercise = snapshot.ConvertTo<Exercise>();
+
+                // Ensure the exercise belongs to the requester's organization
+                if (exercise.OrganizationId != organizationId)
+                {
+                    throw new UnauthorizedAccessException("You do not have access to this exercise.");
+                }
+
+                return exercise;
             }
             catch (Exception ex)
             {
@@ -49,21 +64,24 @@ namespace WorkWell.Server.Services
             }
         }
 
+
         // GET /api/exercises
-        public async Task<IEnumerable<Exercise>> GetAllExercisesAsync()
+        public async Task<IEnumerable<Exercise>> GetAllExercisesAsync(string organizationId)
         {
             try
             {
-                var query = _firestoreDb.Collection("exercises");
+                var query = _firestoreDb.Collection("exercises")
+                                        .WhereEqualTo("OrganizationId", organizationId); // Filter by organizationId
                 var snapshot = await query.GetSnapshotAsync();
                 return snapshot.Documents.Select(doc => doc.ConvertTo<Exercise>());
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching all exercises: {ex.Message}");
+                Console.WriteLine($"Error fetching exercises for organization {organizationId}: {ex.Message}");
                 throw new Exception("Failed to fetch exercises. Please try again later.");
             }
         }
+
 
         // PUT /api/exercises/:id
         public async Task UpdateExerciseAsync(Exercise exercise)

@@ -14,8 +14,8 @@ namespace WorkWell.Server.Models
         [FirestoreProperty]
         public required string Name { get; set; }
 
-        [FirestoreProperty]
-        [JsonConverter(typeof(JsonStringEnumConverter))] // Ensure this converts strings to enum
+        [FirestoreProperty(ConverterType = typeof(FirestoreEnumConverter<TargetArea>))]
+        [JsonConverter(typeof(Utils.JsonStringEnumConverter<TargetArea>))]
         public required TargetArea TargetArea { get; set; }
 
         [FirestoreProperty]

@@ -1,11 +1,24 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { useLogout } from '../hooks/useLogout'; // Import the useLogout hook
-import { useAuthContext } from '../hooks/useAuthContext'; // To access user info
+import { useAuthContext } from '../hooks/useAuthContext';
+import { useLogout } from '../hooks/useLogout';
+
+// Navigation items keyed by string roles
+const navItems = {
+    SuperAdmin: [
+        { name: 'Admins', path: '/admins' },
+        { name: 'Organizations', path: '/organizations' },
+    ],
+    Admin: [
+        { name: 'Users', path: '/users' },
+        { name: 'Routines', path: '/routines' },
+        { name: 'Exercises', path: '/exercises' },
+    ],
+};
 
 const SideNavigationBar = () => {
+    const { user } = useAuthContext();
     const { logout } = useLogout();
-    const { user } = useAuthContext(); // Get user info
 
     const handleLogout = async () => {
         try {
@@ -15,72 +28,58 @@ const SideNavigationBar = () => {
         }
     };
 
+    // Retrieve nav items based on user role or default to an empty array
+    const items = navItems[user?.role] || [];
+
     return (
-        <div className="flex flex-col items-start">
+        <nav className="flex flex-col h-full p-2">
             {/* Profile Section */}
             <div className="flex items-center w-full pb-4 mb-4 border-b border-gray-300">
+                {/* Placeholder avatar */}
                 <div className="w-12 h-12 rounded-full mr-3 bg-accent-aqua"></div>
-                <span className="text-lg font-medium">{user?.role === 0 ? 'Clinic Admin' : 'User'}</span>
-            </div>           
+                {/* Display user's name */}
+                <span className="text-lg font-medium">
+                    {user?.displayName}
+                </span>
+            </div>
 
-            {/* Navigation Links */}
-            <nav className="space-y-4 w-full">
-                {/*<NavLink*/}
-                {/*    to="/dashboard"*/}
-                {/*    className={({ isActive }) =>*/}
-                {/*        `block w-full px-4 py-2 text-left rounded-md ${isActive ? 'bg-blue-500 text-white' : 'bg-gray-300 hover:bg-gray-400'}`*/}
-                {/*    }*/}
-                {/*>*/}
-                {/*    Dashboard*/}
-                {/*</NavLink>*/}
+            {/* Navigation Items */}
+            <ul className="mb-auto">
+                {items.map(({ name, path }) => (
+                    <li key={path} className="mb-4">
+                        <NavLink
+                            to={path}
+                            className={({ isActive }) =>
+                                `block p-2 rounded ${isActive
+                                    ? 'bg-accent-aqua text-white'
+                                    : 'text-gray-700 hover:bg-gray-200'
+                                }`
+                            }
+                        >
+                            {name}
+                        </NavLink>
+                    </li>
+                ))}
+            </ul>
 
-                <NavLink
-                    to="/users"
-                    className={({ isActive }) =>
-                        `block w-full px-4 py-2 text-left rounded-md ${isActive ? 'bg-blue-500 text-white' : 'bg-gray-300 hover:bg-gray-400'}`
-                    }
-                >
-                    Users
-                </NavLink>
-
-                <NavLink
-                    to="/routines"
-                    className={({ isActive }) =>
-                        `block w-full px-4 py-2 text-left rounded-md ${isActive ? 'bg-blue-500 text-white' : 'bg-gray-300 hover:bg-gray-400'}`
-                    }
-                >
-                    Routines
-                </NavLink>
-
-                {/*<NavLink*/}
-                {/*    to="/routinelogs"*/}
-                {/*    className={({ isActive }) =>*/}
-                {/*        `block w-full px-4 py-2 text-left rounded-md ${isActive ? 'bg-blue-500 text-white' : 'bg-gray-300 hover:bg-gray-400'}`*/}
-                {/*    }*/}
-                {/*>*/}
-                {/*    Routine Logs*/}
-                {/*</NavLink>*/}
-
-                <NavLink
-                    to="/exercises"
-                    className={({ isActive }) =>
-                        `block w-full px-4 py-2 text-left rounded-md ${isActive ? 'bg-blue-500 text-white' : 'bg-gray-300 hover:bg-gray-400'}`
-                    }
-                >
-                    Exercises
-                </NavLink>
-
-                
-            </nav>
+            {/* Change Password Link */}
+            <NavLink
+                to="/change-password"
+                className={({ isActive }) =>
+                    `block p-2 text-blue-600 hover:bg-blue-100 rounded mb-2 text-center ${isActive ? 'font-bold' : ''}`
+                }
+            >
+                Change Password
+            </NavLink>
 
             {/* Logout Button */}
             <button
                 onClick={handleLogout}
-                className="mt-6 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 w-full"
+                className="block p-2 text-red-600 hover:bg-red-100 rounded"
             >
                 Logout
             </button>
-        </div>
+        </nav>
     );
 };
 

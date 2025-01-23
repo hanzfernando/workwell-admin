@@ -18,14 +18,27 @@ namespace WorkWell.Server.Controllers
             _exerciseService = exerciseService;
         }
 
+        // Helper method to get claims from the token
+        private string GetOrganizationIdFromToken()
+        {
+            var organizationId = HttpContext.User.FindFirst("OrganizationId")?.Value;
+            if (string.IsNullOrEmpty(organizationId))
+            {
+                throw new UnauthorizedAccessException("Organization ID not found in token.");
+            }
+            return organizationId;
+        }
+
         // GET: api/exercises/{id}
         [HttpGet("{exerciseId}")]
         public async Task<ActionResult<Exercise>> GetExercise(string exerciseId)
         {
-            var exercise = await _exerciseService.GetExerciseAsync(exerciseId);
+            var organizationId = GetOrganizationIdFromToken(); // Get organizationId from token
+
+            var exercise = await _exerciseService.GetExerciseAsync(exerciseId, organizationId);
             if (exercise == null)
             {
-                return NotFound();
+                return NotFound("Exercise not found or you do not have access.");
             }
             return Ok(exercise);
         }
@@ -34,7 +47,9 @@ namespace WorkWell.Server.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Exercise>>> GetAllExercises()
         {
-            var exercises = await _exerciseService.GetAllExercisesAsync();
+            var organizationId = GetOrganizationIdFromToken(); // Get organizationId from token
+
+            var exercises = await _exerciseService.GetAllExercisesAsync(organizationId);
             return Ok(exercises);
         }
 
@@ -47,13 +62,17 @@ namespace WorkWell.Server.Controllers
                 return BadRequest("Invalid input data.");
             }
 
+            // Get organizationId from token and assign it to the exercise
+            var organizationId = GetOrganizationIdFromToken();
+            exercise.OrganizationId = organizationId;
+
             // Check for invalid enum parsing
             if (!Enum.IsDefined(typeof(TargetArea), exercise.TargetArea))
             {
                 return BadRequest($"Invalid exercise type: {exercise.TargetArea}");
             }
 
-            await _exerciseService.AddExerciseAsync(exercise);
+            await _exerciseService.AddExerciseAsync(exercise, organizationId);
             return CreatedAtAction(nameof(GetExercise), new { exerciseId = exercise.ExerciseId }, exercise);
         }
 
@@ -66,10 +85,12 @@ namespace WorkWell.Server.Controllers
                 return BadRequest("Exercise ID mismatch.");
             }
 
-            var existingExercise = await _exerciseService.GetExerciseAsync(exerciseId);
+            var organizationId = GetOrganizationIdFromToken(); // Get organizationId from token
+
+            var existingExercise = await _exerciseService.GetExerciseAsync(exerciseId, organizationId);
             if (existingExercise == null)
             {
-                return NotFound();
+                return NotFound("Exercise not found or you do not have access.");
             }
 
             // Check for invalid enum parsing
@@ -86,10 +107,12 @@ namespace WorkWell.Server.Controllers
         [HttpDelete("{exerciseId}")]
         public async Task<ActionResult> DeleteExercise(string exerciseId)
         {
-            var exercise = await _exerciseService.GetExerciseAsync(exerciseId);
+            var organizationId = GetOrganizationIdFromToken(); // Get organizationId from token
+
+            var exercise = await _exerciseService.GetExerciseAsync(exerciseId, organizationId);
             if (exercise == null)
             {
-                return NotFound();
+                return NotFound("Exercise not found or you do not have access.");
             }
 
             await _exerciseService.DeleteExerciseAsync(exerciseId);

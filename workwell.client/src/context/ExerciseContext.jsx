@@ -1,6 +1,8 @@
 import { createContext, useReducer, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { getExercises } from '../services/exerciseService'; // Assume this is your API call to fetch exercises
+import { useAuthContext } from '../hooks/useAuthContext'; // Import the AuthContext hook
+import UserRole from '../utils/Roles'
 
 const initialState = {
     exercises: [],
@@ -55,20 +57,29 @@ const ExerciseContext = createContext();
 
 const ExerciseProvider = ({ children }) => {
     const [state, dispatch] = useReducer(exerciseReducer, initialState);
+    const { user } = useAuthContext(); // Get the authenticated user and role
 
-    // Fetch exercises when the provider is mounted
+    // Fetch exercises if the user role is Admin
     useEffect(() => {
         const fetchExercises = async () => {
+            
             try {
                 const result = await getExercises(); // API call to fetch exercises
                 dispatch({ type: 'SET_EXERCISES', payload: result });
             } catch (error) {
                 dispatch({ type: 'ERROR', payload: error.message });
             }
+            
         };
 
-        fetchExercises();
-    }, []); // Run only once when the provider is mounted
+        // Check if user exists and their role is SuperAdmin
+        if (user?.role === UserRole.Admin) {
+            fetchExercises();
+        } else if (user) {
+            console.warn('Unauthorized: User is not a Admin.');
+            dispatch({ type: 'ERROR', payload: 'Unauthorized access.' });
+        }
+    }, [user]); // Re-run if the user changes
 
     return (
         <ExerciseContext.Provider value={{ state, dispatch }}>

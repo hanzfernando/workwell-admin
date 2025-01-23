@@ -1,50 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { useAuthContext } from '../hooks/useAuthContext';
+import React, { useState } from 'react';
+import { useExerciseContext } from '../hooks/useExerciseContext'; // Custom hook to access ExerciseContext
 import ExerciseTable from '../components/ExerciseTable';
-import { getExercises, addExercise } from '../services/exerciseService'; // Add the addExercise function
-import AddExerciseModal from '../components/AddExerciseModal'; // Import AddExerciseModal component
+import AddExerciseModal from '../components/AddExerciseModal';
+import { addExercise } from '../services/exerciseService';
 
-const ExercisesPage = () => {
-    const { user } = useAuthContext();
-    const [exercises, setExercises] = useState([]);
-    const [filteredExercises, setFilteredExercises] = useState([]);
+const AdminExercisesPage = () => {
+    const { state: orgState, dispatch } = useExerciseContext(); // Use orgState from context
     const [searchQuery, setSearchQuery] = useState('');
-    const [isAddExerciseModalOpen, setIsAddExerciseModalOpen] = useState(false); // Modal state
+    const [isAddExerciseModalOpen, setIsAddExerciseModalOpen] = useState(false);
 
-    // Fetch all exercises once when the component is mounted
-    useEffect(() => {
-        const fetchExercises = async () => {
-            try {
-                const result = await getExercises(); // Fetch all exercises
-                setExercises(result); // Save all exercises in state
-                setFilteredExercises(result); // Initially show all exercises
-            } catch (error) {
-                console.error('Error fetching exercises:', error);
-            }
-        };
-
-        fetchExercises();
-    }, []);
-
-    // Filter exercises based on search query
-    useEffect(() => {
-        const filtered = exercises.filter((exercise) =>
-            exercise.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            exercise.targetArea.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-        setFilteredExercises(filtered);
-    }, [searchQuery, exercises]);
-
+    // Handle search query changes
     const handleSearchChange = (e) => {
-        setSearchQuery(e.target.value); // Update search query
+        setSearchQuery(e.target.value);
     };
 
+    // Filter exercises based on search query
+    const filteredExercises = orgState.exercises.filter((exercise) =>
+        exercise.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        exercise.targetArea.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    // Add a new exercise
     const handleAddExercise = async (newExercise) => {
         try {
-            const addedExercise = await addExercise(newExercise); // Add the exercise to the backend
+            const addedExercise = await addExercise(newExercise); // API call to add exercise
             if (addedExercise) {
-                setExercises((prev) => [...prev, addedExercise]); // Update state with new exercise
-                setFilteredExercises((prev) => [...prev, addedExercise]); // Update filtered list
+                dispatch({ type: 'CREATE_EXERCISE', payload: addedExercise }); // Dispatch to context
             }
         } catch (error) {
             console.error('Error adding exercise:', error);
@@ -57,7 +38,7 @@ const ExercisesPage = () => {
     return (
         <div>
             <div className="font-medium text-lg">
-                <h1>Hello, {user.displayName}</h1>
+                <h1>Welcome, Admin</h1>
             </div>
             <div className="bg-white w-full h-full mt-4 p-4 rounded-lg">
                 <div className="flex justify-between items-center pb-4 mb-4 border-b">
@@ -78,7 +59,13 @@ const ExercisesPage = () => {
                         />
                     </div>
                 </div>
-                <ExerciseTable exercises={filteredExercises} /> {/* Pass filtered exercises to the table */}
+                {orgState.loading ? (
+                    <p>Loading exercises...</p>
+                ) : orgState.error ? (
+                    <p className="text-red-600">Error: {orgState.error}</p>
+                ) : (
+                    <ExerciseTable exercises={filteredExercises} /> // Pass filtered exercises to the table
+                )}
             </div>
 
             {/* Add Exercise Modal */}
@@ -93,4 +80,4 @@ const ExercisesPage = () => {
     );
 };
 
-export default ExercisesPage;
+export default AdminExercisesPage;

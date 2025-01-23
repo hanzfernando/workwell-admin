@@ -1,6 +1,8 @@
 import { createContext, useReducer, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { getPatients } from '../services/patientService'; // Assume this is your API call to fetch patients
+import { useAuthContext } from '../hooks/useAuthContext.js';
+import UserRole from '../utils/Roles'
 
 const initialState = {
     patients: [],
@@ -67,6 +69,7 @@ const PatientContext = createContext();
 
 const PatientProvider = ({ children }) => {
     const [state, dispatch] = useReducer(patientReducer, initialState);
+    const { user } = useAuthContext(); // Get the authenticated user and role
 
     // Fetch patients when the provider is mounted
     useEffect(() => {
@@ -79,8 +82,14 @@ const PatientProvider = ({ children }) => {
             }
         };
 
-        fetchPatients();
-    }, []); // Run only once when the provider is mounted
+        // Check if user exists and their role is SuperAdmin
+        if (user?.role === UserRole.Admin) {
+            fetchPatients();
+        } else if (user) {
+            console.warn('Unauthorized: User is not a Admin.');
+            dispatch({ type: 'ERROR', payload: 'Unauthorized access.' });
+        }
+    }, [user]); // Run only once when the provider is mounted
 
     return (
         <PatientContext.Provider value={{ state, dispatch }}>
