@@ -19,6 +19,9 @@ namespace WorkWell.Server.Models
         public required string SelfAssessmentId { get; set; }
 
         [FirestoreProperty]
+        public required string OrganizationId { get; set; }
+
+        [FirestoreProperty]
         public required string JournalId { get; set; }
 
         [FirestoreProperty]

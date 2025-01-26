@@ -8,7 +8,7 @@ import AddPatientModal from '../components/AddPatientModal';
 import { signUp } from "../services/authService";
 
 
-const PatientsPage = () => {
+const AdminPatientsPage = () => {
     const { user } = useAuthContext();
     const { state: { patients }, dispatch } = usePatientContext(); // Get patients from context
     const [searchQuery, setSearchQuery] = useState('');
@@ -69,26 +69,20 @@ const PatientsPage = () => {
     const handlePatientAdded = async (newPatient) => {
         console.log('Adding patient:', newPatient);
 
-        const addedPatient = await signUp(newPatient.firstName, newPatient.lastName, newPatient.email, newPatient.password, newPatient.age, newPatient.medicalCondition);
-        //const addedPatient = {
-        //    firstName: newPatient.firstName,
-        //    lastName: newPatient.lastName,
-        //    email: newPatient.email,
-        //    uid: 'sample'
-        //}
-        console.log("-----------");
-        console.log(addedPatient);
+        const addedPatient = await signUp(newPatient);
+        
         if (addedPatient) {
-            //console.log('Patient added:', addedPatient);
-            //console.log('Before Dispatch', filteredPatients)
+            console.log('Patient added:', addedPatient);
 
+            // Update the local state and context
             dispatch({ type: 'ADD_PATIENT', payload: addedPatient });
             setFilteredPatients((prevFilteredPatients) => [...prevFilteredPatients, addedPatient]);
             handleCloseAddPatientModal();
         } else {
-            console.error('Error adding patient.')
+            console.error('Error adding patient.');
         }
-    }  
+    };
+ 
     //console.log("0 Patients", patients[0]);
     //console.log("All Patients", patients);
     return (
@@ -141,4 +135,4 @@ const PatientsPage = () => {
     );
 };
 
-export default PatientsPage;
+export default AdminPatientsPage;

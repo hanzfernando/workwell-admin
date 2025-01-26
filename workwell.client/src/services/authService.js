@@ -6,43 +6,47 @@ const BASE_URL = `${backendLink}/api/auth`;
 
 
 
-const signUp = async (firstName, lastName, email, password, age, medicalCondition) => {
+const signUp = async (patientData) => {
     try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        // Get the signed-in user
+        // Step 1: Create user in Firebase
+        const userCredential = await createUserWithEmailAndPassword(auth, patientData.email, patientData.password);
         const user = userCredential.user;
-        //console.log("User created and verification email sent.");
-        //await sendEmailVerification(user)
 
+        // Step 2: Add Firebase UID to the patient data object
+        const dataToSend = { ...patientData, uid: user.uid };
 
-        // Step 1: Send signup request to backend (No user creation here)
+        // Step 3: Register user details in the backend
         const response = await fetch(`${BASE_URL}/signup`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getToken()}`,
             },
-            body: JSON.stringify({
-                uid: user.uid,
-                email,
-                firstName,
-                lastName,
-                password,
-                medicalCondition,
-                age
-            }),
+            body: JSON.stringify(dataToSend),
         });
-    
+
+        if (!response.ok) {
+            // If backend fails, delete the Firebase user
+            await user.delete();
+            throw new Error(`Failed to register user in backend: ${await response.text()}`);
+        }
 
         const result = await response.json();
 
-        //console.log("User created and verification email sent.");
+        // Step 4: Send verification email only after backend succeeds
         await sendEmailVerification(user);
 
         return result;
 
-     
     } catch (error) {
-        console.error("Error during signup:", error.message);
+        if (error.code === 'auth/email-already-in-use') {
+            console.error("This email is already in use.");
+        } else if (error.code === 'auth/invalid-email') {
+            console.error("Invalid email format.");
+        } else {
+            console.error("Error during signup:", error.message);
+        }
+        return null; // Ensure to return null on failure
     }
 };
 

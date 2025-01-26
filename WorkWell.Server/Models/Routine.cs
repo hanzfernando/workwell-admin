@@ -22,6 +22,9 @@ namespace WorkWell.Server.Models
         public List<string> Users { get; set; } = new List<string>();
 
         [FirestoreProperty]
+        public string? OrganizationId { get; set; }
+
+        [FirestoreProperty]
         public List<RoutineExercise> Exercises { get; set; } = new List<RoutineExercise>();
 
         [FirestoreProperty]

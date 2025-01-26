@@ -2,7 +2,7 @@ import React from 'react';
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider, Navigate } from 'react-router-dom';
 
 // Import Pages
-import UsersPage from './pages/PatientsPage';
+import AdminPatientsPage from './pages/AdminPatientsPage';
 import RoutinesPage from './pages/RoutinesPage';
 import AdminExercisesPage from './pages/AdminExercisesPage';
 import LoginPage from './pages/LoginPage';
@@ -108,7 +108,7 @@ const App = () => {
                         </AdminRoute>
                     }
                 >
-                    <Route path="/users" element={<UsersPage />} />
+                    <Route path="/users" element={<AdminPatientsPage />} />
                     <Route path="/routines" element={<RoutinesPage />} />
                     <Route path="/exercises" element={<AdminExercisesPage />} />
                     <Route path="/routinelogs" element={<RoutineLogsPage />} />

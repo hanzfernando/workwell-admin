@@ -9,6 +9,9 @@ namespace WorkWell.Server.Models
         public required string JournalId { get; set; }
 
         [FirestoreProperty]
+        public required string OrganizationId { get; set; }
+
+        [FirestoreProperty]
         public required string Content { get; set; }
     }
 }

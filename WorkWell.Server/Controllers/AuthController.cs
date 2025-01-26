@@ -10,6 +10,7 @@ namespace WorkWell.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class AuthController : ControllerBase
     {
         private readonly AuthService _authService;
@@ -19,7 +20,6 @@ namespace WorkWell.Server.Controllers
             _authService = authService;
         }
 
-        // POST: api/auth/signup
         [HttpPost("signup")]
         public async Task<IActionResult> SignUp([FromBody] SignUpRequest request)
         {
@@ -32,8 +32,16 @@ namespace WorkWell.Server.Controllers
 
             try
             {
-                // Default role to User if not passed
-                request.Role = request.Role == UserRole.Admin ? request.Role : UserRole.User;
+                // Extract OrganizationId from the admin's token
+                var organizationId = HttpContext.User.FindFirst("OrganizationId")?.Value;
+
+                if (string.IsNullOrEmpty(organizationId))
+                {
+                    return Unauthorized("OrganizationId not found in token.");
+                }
+
+                // Add the OrganizationId to the request
+                request.OrganizationId = organizationId;
 
                 // Call the SignUpAsync method and get the user object
                 var user = await _authService.SignUpAsync(request);
@@ -46,6 +54,7 @@ namespace WorkWell.Server.Controllers
                 return BadRequest($"Error during signup: {ex.Message}");
             }
         }
+
 
 
 

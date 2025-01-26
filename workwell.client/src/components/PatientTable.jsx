@@ -44,22 +44,24 @@ const PatientTable = ({ patients, onViewRoutine }) => {
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{patient.age}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{patient.medicalCondition}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{patient.email}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-center flex gap-2 justify-center">
-                                    {/* View Routine Button */}
-                                    <button
-                                        className="bg-accent-aqua p-1 rounded-lg hover:bg-teal-500"
-                                        onClick={() => onViewRoutine(patient)} // Call onViewRoutine when clicked
-                                    >
-                                        <img src={ic_eye} alt="View Routine" className="h-6 w-6" />
-                                    </button>
+                                <td className="px-6 py-4 whitespace-nowrap text-center">
+                                    <div className="flex gap-2 justify-center overflow-x-auto">
+                                        {/* View Routine Button */}
+                                        <button
+                                            className="bg-accent-aqua p-1 rounded-lg w-8 hover:bg-teal-500"
+                                            onClick={() => onViewRoutine(patient)} // Call onViewRoutine when clicked
+                                        >
+                                            <img src={ic_eye} alt="View Routine" className="h-6 w-6" />
+                                        </button>
 
-                                    {/* View Logs Button */}
-                                    <button
-                                        onClick={() => handleViewLogs(patient.uid)} // Pass the user's UID to handleViewLogs
-                                        className="bg-accent-aqua text-white py-1 px-2 rounded-lg hover:bg-teal-500"
-                                    >
-                                        View Logs
-                                    </button>
+                                        {/* View Logs Button */}
+                                        <button
+                                            onClick={() => handleViewLogs(patient.uid)} // Pass the user's UID to handleViewLogs
+                                            className="bg-accent-aqua text-white py-1 px-2 rounded-lg hover:bg-teal-500"
+                                        >
+                                            View Logs
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         ))

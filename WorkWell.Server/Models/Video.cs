@@ -7,6 +7,8 @@ namespace WorkWell.Server.Models
     {
         [FirestoreProperty]
         public required string VideoId { get; set; }
+        [FirestoreProperty]
+        public required string OrganizationId { get; set; }
 
         [FirestoreProperty]
         public required string CloudinaryId { get; set; }

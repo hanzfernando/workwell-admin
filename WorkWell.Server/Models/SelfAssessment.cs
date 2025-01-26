@@ -7,7 +7,8 @@ namespace WorkWell.Server.Models
     {
         [FirestoreProperty]
         public required string SelfAssessmentId { get; set; }
-
+        [FirestoreProperty]
+        public required string OrganizationId { get; set; }
         [FirestoreProperty]
         public required int Awareness { get; set; }
 

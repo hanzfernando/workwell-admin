@@ -4,6 +4,8 @@ using WorkWell.Server.Services;
 using WorkWell.Server.Models;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
+using System.Linq;
+using System.Security.Claims;
 
 namespace WorkWell.Server.Controllers
 {
@@ -23,7 +25,16 @@ namespace WorkWell.Server.Controllers
         [HttpGet]
         public async Task<ActionResult<List<RoutineLog>>> GetRoutineLogs()
         {
-            var routineLogs = await _routineLogService.GetRoutineLogsAsync();
+            // Extract OrganizationId from token claims
+            var organizationId = User.FindFirst("OrganizationId")?.Value;
+
+            if (string.IsNullOrEmpty(organizationId))
+            {
+                return Unauthorized("OrganizationId is missing in the token.");
+            }
+
+            var routineLogs = await _routineLogService.GetRoutineLogsAsync(organizationId);
+
             return Ok(routineLogs);
         }
 
@@ -31,11 +42,21 @@ namespace WorkWell.Server.Controllers
         [HttpGet("{routineLogId}")]
         public async Task<ActionResult<RoutineLog>> GetRoutineLogById(string routineLogId)
         {
-            var routineLog = await _routineLogService.GetRoutineLogByIdAsync(routineLogId);
+            // Extract OrganizationId from token claims
+            var organizationId = User.FindFirst("OrganizationId")?.Value;
+
+            if (string.IsNullOrEmpty(organizationId))
+            {
+                return Unauthorized("OrganizationId is missing in the token.");
+            }
+
+            var routineLog = await _routineLogService.GetRoutineLogByIdAsync(routineLogId, organizationId);
+
             if (routineLog == null)
             {
-                return NotFound($"RoutineLog with ID {routineLogId} not found.");
+                return NotFound($"RoutineLog with ID {routineLogId} not found or does not belong to your organization.");
             }
+
             return Ok(routineLog);
         }
     }

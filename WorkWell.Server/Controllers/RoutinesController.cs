@@ -1,17 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Google.Cloud.Firestore;
+﻿using System.Linq;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WorkWell.Server.Models;
 using WorkWell.Server.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 
 namespace WorkWell.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-
     public class RoutinesController : ControllerBase
     {
         private readonly RoutineService _routineService;
@@ -21,86 +21,144 @@ namespace WorkWell.Server.Controllers
             _routineService = routineService;
         }
 
+        private string GetOrganizationIdFromToken()
+        {
+            var organizationIdClaim = User.Claims.FirstOrDefault(c => c.Type == "OrganizationId");
+            if (organizationIdClaim == null)
+            {
+                throw new UnauthorizedAccessException("OrganizationId is missing in the token.");
+            }
+            return organizationIdClaim.Value;
+        }
+
         // GET: api/routines/{id}
         [HttpGet("{routineId}")]
         public async Task<ActionResult<Routine>> GetRoutine(string routineId)
         {
-            var routine = await _routineService.GetRoutineAsync(routineId);
-            if (routine == null)
+            try
             {
-                return NotFound();
+                var organizationId = GetOrganizationIdFromToken();
+                var routine = await _routineService.GetRoutineAsync(routineId, organizationId);
+                if (routine == null)
+                {
+                    return NotFound("Routine not found or not accessible.");
+                }
+                return Ok(routine);
             }
-            return Ok(routine);
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         // GET: api/routines
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Routine>>> GetAllRoutines()
         {
-            var routines = await _routineService.GetAllRoutinesAsync();
-            return Ok(routines);
+            try
+            {
+                var organizationId = GetOrganizationIdFromToken();
+                var routines = await _routineService.GetAllRoutinesAsync(organizationId);
+                return Ok(routines);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         // POST: api/routines
         [HttpPost]
         public async Task<ActionResult> AddRoutine([FromBody] Routine routine)
         {
-            if (routine == null)
+            try
             {
-                return BadRequest("Invalid input data.");
-            }
+                if (routine == null)
+                {
+                    return BadRequest("Invalid input data.");
+                }
 
-            // Check for invalid enum parsing in the Routine model
-            if (!Enum.IsDefined(typeof(TargetArea), routine.TargetArea))
+                var organizationId = GetOrganizationIdFromToken();
+                routine.OrganizationId = organizationId;
+
+                await _routineService.AddRoutineAsync(routine);
+                return CreatedAtAction(nameof(GetRoutine), new { routineId = routine.RoutineId }, routine);
+            }
+            catch (UnauthorizedAccessException ex)
             {
-                return BadRequest($"Invalid target area: {routine.TargetArea}");
+                return Unauthorized(ex.Message);
             }
-
-            Console.WriteLine("_________________________________________");
-            Console.WriteLine("Adding routine:");
-            Console.WriteLine(routine);
-
-            await _routineService.AddRoutineAsync(routine);
-            return CreatedAtAction(nameof(GetRoutine), new { routineId = routine.RoutineId }, routine);
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         // PUT: api/routines/{id}
         [HttpPut("{routineId}")]
         public async Task<ActionResult> UpdateRoutine(string routineId, [FromBody] Routine routine)
         {
-            if (routineId != routine.RoutineId)
+            try
             {
-                return BadRequest("Routine ID mismatch.");
-            }
+                if (routineId != routine.RoutineId)
+                {
+                    return BadRequest("Routine ID mismatch.");
+                }
 
-            var existingRoutine = await _routineService.GetRoutineAsync(routineId);
-            if (existingRoutine == null)
+                var organizationId = GetOrganizationIdFromToken();
+                var existingRoutine = await _routineService.GetRoutineAsync(routineId, organizationId);
+                if (existingRoutine == null)
+                {
+                    return NotFound("Routine not found or not accessible.");
+                }
+
+                routine.OrganizationId = organizationId;
+
+                await _routineService.UpdateRoutineAsync(routine);
+                return NoContent();
+            }
+            catch (UnauthorizedAccessException ex)
             {
-                return NotFound();
+                return Unauthorized(ex.Message);
             }
-
-            // Check for invalid enum parsing in the Routine model
-            if (!Enum.IsDefined(typeof(TargetArea), routine.TargetArea))
+            catch (Exception ex)
             {
-                return BadRequest($"Invalid target area: {routine.TargetArea}");
+                return StatusCode(500, ex.Message);
             }
-
-            await _routineService.UpdateRoutineAsync(routine);
-            return NoContent();
         }
 
         // DELETE: api/routines/{id}
         [HttpDelete("{routineId}")]
         public async Task<ActionResult> DeleteRoutine(string routineId)
         {
-            var routine = await _routineService.GetRoutineAsync(routineId);
-            if (routine == null)
+            try
             {
-                return NotFound();
-            }
+                var organizationId = GetOrganizationIdFromToken();
+                var routine = await _routineService.GetRoutineAsync(routineId, organizationId);
+                if (routine == null)
+                {
+                    return NotFound("Routine not found or not accessible.");
+                }
 
-            await _routineService.DeleteRoutineAsync(routineId);
-            return NoContent();
+                await _routineService.DeleteRoutineAsync(routineId);
+                return NoContent();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpPatch("{routineId}/assign-users")]
@@ -108,16 +166,19 @@ namespace WorkWell.Server.Controllers
         {
             try
             {
-                // Allow empty userIds to unassign all users
-                await _routineService.AssignUsersToRoutineAsync(routineId, userIds);
+                var organizationId = GetOrganizationIdFromToken();
+
+                await _routineService.AssignUsersToRoutineAsync(routineId, userIds, organizationId);
                 return NoContent(); // Success
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message); // Internal Server Error
+                return StatusCode(500, ex.Message);
             }
         }
-
-
     }
 }

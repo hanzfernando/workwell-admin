@@ -15,13 +15,18 @@ namespace WorkWell.Server.Services
             _firestoreDb = firestoreDb;
         }
 
-        // GET /api/videos
-        public async Task<IEnumerable<Video>> GetAllVideosAsync()
+        // GET /api/videos filtered by OrganizationId
+        public async Task<IEnumerable<Video>> GetAllVideosByOrganizationAsync(string organizationId)
         {
             try
             {
-                var query = _firestoreDb.Collection("videos");
+                // Query Firestore collection for videos belonging to the specified organization
+                var query = _firestoreDb
+                    .Collection("videos")
+                    .WhereEqualTo("OrganizationId", organizationId);
+
                 var snapshot = await query.GetSnapshotAsync();
+
                 return snapshot.Documents.Select(doc =>
                 {
                     var video = doc.ConvertTo<Video>();
@@ -31,7 +36,7 @@ namespace WorkWell.Server.Services
             }
             catch (System.Exception ex)
             {
-                System.Console.WriteLine($"Error fetching all videos: {ex.Message}");
+                System.Console.WriteLine($"Error fetching videos for organization {organizationId}: {ex.Message}");
                 throw new System.Exception("Failed to fetch videos. Please try again later.");
             }
         }

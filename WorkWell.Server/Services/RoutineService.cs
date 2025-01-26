@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WorkWell.Server.Models.WorkWell.Server.Models;
 
 namespace WorkWell.Server.Services
 {
@@ -22,13 +21,8 @@ namespace WorkWell.Server.Services
         {
             try
             {
-                // Create a new document reference with a unique ID
                 var docRef = _firestoreDb.Collection("routines").Document();
-                routine.RoutineId = docRef.Id; // Assign the generated document ID to the routine
-
-                Console.WriteLine($"Adding routine with ID: {routine.RoutineId}");
-
-                // Save the routine to Firestore
+                routine.RoutineId = docRef.Id;
                 await docRef.SetAsync(routine);
             }
             catch (Exception ex)
@@ -39,7 +33,7 @@ namespace WorkWell.Server.Services
         }
 
         // GET /api/routines/:id
-        public async Task<Routine?> GetRoutineAsync(string routineId)
+        public async Task<Routine?> GetRoutineAsync(string routineId, string organizationId)
         {
             try
             {
@@ -48,7 +42,10 @@ namespace WorkWell.Server.Services
 
                 if (!snapshot.Exists) return null;
 
-                return snapshot.ConvertTo<Routine>();
+                var routine = snapshot.ConvertTo<Routine>();
+
+                // Verify organizationId matches
+                return routine.OrganizationId == organizationId ? routine : null;
             }
             catch (Exception ex)
             {
@@ -58,11 +55,11 @@ namespace WorkWell.Server.Services
         }
 
         // GET /api/routines
-        public async Task<IEnumerable<Routine>> GetAllRoutinesAsync()
+        public async Task<IEnumerable<Routine>> GetAllRoutinesAsync(string organizationId)
         {
             try
             {
-                var query = _firestoreDb.Collection("routines");
+                var query = _firestoreDb.Collection("routines").WhereEqualTo("OrganizationId", organizationId);
                 var snapshot = await query.GetSnapshotAsync();
                 return snapshot.Documents.Select(doc => doc.ConvertTo<Routine>()).ToList();
             }
@@ -102,7 +99,9 @@ namespace WorkWell.Server.Services
                 throw new Exception("Failed to delete routine. Please try again later.");
             }
         }
-        public async Task AssignUsersToRoutineAsync(string routineId, List<string> userIds)
+
+        // PATCH /api/routines/:id/assign-users
+        public async Task AssignUsersToRoutineAsync(string routineId, List<string> userIds, string organizationId)
         {
             try
             {
@@ -113,14 +112,20 @@ namespace WorkWell.Server.Services
 
                 var routine = routineSnapshot.ConvertTo<Routine>();
 
-                // Update the routine's Users list (allow empty list to unassign everyone)
+                // Verify organizationId matches
+                if (routine.OrganizationId != organizationId)
+                {
+                    throw new UnauthorizedAccessException("Routine does not belong to your organization.");
+                }
+
+                // Update the routine's Users field
                 routine.Users = userIds;
                 await routineRef.SetAsync(routine, SetOptions.Overwrite);
 
-                // Clear each user's Routines list if unassigned
+                // Maintain reverse mapping in user documents
                 if (userIds.Count == 0)
                 {
-                    // Remove this routine from all users
+                    // Remove this routine from all users previously assigned to it
                     var userQuery = _firestoreDb.Collection("users")
                                                 .WhereArrayContains("Routines", routineId);
                     var userSnapshots = await userQuery.GetSnapshotAsync();
@@ -134,13 +139,16 @@ namespace WorkWell.Server.Services
                 }
                 else
                 {
-                    // Update each user's Routines list
+                    // Update each user's Routines list to include this routine
                     foreach (var userId in userIds)
                     {
                         var userRef = _firestoreDb.Collection("users").Document(userId);
                         var userSnapshot = await userRef.GetSnapshotAsync();
 
-                        if (!userSnapshot.Exists) throw new Exception($"User {userId} not found.");
+                        if (!userSnapshot.Exists)
+                        {
+                            throw new Exception($"User with ID {userId} not found.");
+                        }
 
                         var user = userSnapshot.ConvertTo<User>();
 
@@ -148,6 +156,21 @@ namespace WorkWell.Server.Services
                         {
                             user.Routines.Add(routineId);
                             await userRef.SetAsync(user, SetOptions.Overwrite);
+                        }
+                    }
+
+                    // Clean up users no longer assigned to this routine
+                    var oldUserQuery = _firestoreDb.Collection("users")
+                                                   .WhereArrayContains("Routines", routineId);
+                    var oldUserSnapshots = await oldUserQuery.GetSnapshotAsync();
+
+                    foreach (var userDoc in oldUserSnapshots.Documents)
+                    {
+                        if (!userIds.Contains(userDoc.Id))
+                        {
+                            var user = userDoc.ConvertTo<User>();
+                            user.Routines.Remove(routineId);
+                            await _firestoreDb.Collection("users").Document(userDoc.Id).SetAsync(user, SetOptions.Overwrite);
                         }
                     }
                 }

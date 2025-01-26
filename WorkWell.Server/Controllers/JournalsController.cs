@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using WorkWell.Server.Models;
 using WorkWell.Server.Services;
@@ -10,7 +11,6 @@ namespace WorkWell.Server.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-
     public class JournalsController : ControllerBase
     {
         private readonly JournalService _journalService;
@@ -27,7 +27,14 @@ namespace WorkWell.Server.Controllers
         {
             try
             {
-                var journals = await _journalService.GetAllJournalsAsync();
+                // Extract OrganizationId from token claims
+                var organizationId = User.FindFirst("OrganizationId")?.Value;
+                if (string.IsNullOrEmpty(organizationId))
+                {
+                    return Unauthorized("Missing or invalid OrganizationId.");
+                }
+
+                var journals = await _journalService.GetAllJournalsByOrganizationAsync(organizationId);
                 return Ok(journals);
             }
             catch (System.Exception ex)

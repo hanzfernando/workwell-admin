@@ -16,11 +16,11 @@ namespace WorkWell.Server.Services
         }
 
         public async Task<AdminAccountRequest> CreateAdminAccount(
-    string email,
-    string password,
-    string firstName,
-    string lastName,
-    string organizationId)
+            string email,
+            string password,
+            string firstName,
+            string lastName,
+            string organizationId)
         {
             try
             {

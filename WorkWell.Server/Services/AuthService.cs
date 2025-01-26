@@ -2,7 +2,6 @@
 using Google.Cloud.Firestore;
 using WorkWell.Server.Models;
 using System.Threading.Tasks;
-using WorkWell.Server.Models.WorkWell.Server.Models;
 using System.Diagnostics;
 
 namespace WorkWell.Server.Services
@@ -28,7 +27,8 @@ namespace WorkWell.Server.Services
                     Email = request.Email,
                     FirstName = request.FirstName,
                     LastName = request.LastName,
-                    Role = request.Role,
+                    Role = UserRole.User, // Default to User; Admin can set this if required
+                    OrganizationId = request.OrganizationId, // Set from the admin's token
                     MedicalCondition = request.MedicalCondition,
                     Age = request.Age
                 };
@@ -38,7 +38,11 @@ namespace WorkWell.Server.Services
                 await userRef.SetAsync(user);
 
                 // Set custom claims for the user in Firebase Authentication
-                var claims = new Dictionary<string, object> { { "Role", (int)request.Role } };
+                var claims = new Dictionary<string, object>
+                {
+                    { "Role", user.Role.ToString() }, // Store as string (Admin/User/etc.)
+                    { "OrganizationId", request.OrganizationId }
+                };
                 await FirebaseAuth.DefaultInstance.SetCustomUserClaimsAsync(request.Uid, claims);
 
                 // Return the full user object
@@ -49,6 +53,7 @@ namespace WorkWell.Server.Services
                 throw new Exception($"Error signing up: {ex.Message}");
             }
         }
+
 
 
 

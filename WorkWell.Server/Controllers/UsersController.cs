@@ -1,93 +1,131 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Linq;
+using System.Security.Claims;
 using WorkWell.Server.Models;
-using WorkWell.Server.Models.WorkWell.Server.Models;
 using WorkWell.Server.Services;
 
-namespace WorkWell.Server.Controllers
+[Route("api/[controller]")]
+[ApiController]
+[Authorize]
+public class UsersController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    [Authorize]
+    private readonly UserService _userService;
 
-    public class UsersController : ControllerBase
+    public UsersController(UserService userService)
     {
-        private readonly UserService _userService;
+        _userService = userService;
+    }
 
-        public UsersController(UserService userService)
+    private string GetOrganizationIdFromToken()
+    {
+        var organizationIdClaim = User.Claims.FirstOrDefault(c => c.Type == "OrganizationId");
+        if (organizationIdClaim == null)
         {
-            _userService = userService;
+            throw new UnauthorizedAccessException("OrganizationId is missing in the token.");
         }
+        return organizationIdClaim.Value;
+    }
 
-        // GET: api/users
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+    // GET: api/users
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+    {
+        try
         {
-            var users = await _userService.GetAllUsersAsync();
+            var organizationId = GetOrganizationIdFromToken();
+            var users = await _userService.GetAllUsersAsync(organizationId);
             return Ok(users);
         }
-
-        // GET: api/users/{uid}
-        [HttpGet("{uid}")]
-        public async Task<ActionResult<User>> GetUser(string uid)
+        catch (UnauthorizedAccessException ex)
         {
-            var user = await _userService.GetUserAsync(uid);
+            return Unauthorized(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+
+    // GET: api/users/{uid}
+    [HttpGet("{uid}")]
+    public async Task<ActionResult<User>> GetUser(string uid)
+    {
+        try
+        {
+            var organizationId = GetOrganizationIdFromToken();
+            var user = await _userService.GetUserAsync(uid, organizationId);
             if (user == null)
             {
                 return NotFound();
             }
             return Ok(user);
         }
-
-        // PATCH: api/users/{uid}/assign-routines
-        [HttpPatch("{uid}/assign-routines")]
-        public async Task<ActionResult> AssignRoutinesToUser(string uid, [FromBody] List<string> routineIds)
+        catch (UnauthorizedAccessException ex)
         {
-            if (routineIds == null || routineIds.Count == 0)
-            {
-                return BadRequest("Routine IDs cannot be null or empty.");
-            }
+            return Unauthorized(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
 
-            try
-            {
-                await _userService.AssignRoutinesToUserAsync(uid, routineIds);
-                return NoContent(); // Success
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound("User or one of the routines not found.");
-            }
-            catch (System.Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+    // PATCH: api/users/{uid}/assign-routines
+    [HttpPatch("{uid}/assign-routines")]
+    public async Task<ActionResult> AssignRoutinesToUser(string uid, [FromBody] List<string> routineIds)
+    {
+        if (routineIds == null || routineIds.Count == 0)
+        {
+            return BadRequest("Routine IDs cannot be null or empty.");
         }
 
-        // PATCH: api/users/{uid}/remove-routine
-        [HttpPatch("{uid}/remove-routine")]
-        public async Task<ActionResult> RemoveRoutineFromUser(string uid, [FromBody] string routineId)
+        try
         {
-            if (string.IsNullOrEmpty(routineId))
-            {
-                return BadRequest("Routine ID cannot be null or empty.");
-            }
+            var organizationId = GetOrganizationIdFromToken();
+            await _userService.AssignRoutinesToUserAsync(uid, routineIds, organizationId);
+            return NoContent(); // Success
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(ex.Message);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound("User or one of the routines not found.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
 
-            try
-            {
-                await _userService.RemoveRoutineFromUserAsync(uid, routineId);
-                return NoContent(); // Success
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound("User or routine not found.");
-            }
-            catch (System.Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+    // PATCH: api/users/{uid}/remove-routine
+    [HttpPatch("{uid}/remove-routine")]
+    public async Task<ActionResult> RemoveRoutineFromUser(string uid, [FromBody] string routineId)
+    {
+        if (string.IsNullOrEmpty(routineId))
+        {
+            return BadRequest("Routine ID cannot be null or empty.");
+        }
+
+        try
+        {
+            var organizationId = GetOrganizationIdFromToken();
+            await _userService.RemoveRoutineFromUserAsync(uid, routineId, organizationId);
+            return NoContent(); // Success
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(ex.Message);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound("User or routine not found.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
         }
     }
 }

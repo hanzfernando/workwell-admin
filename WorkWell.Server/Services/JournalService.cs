@@ -15,12 +15,13 @@ namespace WorkWell.Server.Services
             _firestoreDb = firestoreDb;
         }
 
-        // GET /api/journals
-        public async Task<IEnumerable<Journal>> GetAllJournalsAsync()
+        // GET /api/journals - Filter by OrganizationId
+        public async Task<IEnumerable<Journal>> GetAllJournalsByOrganizationAsync(string organizationId)
         {
             try
             {
-                var query = _firestoreDb.Collection("journals");
+                var query = _firestoreDb.Collection("journals")
+                    .WhereEqualTo("OrganizationId", organizationId); // Filter by OrganizationId
                 var snapshot = await query.GetSnapshotAsync();
                 return snapshot.Documents.Select(doc =>
                 {
@@ -32,7 +33,7 @@ namespace WorkWell.Server.Services
             catch (System.Exception ex)
             {
                 // Log the exception (consider using a logging framework)
-                System.Console.WriteLine($"Error fetching all journals: {ex.Message}");
+                System.Console.WriteLine($"Error fetching journals for organization {organizationId}: {ex.Message}");
                 throw new System.Exception("Failed to fetch journals. Please try again later.");
             }
         }

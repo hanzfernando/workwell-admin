@@ -3,6 +3,7 @@ import { usePatientContext } from "../hooks/usePatientContext";
 
 const AddPatientModal = ({ isOpen, onClose, onAddPatient }) => {
     const [email, setEmail] = useState('');
+    const [contact, setContact] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [firstName, setFirstName] = useState('');
@@ -31,6 +32,7 @@ const AddPatientModal = ({ isOpen, onClose, onAddPatient }) => {
                 firstName,
                 lastName,
                 email,
+                contact,
                 password,
                 age: parseInt(age), // Ensure age is sent as a number
                 medicalCondition
@@ -91,6 +93,17 @@ const AddPatientModal = ({ isOpen, onClose, onAddPatient }) => {
                             id="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            required
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="email">Contact</label>
+                        <input
+                            type="contact"
+                            id="contact"
+                            value={contact}
+                            onChange={(e) => setContact(e.target.value)}
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             required
                         />

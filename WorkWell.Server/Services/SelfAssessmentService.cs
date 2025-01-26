@@ -15,13 +15,15 @@ namespace WorkWell.Server.Services
             _firestoreDb = firestoreDb;
         }
 
-        // GET /api/selfassessments
-        public async Task<IEnumerable<SelfAssessment>> GetAllSelfAssessmentsAsync()
+        // GET /api/selfassessments - Filter by OrganizationId
+        public async Task<IEnumerable<SelfAssessment>> GetAllSelfAssessmentsByOrganizationAsync(string organizationId)
         {
             try
             {
-                var query = _firestoreDb.Collection("selfassessments");
+                var query = _firestoreDb.Collection("selfassessments")
+                    .WhereEqualTo("OrganizationId", organizationId); // Filter by OrganizationId
                 var snapshot = await query.GetSnapshotAsync();
+
                 return snapshot.Documents.Select(doc =>
                 {
                     var selfAssessment = doc.ConvertTo<SelfAssessment>();
@@ -31,7 +33,7 @@ namespace WorkWell.Server.Services
             }
             catch (System.Exception ex)
             {
-                System.Console.WriteLine($"Error fetching all self-assessments: {ex.Message}");
+                System.Console.WriteLine($"Error fetching self-assessments for organization {organizationId}: {ex.Message}");
                 throw new System.Exception("Failed to fetch self-assessments. Please try again later.");
             }
         }
