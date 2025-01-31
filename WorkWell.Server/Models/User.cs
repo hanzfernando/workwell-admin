@@ -27,6 +27,21 @@ namespace WorkWell.Server.Models
 
         [FirestoreProperty]
         public int? Age { get; set; } // New: Age of the user
+        
+        [FirestoreProperty]
+        public int? Height { get; set; } 
+        
+        [FirestoreProperty]
+        public int? Weight { get; set; } 
+        
+        [FirestoreProperty]
+        public string? Address { get; set; }
+        [FirestoreProperty]
+        public string? AssignedProfessional { get; set; }
+
+        [FirestoreProperty]
+        public string? Contact { get; set; } 
+        
         [FirestoreProperty]
         public string? OrganizationId { get; set; } // New: Age of the user
 
@@ -45,14 +60,22 @@ namespace WorkWell.Server.Models
         public required string Email { get; set; }
 
         public required string Password { get; set; }
-        //[JsonConverter(typeof(Utils.JsonStringEnumConverter<UserRole>))]
-        //public UserRole Role { get; set; } = UserRole.User;
+        public string? AssignedProfessional { get; set; }
+
+        public int? Age { get; set; } // New: Age of the user
+
+        public int? Height { get; set; }
+
+        public int? Weight { get; set; }
+
+        public string? Address { get; set; }
+
+        public string? Contact { get; set; }
 
         public required string FirstName { get; set; }
 
         public required string LastName { get; set; }
 
-        public int Age { get; set; } // New: Age of the user
         public string? OrganizationId { get; set; }
 
         public string? MedicalCondition { get; set; } // New: Medical condition of the user (optional)

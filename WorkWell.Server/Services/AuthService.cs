@@ -27,6 +27,11 @@ namespace WorkWell.Server.Services
                     Email = request.Email,
                     FirstName = request.FirstName,
                     LastName = request.LastName,
+                    AssignedProfessional = request.AssignedProfessional,
+                    Height = request.Height,
+                    Weight = request.Weight,
+                    Address = request.Address,
+                    Contact = request.Contact,
                     Role = UserRole.User, // Default to User; Admin can set this if required
                     OrganizationId = request.OrganizationId, // Set from the admin's token
                     MedicalCondition = request.MedicalCondition,

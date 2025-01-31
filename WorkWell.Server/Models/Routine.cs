@@ -5,11 +5,11 @@ using WorkWell.Server.Utils;
 
 namespace WorkWell.Server.Models
 {
-    [FirestoreData]  // Marks the class as a Firestore document
+    [FirestoreData] 
     public class Routine
     {
-        [FirestoreProperty]  // Marks this property to be saved in Firestore
-        public string? RoutineId { get; set; } // Routine ID, e.g., "routine123"
+        [FirestoreProperty] 
+        public string? RoutineId { get; set; }
 
         [FirestoreProperty]
         public required string Name { get; set; }
@@ -35,14 +35,17 @@ namespace WorkWell.Server.Models
         [JsonConverter(typeof(FirestoreTimestampJsonConverter))]
         public Timestamp EndDate{ get; set; }
 
-        [JsonPropertyName("startDateFormatted")] // Use this property for JSON serialization
+        [JsonPropertyName("startDateFormatted")] 
         public string StartDateFormatted => StartDate.ToDateTime().ToLocalTime().ToString("yyyy-MM-dd");
         
-        [JsonPropertyName("endDateFormatted")] // Use this property for JSON serialization
+        [JsonPropertyName("endDateFormatted")] 
         public string EndDateFormatted => EndDate.ToDateTime().ToLocalTime().ToString("yyyy-MM-dd");
+        
+        [FirestoreProperty]
+        public string? CreatedBy { get; set; }
 
         // Sub-model for each exercise in the routine
-        [FirestoreData]  // Marks this class as a Firestore document
+        [FirestoreData] 
         public class RoutineExercise
         {
             [FirestoreProperty]

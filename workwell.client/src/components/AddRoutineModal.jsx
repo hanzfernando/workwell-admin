@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useExerciseContext } from '../hooks/useExerciseContext';
+import { useAuthContext } from '../hooks/useAuthContext';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 const AddRoutineModal = ({ isOpen, onClose, onAddRoutine }) => {
     const { state: { exercises } } = useExerciseContext();
+    const { user } = useAuthContext();
 
     const [routineName, setRoutineName] = useState('');
     const [targetArea, setTargetArea] = useState('');
@@ -65,6 +67,7 @@ const AddRoutineModal = ({ isOpen, onClose, onAddRoutine }) => {
         const newRoutine = {
             name: routineName,
             targetArea,
+            createdBy: user.uid,
             startDate: formattedStartDate,
             endDate: formattedEndDate,
             exercises: selectedExercises.map(({ exerciseId, reps, duration }) => ({

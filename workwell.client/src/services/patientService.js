@@ -6,7 +6,9 @@ const BASE_URL = `${backendLink}/api/users`;
 // Get all patients
 const getPatients = async () => {
     try {
-        const response = await fetch(BASE_URL, {
+        console.log("getPatients");
+
+        const response = await fetch(`${BASE_URL}/organization`, {
             headers: {
                 Authorization: `Bearer ${getToken()}`, // Add Authorization header
             },

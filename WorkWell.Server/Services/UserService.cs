@@ -1,4 +1,5 @@
 ﻿using Google.Cloud.Firestore;
+using Microsoft.AspNetCore.Mvc;
 using WorkWell.Server.Models;
 
 public class UserService
@@ -29,6 +30,44 @@ public class UserService
         }
     }
 
+    public async Task<IEnumerable<User>> GetAllPatientsAsync(string organizationId)
+    {
+        try
+        {
+            var query = _firestoreDb.Collection("users")
+                .WhereEqualTo("OrganizationId", organizationId)
+                ;
+
+            var snapshot = await query.GetSnapshotAsync();
+            return snapshot.Documents.Select(doc => doc.ConvertTo<User>()).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching patients: {ex.Message}");
+            throw new Exception("Failed to fetch patients. Please try again later.");
+        }
+    }
+
+    // GET /api/users/patients?assignedProfessional={userId} - Get only patients assigned to a specific Admin
+    public async Task<IEnumerable<User>> GetPatientsByAssignedProfessionalAsync(string organizationId, string assignedProfessionalId)
+    {
+        try
+        {
+            var query = _firestoreDb.Collection("users")
+                .WhereEqualTo("OrganizationId", organizationId)
+                .WhereEqualTo("AssignedProfessional", assignedProfessionalId)
+                ;
+
+            var snapshot = await query.GetSnapshotAsync();
+            return snapshot.Documents.Select(doc => doc.ConvertTo<User>()).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching assigned patients: {ex.Message}");
+            throw new Exception("Failed to fetch assigned patients. Please try again later.");
+        }
+    }
+
     // GET /api/users/{uid} - Filtered by organizationId
     public async Task<User?> GetUserAsync(string uid, string organizationId)
     {
@@ -48,6 +87,25 @@ public class UserService
         {
             Console.WriteLine($"Error fetching user with UID {uid}: {ex.Message}");
             throw new Exception("Failed to fetch user. Please try again later.");
+        }
+    }
+   
+    // GET /api/users/organization-admins - Get all admins in the requester's organization
+    public async Task<IEnumerable<User>> GetAllOrganizationAdminsAsync(string organizationId)
+    {
+        try
+        {
+            var query = _firestoreDb.Collection("users")
+                .WhereEqualTo("OrganizationId", organizationId)
+                .WhereEqualTo("Role", UserRole.Admin);
+
+            var snapshot = await query.GetSnapshotAsync();
+            return snapshot.Documents.Select(doc => doc.ConvertTo<User>()).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching admins: {ex.Message}");
+            throw new Exception("Failed to fetch admins. Please try again later.");
         }
     }
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
 using WorkWell.Server.Models;
@@ -47,6 +48,53 @@ public class UsersController : ControllerBase
         }
     }
 
+    // GET: api/users
+    [HttpGet("organization")]
+    public async Task<ActionResult<IEnumerable<User>>> GetPatients()
+    {
+        try
+        {
+            var organizationId = GetOrganizationIdFromToken();
+            var userRoleClaim = User.Claims.FirstOrDefault(c => c.Type == "Role");
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "user_id");
+
+            if (userRoleClaim == null || userIdClaim == null || string.IsNullOrEmpty(userRoleClaim.Value) || string.IsNullOrEmpty(userIdClaim.Value))
+            {
+                return Unauthorized("Invalid token. Role or User ID missing.");
+            }
+
+            string userRole = userRoleClaim.Value;
+            string userId = userIdClaim.Value;
+            
+            IEnumerable<User> users;
+
+            if (userRole == UserRole.Admin.ToString("G"))
+            {
+                // Fetch only patients assigned to the logged-in Admin
+                users = await _userService.GetPatientsByAssignedProfessionalAsync(organizationId, userId);
+            }
+            else if (userRole == UserRole.AdminAssistant.ToString("G"))
+            {
+                // Fetch all patients in the organization
+                users = await _userService.GetAllPatientsAsync(organizationId);
+            }
+            else
+            {
+                return Forbid("Unauthorized access to patient data.");
+            }
+
+            return Ok(users);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+
     // GET: api/users/{uid}
     [HttpGet("{uid}")]
     public async Task<ActionResult<User>> GetUser(string uid)
@@ -60,6 +108,25 @@ public class UsersController : ControllerBase
                 return NotFound();
             }
             return Ok(user);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+
+    [HttpGet("organization-admins")]
+    public async Task<ActionResult<IEnumerable<User>>> GetAllOrganizationAdmins()
+    {
+        try
+        {
+            var organizationId = GetOrganizationIdFromToken();
+            var admins = await _userService.GetAllOrganizationAdminsAsync(organizationId);
+            return Ok(admins);
         }
         catch (UnauthorizedAccessException ex)
         {

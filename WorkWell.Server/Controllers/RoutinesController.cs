@@ -21,6 +21,7 @@ namespace WorkWell.Server.Controllers
             _routineService = routineService;
         }
 
+        // Get OrganizationId from JWT token
         private string GetOrganizationIdFromToken()
         {
             var organizationIdClaim = User.Claims.FirstOrDefault(c => c.Type == "OrganizationId");
@@ -31,14 +32,27 @@ namespace WorkWell.Server.Controllers
             return organizationIdClaim.Value;
         }
 
-        // GET: api/routines/{id}
+        // Get Uid (user identifier) from JWT token
+        private string GetUserIdFromToken()
+        {
+            var uidClaim = User.Claims.FirstOrDefault(c => c.Type == "user_id");
+            if (uidClaim == null)
+            {
+                throw new UnauthorizedAccessException("User ID is missing in the token.");
+            }
+            return uidClaim.Value;
+        }
+
+        // GET: api/routines/{routineId}
         [HttpGet("{routineId}")]
         public async Task<ActionResult<Routine>> GetRoutine(string routineId)
         {
             try
             {
                 var organizationId = GetOrganizationIdFromToken();
-                var routine = await _routineService.GetRoutineAsync(routineId, organizationId);
+                var uid = GetUserIdFromToken();
+                var routine = await _routineService.GetRoutineAsync(routineId, organizationId, uid);
+
                 if (routine == null)
                 {
                     return NotFound("Routine not found or not accessible.");
@@ -55,14 +69,15 @@ namespace WorkWell.Server.Controllers
             }
         }
 
-        // GET: api/routines
+        // GET: api/routines (fetch all routines created by the logged-in user)
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Routine>>> GetAllRoutines()
         {
             try
             {
                 var organizationId = GetOrganizationIdFromToken();
-                var routines = await _routineService.GetAllRoutinesAsync(organizationId);
+                var uid = GetUserIdFromToken();
+                var routines = await _routineService.GetAllRoutinesAsync(organizationId, uid);
                 return Ok(routines);
             }
             catch (UnauthorizedAccessException ex)
@@ -75,7 +90,7 @@ namespace WorkWell.Server.Controllers
             }
         }
 
-        // POST: api/routines
+        // POST: api/routines (create a new routine)
         [HttpPost]
         public async Task<ActionResult> AddRoutine([FromBody] Routine routine)
         {
@@ -87,7 +102,9 @@ namespace WorkWell.Server.Controllers
                 }
 
                 var organizationId = GetOrganizationIdFromToken();
+                var uid = GetUserIdFromToken();
                 routine.OrganizationId = organizationId;
+                routine.CreatedBy = uid; // Assign the creator
 
                 await _routineService.AddRoutineAsync(routine);
                 return CreatedAtAction(nameof(GetRoutine), new { routineId = routine.RoutineId }, routine);
@@ -102,7 +119,7 @@ namespace WorkWell.Server.Controllers
             }
         }
 
-        // PUT: api/routines/{id}
+        // PUT: api/routines/{routineId} (update an existing routine)
         [HttpPut("{routineId}")]
         public async Task<ActionResult> UpdateRoutine(string routineId, [FromBody] Routine routine)
         {
@@ -114,13 +131,15 @@ namespace WorkWell.Server.Controllers
                 }
 
                 var organizationId = GetOrganizationIdFromToken();
-                var existingRoutine = await _routineService.GetRoutineAsync(routineId, organizationId);
+                var uid = GetUserIdFromToken();
+                var existingRoutine = await _routineService.GetRoutineAsync(routineId, organizationId, uid);
                 if (existingRoutine == null)
                 {
                     return NotFound("Routine not found or not accessible.");
                 }
 
                 routine.OrganizationId = organizationId;
+                routine.CreatedBy = uid; // Ensure the creator remains unchanged
 
                 await _routineService.UpdateRoutineAsync(routine);
                 return NoContent();
@@ -135,14 +154,15 @@ namespace WorkWell.Server.Controllers
             }
         }
 
-        // DELETE: api/routines/{id}
+        // DELETE: api/routines/{routineId} (delete a routine)
         [HttpDelete("{routineId}")]
         public async Task<ActionResult> DeleteRoutine(string routineId)
         {
             try
             {
                 var organizationId = GetOrganizationIdFromToken();
-                var routine = await _routineService.GetRoutineAsync(routineId, organizationId);
+                var uid = GetUserIdFromToken();
+                var routine = await _routineService.GetRoutineAsync(routineId, organizationId, uid);
                 if (routine == null)
                 {
                     return NotFound("Routine not found or not accessible.");
@@ -161,15 +181,23 @@ namespace WorkWell.Server.Controllers
             }
         }
 
+        // PATCH: api/routines/{routineId}/assign-users (assign users to a routine)
         [HttpPatch("{routineId}/assign-users")]
         public async Task<ActionResult> AssignUsersToRoutine(string routineId, [FromBody] List<string> userIds)
         {
             try
             {
                 var organizationId = GetOrganizationIdFromToken();
+                var uid = GetUserIdFromToken();
+
+                var routine = await _routineService.GetRoutineAsync(routineId, organizationId, uid);
+                if (routine == null)
+                {
+                    return NotFound("Routine not found or not accessible.");
+                }
 
                 await _routineService.AssignUsersToRoutineAsync(routineId, userIds, organizationId);
-                return NoContent(); // Success
+                return NoContent();
             }
             catch (UnauthorizedAccessException ex)
             {

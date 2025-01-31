@@ -1,6 +1,7 @@
 import React, { createContext, useReducer, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { getAllAdmins } from '../services/superAdminService';
+import { getAllOrganizationAdmins } from '../services/adminService'; 
 import { useAuthContext } from '../hooks/useAuthContext.js';
 
 const initialState = {
@@ -38,9 +39,20 @@ const AdminProvider = ({ children }) => {
             }
         };
 
+        const fetchOrganizationAdmins = async () => {
+            try {
+                const admins = await getAllOrganizationAdmins();
+                dispatch({ type: 'SET_ADMINS', payload: admins.data });
+            } catch (error) {
+                dispatch({ type: 'ERROR', payload: error.message });
+            }
+        }
+
         // Check if user exists and their role is SuperAdmin
         if (user?.role === 'SuperAdmin') {
             fetchAdmins();
+        } else if (user?.role === 'Admin') {
+            fetchOrganizationAdmins();
         } else if (user) {
             console.warn('Unauthorized: User is not a SuperAdmin.');
             dispatch({ type: 'ERROR', payload: 'Unauthorized access.' });
