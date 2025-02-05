@@ -100,8 +100,13 @@ namespace WorkWell.Server.Services
             try
             {
                 var snapshot = await _firestoreDb.Collection("users")
-                    .WhereEqualTo("Role", UserRole.Admin.ToString("G")) // Use "Admin" string
+                    .WhereIn("Role", new[]
+                    {
+                        UserRole.Admin.ToString("G"),
+                        UserRole.AdminAssistant.ToString("G")
+                    })
                     .GetSnapshotAsync();
+
 
                 return snapshot.Documents.Select(doc => doc.ConvertTo<Admin>()).ToList();
             }

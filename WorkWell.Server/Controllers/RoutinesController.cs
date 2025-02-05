@@ -6,6 +6,7 @@ using WorkWell.Server.Models;
 using WorkWell.Server.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace WorkWell.Server.Controllers
 {
@@ -43,6 +44,16 @@ namespace WorkWell.Server.Controllers
             return uidClaim.Value;
         }
 
+        private string GetRoleFromToken()
+        {
+            var roleClaim = User.Claims.FirstOrDefault(c => c.Type == "Role");
+            if (roleClaim == null)
+            {
+                throw new UnauthorizedAccessException("Role is missing in the token.");
+            }
+            return roleClaim.Value;
+        }
+
         // GET: api/routines/{routineId}
         [HttpGet("{routineId}")]
         public async Task<ActionResult<Routine>> GetRoutine(string routineId)
@@ -75,10 +86,23 @@ namespace WorkWell.Server.Controllers
         {
             try
             {
-                var organizationId = GetOrganizationIdFromToken();
-                var uid = GetUserIdFromToken();
-                var routines = await _routineService.GetAllRoutinesAsync(organizationId, uid);
-                return Ok(routines);
+                string role = GetRoleFromToken();
+                if (UserRole.Admin.ToString("G").Equals(role))
+                {
+                    var organizationId = GetOrganizationIdFromToken();
+                    var uid = GetUserIdFromToken();
+                    var routines = await _routineService.GetAllRoutinesAsync(organizationId, uid);
+                    return Ok(routines);
+
+                }
+                else
+                {
+                    var organizationId = GetOrganizationIdFromToken();
+                    var uid = GetUserIdFromToken();
+                    var routines = await _routineService.GetAllOrganizationRoutinesAsync(organizationId);
+                    return Ok(routines);
+                }
+
             }
             catch (UnauthorizedAccessException ex)
             {

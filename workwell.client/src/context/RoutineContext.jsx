@@ -60,6 +60,7 @@ const RoutineProvider = ({ children }) => {
         const fetchRoutines = async () => {
             try {
                 const routines = await getAllRoutines(); // Fetch all routines
+                //console.log(routines)
                 dispatch({ type: 'SET_ROUTINES', payload: routines });
             } catch (error) {
                 dispatch({ type: 'SET_ERROR', payload: error.message });

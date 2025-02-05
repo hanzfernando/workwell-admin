@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace WorkWell.Server.Services
 {
@@ -37,6 +38,8 @@ namespace WorkWell.Server.Services
         {
             try
             {
+                Debug.WriteLine("Get ALl Routines");
+
                 var docRef = _firestoreDb.Collection("routines").Document(routineId);
                 var snapshot = await docRef.GetSnapshotAsync();
 
@@ -62,6 +65,25 @@ namespace WorkWell.Server.Services
                 var query = _firestoreDb.Collection("routines")
                                         .WhereEqualTo("OrganizationId", organizationId)
                                         .WhereEqualTo("CreatedBy", uid);
+
+                var snapshot = await query.GetSnapshotAsync();
+                return snapshot.Documents.Select(doc => doc.ConvertTo<Routine>()).ToList();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching all routines: {ex.Message}");
+                throw new Exception("Failed to fetch routines. Please try again later.");
+            }
+        }
+
+        // Get all routines created by the authenticated user
+        public async Task<IEnumerable<Routine>> GetAllOrganizationRoutinesAsync(string organizationId)
+        {
+            try
+            {
+
+                var query = _firestoreDb.Collection("routines")
+                                        .WhereEqualTo("OrganizationId", organizationId);
 
                 var snapshot = await query.GetSnapshotAsync();
                 return snapshot.Documents.Select(doc => doc.ConvertTo<Routine>()).ToList();

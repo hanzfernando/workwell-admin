@@ -67,14 +67,14 @@ const SideNavigationBar = () => {
             </ul>
 
             {/* Change Password Link */}
-            <NavLink
-                to="/change-password"
-                className={({ isActive }) =>
-                    `block p-2 text-blue-600 hover:bg-blue-100 rounded mb-2 text-center ${isActive ? 'font-bold' : ''}`
-                }
-            >
-                Change Password
-            </NavLink>
+            {/*<NavLink*/}
+            {/*    to="/change-password"*/}
+            {/*    className={({ isActive }) =>*/}
+            {/*        `block p-2 text-blue-600 hover:bg-blue-100 rounded mb-2 text-center ${isActive ? 'font-bold' : ''}`*/}
+            {/*    }*/}
+            {/*>*/}
+            {/*    Change Password*/}
+            {/*</NavLink>*/}
 
             {/* Logout Button */}
             <button
