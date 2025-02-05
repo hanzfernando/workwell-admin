@@ -73,7 +73,7 @@ const ExerciseProvider = ({ children }) => {
         };
 
         // Check if user exists and their role is SuperAdmin
-        if (user?.role === UserRole.Admin) {
+        if (user?.role === UserRole.Admin || user?.role === UserRole.AdminAssistant) {
             fetchExercises();
         } else if (user) {
             console.warn('Unauthorized: User is not a Admin.');

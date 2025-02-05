@@ -76,7 +76,6 @@ const OrganizationProvider = ({ children }) => {
         const fetchOrganizations = async () => {
             try {
                 const organizations = await getAllOrganizations(); // Fetch all organizations
-                console.log(organizations)
                 dispatch({ type: 'SET_ORGANIZATIONS', payload: organizations });
             } catch (error) {
                 dispatch({ type: 'ERROR', payload: error.message });

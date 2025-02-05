@@ -12,8 +12,10 @@ namespace WorkWell.Server.Models
 
         [FirestoreProperty]
         public string Email { get; set; } = string.Empty;
+
         [FirestoreProperty(ConverterType = typeof(FirestoreEnumConverter<UserRole>))]
-        public UserRole Role { get; set; } = UserRole.User;
+        [JsonConverter(typeof(Utils.JsonStringEnumConverter<UserRole>))]
+        public UserRole Role { get; set; }
 
         [FirestoreProperty]
         public string FirstName { get; set; } = string.Empty;
@@ -33,6 +35,7 @@ namespace WorkWell.Server.Models
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
         public required string OrganizationId { get; set; }
+        public required string Role { get; set; }
     }
 
     public class AdminResponseDto

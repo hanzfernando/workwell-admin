@@ -20,7 +20,8 @@ namespace WorkWell.Server.Services
             string password,
             string firstName,
             string lastName,
-            string organizationId)
+            string organizationId,
+            UserRole role)
         {
             try
             {
@@ -54,7 +55,8 @@ namespace WorkWell.Server.Services
                     Password = password,
                     FirstName = firstName,
                     LastName = lastName,
-                    OrganizationId = organizationId
+                    OrganizationId = organizationId,
+                    Role = role.ToString() 
                 };
 
                 DocumentReference userDoc = _firestoreDb
@@ -68,14 +70,14 @@ namespace WorkWell.Server.Services
                     FirstName = firstName,
                     LastName = lastName,
                     OrganizationId = organizationId,
-                    Role = UserRole.Admin.ToString("G") // Admin role
+                    Role = role.ToString() 
                 });
                 Console.WriteLine("Admin details added to Firestore.");
 
                 // Step 3: Set custom claim (Role = "Admin") in Firebase Authentication
                 var customClaims = new Dictionary<string, object>
                 {
-                    { "Role", UserRole.Admin.ToString("G") },
+                    { "Role", role.ToString() },
                     { "OrganizationId", organizationId }
                 };
 

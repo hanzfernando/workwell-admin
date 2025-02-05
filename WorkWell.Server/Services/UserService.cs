@@ -1,5 +1,6 @@
 ﻿using Google.Cloud.Firestore;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 using WorkWell.Server.Models;
 
 public class UserService
@@ -16,19 +17,22 @@ public class UserService
     {
         try
         {
-            var query = _firestoreDb.Collection("users").WhereEqualTo("OrganizationId", organizationId);
-            var snapshot = await query.GetSnapshotAsync();
-            var users = snapshot.Documents.Select(doc => doc.ConvertTo<User>());
+            var query = _firestoreDb.Collection("users")
+                .WhereEqualTo("OrganizationId", organizationId)
+                .WhereEqualTo("Role", UserRole.User.ToString("G")); // Fetch only 'User' roles
 
-            // Return users with role 'User' and matching organizationId
-            return users.Where(u => u.Role == UserRole.User).ToList();
+            var snapshot = await query.GetSnapshotAsync();
+            var users = snapshot.Documents.Select(doc => doc.ConvertTo<User>()).ToList();
+
+            return users;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error fetching all users: {ex.Message}");
+            Console.WriteLine($"Error fetching users with Role: User - {ex.Message}");
             throw new Exception("Failed to fetch users. Please try again later.");
         }
     }
+
 
     public async Task<IEnumerable<User>> GetAllPatientsAsync(string organizationId)
     {
@@ -91,16 +95,16 @@ public class UserService
     }
    
     // GET /api/users/organization-admins - Get all admins in the requester's organization
-    public async Task<IEnumerable<User>> GetAllOrganizationAdminsAsync(string organizationId)
+    public async Task<IEnumerable<Admin>> GetAllOrganizationAdminsAsync(string organizationId)
     {
         try
         {
             var query = _firestoreDb.Collection("users")
                 .WhereEqualTo("OrganizationId", organizationId)
-                .WhereEqualTo("Role", UserRole.Admin);
+                .WhereEqualTo("Role", UserRole.Admin.ToString("G"));
 
             var snapshot = await query.GetSnapshotAsync();
-            return snapshot.Documents.Select(doc => doc.ConvertTo<User>()).ToList();
+            return snapshot.Documents.Select(doc => doc.ConvertTo<Admin>()).ToList();
         }
         catch (Exception ex)
         {

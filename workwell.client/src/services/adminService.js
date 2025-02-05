@@ -5,12 +5,11 @@ const BASE_URL = `${backendLink}/api/users`;
 
 const getAllOrganizationAdmins = async () => {
     try {
-        const token = await getToken();
         const response = await fetch(`${BASE_URL}/organization-admins`, {
             method: 'GET',
             headers: {
-                Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${getToken()}`
             },
         });
 

@@ -37,7 +37,7 @@ const VideoProvider = ({ children }) => {
             }
         };
         // Check if user exists and their role is SuperAdmin
-        if (user?.role === UserRole.Admin) {
+        if (user?.role === UserRole.Admin || user?.role === UserRole.AdminAssistant) {
             fetchVideos();
         } else if (user) {
             console.warn('Unauthorized: User is not a Admin.');

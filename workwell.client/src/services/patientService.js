@@ -3,12 +3,29 @@ import { getToken } from '../utils/authUtil.js';
 
 const BASE_URL = `${backendLink}/api/users`;
 
-// Get all patients
+// Get all patients under that professional
 const getPatients = async () => {
     try {
-        console.log("getPatients");
-
         const response = await fetch(`${BASE_URL}/organization`, {
+            headers: {
+                Authorization: `Bearer ${getToken()}`, // Add Authorization header
+            },
+        });
+        if (!response.ok) {
+            throw new Error("Failed to fetch patients.");
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error fetching patients:", error.message);
+        throw error;
+    }
+};
+
+// 
+const getAllOrganizationPatients = async () => {
+    try {
+        const response = await fetch(`${BASE_URL}/patients`, {
             headers: {
                 Authorization: `Bearer ${getToken()}`, // Add Authorization header
             },
@@ -43,4 +60,4 @@ const getPatient = async (id) => {
     }
 };
 
-export { getPatients, getPatient };
+export { getPatients, getPatient, getAllOrganizationPatients };

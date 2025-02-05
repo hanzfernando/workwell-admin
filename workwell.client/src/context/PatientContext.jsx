@@ -1,6 +1,6 @@
 import { createContext, useReducer, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { getPatients } from '../services/patientService'; // Assume this is your API call to fetch patients
+import { getPatients, getAllOrganizationPatients } from '../services/patientService'; // Assume this is your API call to fetch patients
 import { useAuthContext } from '../hooks/useAuthContext.js';
 import UserRole from '../utils/Roles'
 
@@ -82,13 +82,26 @@ const PatientProvider = ({ children }) => {
             }
         };
 
+        const fetchOrganizationPatients = async () => {
+            try {
+                const result = await getAllOrganizationPatients(); // API call to fetch patients
+                dispatch({ type: 'SET_PATIENTS', payload: result.data });
+            } catch (error) {
+                dispatch({ type: 'ERROR', payload: error.message });
+            }
+        }
+
         // Check if user exists and their role is SuperAdmin
         if (user?.role === UserRole.Admin) {
             fetchPatients();
-        } else if (user) {
+        } else if (user?.role === UserRole.AdminAssistant) {
+            fetchOrganizationPatients();
+        }
+        else if (user) {
             console.warn('Unauthorized: User is not a Admin.');
             dispatch({ type: 'ERROR', payload: 'Unauthorized access.' });
         }
+
     }, [user]); // Run only once when the provider is mounted
 
     return (

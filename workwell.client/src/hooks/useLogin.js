@@ -18,7 +18,7 @@ const useLogin = () => {
 
             const user = await verifyToken(idToken);
             //console.log(user)
-            if (user.role === UserRole.Admin) {
+            if (user.role === UserRole.Admin || user.role === UserRole.AdminAssistant) {
                 console.log("admin")
                 setToken(idToken);
                 dispatch({

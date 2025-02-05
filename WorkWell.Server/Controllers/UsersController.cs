@@ -29,24 +29,32 @@ public class UsersController : ControllerBase
     }
 
     // GET: api/users
-    [HttpGet]
+    [HttpGet("patients")] // Ensuring clarity in endpoint
     public async Task<ActionResult<IEnumerable<User>>> GetUsers()
     {
         try
         {
+
             var organizationId = GetOrganizationIdFromToken();
             var users = await _userService.GetAllUsersAsync(organizationId);
-            return Ok(users);
+
+            if (users == null || !users.Any())
+            {
+                return Ok(new { success = true, message = "No users found.", data = new List<User>() });
+            }
+
+            return Ok(new { success = true, data = users });
         }
         catch (UnauthorizedAccessException ex)
         {
-            return Unauthorized(ex.Message);
+            return Unauthorized(new { success = false, message = ex.Message });
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ex.Message);
+            return StatusCode(500, new { success = false, message = ex.Message });
         }
     }
+
 
     // GET: api/users
     [HttpGet("organization")]
@@ -120,7 +128,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("organization-admins")]
-    public async Task<ActionResult<IEnumerable<User>>> GetAllOrganizationAdmins()
+    public async Task<ActionResult<IEnumerable<Admin>>> GetAllOrganizationAdmins()
     {
         try
         {

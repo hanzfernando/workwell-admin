@@ -29,7 +29,7 @@ const AdminRoute = ({ children }) => {
     }
 
     // If user is not an Admin, redirect to login
-    if (user.role !== UserRole.Admin) {
+    if (user.role !== UserRole.Admin && user.role !== UserRole.AdminAssistant) {
         return <Navigate to="/login" replace />;
     }
 
@@ -58,7 +58,7 @@ const PublicRoute = ({ children }) => {
     const { user } = useAuthContext();
     // If user is already logged in, redirect based on role
     if (user) {
-        if (user.role === UserRole.Admin) {
+        if (user.role === UserRole.Admin || user.role === UserRole.AdminAssistant) {
             // Admin
             return <Navigate to="/users" replace />;
         } else if (user.role === UserRole.SuperAdmin) {

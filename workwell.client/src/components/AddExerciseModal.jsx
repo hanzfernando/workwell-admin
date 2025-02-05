@@ -13,7 +13,6 @@ const AddExerciseModal = ({ isOpen, onClose, onAddExercise }) => {
             return;
         }
 
-        console.log(user)
         const newExercise = {
             name,
             description,

@@ -14,6 +14,10 @@ const navItems = {
         { name: 'Routines', path: '/routines' },
         { name: 'Exercises', path: '/exercises' },
     ],
+    AdminAssistant: [
+        { name: 'Users', path: '/users' },
+    ]
+
 };
 
 const SideNavigationBar = () => {

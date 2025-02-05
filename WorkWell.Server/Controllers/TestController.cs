@@ -13,7 +13,8 @@ namespace WorkWell.Server.Controllers
         private static readonly List<UserRole> AllowedRoles = new()
         {
             UserRole.SuperAdmin,
-            UserRole.Admin
+            UserRole.Admin,
+            UserRole.AdminAssistant
         };
 
         [HttpGet("claims")]

@@ -22,12 +22,23 @@ namespace WorkWell.Server.Controllers
         {
             if (string.IsNullOrEmpty(request.Email) ||
                 string.IsNullOrEmpty(request.Password) ||
-                string.IsNullOrEmpty(request.OrganizationId))
+                string.IsNullOrEmpty(request.OrganizationId) ||
+                string.IsNullOrEmpty(request.Role)) // Ensure Role is provided
             {
                 return BadRequest(new
                 {
                     success = false,
-                    message = "Email, Password, and OrganizationId are required."
+                    message = "Email, Password, OrganizationId, and Role are required."
+                });
+            }
+
+            // Convert string to Enum
+            if (!Enum.TryParse(request.Role, out UserRole parsedRole))
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Invalid role provided. Allowed values: SuperAdmin, Admin, AdminAssistant, User."
                 });
             }
 
@@ -38,7 +49,8 @@ namespace WorkWell.Server.Controllers
                     request.Password,
                     request.FirstName,
                     request.LastName,
-                    request.OrganizationId
+                    request.OrganizationId,
+                    parsedRole // Pass converted UserRole enum
                 );
 
                 return Ok(new
@@ -57,6 +69,7 @@ namespace WorkWell.Server.Controllers
                 });
             }
         }
+
 
         [HttpGet("admins")]
         public async Task<IActionResult> GetAllAdmins()

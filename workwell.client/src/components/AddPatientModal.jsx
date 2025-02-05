@@ -28,7 +28,7 @@ const AddPatientModal = ({ isOpen, onClose, onAddPatient }) => {
             setAssignedProfessional(user.userId);
         }
     }, [user.role, user.uid]);
-
+ 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -246,16 +246,28 @@ const AddPatientModal = ({ isOpen, onClose, onAddPatient }) => {
                                 onChange={(e) => setAssignedProfessional(e.target.value)}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-teal-500"
                                 required
+                                disabled={!adminState.admins || adminState.admins.length === 0} // Disable if no admins
                             >
                                 <option value="">Select Admin</option>
-                                {adminState.admins.map((admin) => (
-                                    <option key={admin.uid} value={admin.uid}>
-                                        {admin.firstName} {admin.lastName}
-                                    </option>
-                                ))}
+                                {adminState.admins && adminState.admins.length > 0 ? (
+                                    adminState.admins.map((admin) => (
+                                        <option key={admin.uid} value={admin.uid}>
+                                            {admin.firstName} {admin.lastName}
+                                        </option>
+                                    ))
+                                ) : (
+                                    <option value="" disabled>No admins available</option>
+                                )}
                             </select>
+
+                            {(!adminState.admins || adminState.admins.length === 0) && (
+                                <p className="text-red-500 text-sm mt-1">
+                                    No available admins. Please add an admin first.
+                                </p>
+                            )}
                         </div>
                     )}
+
 
                     <div className="mt-4 flex justify-end space-x-4">
                         <button onClick={onClose} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancel</button>

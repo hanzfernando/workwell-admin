@@ -35,7 +35,7 @@ const JournalProvider = ({ children }) => {
                 dispatch({ type: 'ERROR', payload: error.message });
             }
         };
-        if (user?.role === UserRole.Admin) {
+        if (user?.role === UserRole.Admin || user?.role === UserRole.AdminAssistant) {
             fetchJournals();
         } else if (user) {
             console.warn('Unauthorized: User is not a Admin.');

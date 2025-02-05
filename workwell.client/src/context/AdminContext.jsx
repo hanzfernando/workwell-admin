@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { getAllAdmins } from '../services/superAdminService';
 import { getAllOrganizationAdmins } from '../services/adminService'; 
 import { useAuthContext } from '../hooks/useAuthContext.js';
-
+import UserRole from '../utils/Roles';
 const initialState = {
     admins: [],
     loading: true,
@@ -41,17 +41,17 @@ const AdminProvider = ({ children }) => {
 
         const fetchOrganizationAdmins = async () => {
             try {
-                const admins = await getAllOrganizationAdmins();
-                dispatch({ type: 'SET_ADMINS', payload: admins.data });
+                const admins = await getAllOrganizationAdmins();              
+                dispatch({ type: 'SET_ADMINS', payload: admins });
             } catch (error) {
                 dispatch({ type: 'ERROR', payload: error.message });
             }
         }
 
         // Check if user exists and their role is SuperAdmin
-        if (user?.role === 'SuperAdmin') {
+        if (user?.role === UserRole.SuperAdmin) {
             fetchAdmins();
-        } else if (user?.role === 'Admin') {
+        } else if (user?.role === UserRole.Admin || user?.role === UserRole.AdminAssistant) {
             fetchOrganizationAdmins();
         } else if (user) {
             console.warn('Unauthorized: User is not a SuperAdmin.');

@@ -9,11 +9,14 @@ const AddAdminModal = ({ isOpen, onClose, onAddAdmin }) => {
     const [lastName, setLastName] = useState('');
     const [organizationId, setOrganizationId] = useState('');
 
+    // New state for choosing role: "Admin" or "AdminAssistant"
+    const [role, setRole] = useState('');
+
     const { state } = useOrganizationContext();
 
     const handleSubmit = () => {
-        if (!email || !password || !firstName || !lastName || !organizationId) {
-            alert('All fields are required.');
+        if (!email || !password || !firstName || !lastName || !organizationId || !role) {
+            alert('All fields are required, including Role Choice.');
             return;
         }
 
@@ -23,15 +26,22 @@ const AddAdminModal = ({ isOpen, onClose, onAddAdmin }) => {
             firstName,
             lastName,
             organizationId,
+            role // Pass the selected role to the parent
         };
 
-        onAddAdmin(newAdmin); // Call the callback to add the admin
+        // Call the callback to add the admin
+        onAddAdmin(newAdmin);
+
+        // Reset fields
         setEmail('');
         setPassword('');
         setFirstName('');
         setLastName('');
         setOrganizationId('');
-        onClose(); // Close the modal
+        setRole('');
+
+        // Close the modal
+        onClose();
     };
 
     if (!isOpen) return null;
@@ -96,6 +106,20 @@ const AddAdminModal = ({ isOpen, onClose, onAddAdmin }) => {
                                     {organization.name}
                                 </option>
                             ))}
+                        </select>
+                    </div>
+
+                    {/* Role Choice Dropdown */}
+                    <div>
+                        <label className="block text-sm font-medium mb-2">Role</label>
+                        <select
+                            value={role}
+                            onChange={(e) => setRole(e.target.value)}
+                            className="w-full px-3 py-2 border rounded focus:outline-none focus:border-teal-500"
+                        >
+                            <option value="">Select a Role</option>
+                            <option value="Admin">Admin</option>
+                            <option value="AdminAssistant">Admin Assistant</option>
                         </select>
                     </div>
                 </div>
