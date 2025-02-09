@@ -60,6 +60,29 @@ const addRoutine = async (routine) => {
     }
 };
 
+const addUniqueRoutine = async (routine) => {
+    console.log(routine)
+    try {
+        const response = await fetch(`${BASE_URL}/unique-routine`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${getToken()}`, // Add Authorization header
+
+            },
+            body: JSON.stringify(routine),
+        });
+        if (!response.ok) {
+            const message = await response.text();
+            throw new Error(`Error adding routine: ${message}`);
+        }
+        return await response.json(); // Return the created routine
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+};
+
 const updateRoutine = async (routineId, routine) => {
     try {
         const response = await fetch(`${BASE_URL}/${routineId}`, {
@@ -126,4 +149,4 @@ const assignUsersToRoutine = async (routineId, userIds) => {
 
 
 
-export { getRoutine, getAllRoutines, addRoutine, updateRoutine, deleteRoutine, assignUsersToRoutine };
+export { getRoutine, getAllRoutines, addRoutine, addUniqueRoutine, updateRoutine, deleteRoutine, assignUsersToRoutine };

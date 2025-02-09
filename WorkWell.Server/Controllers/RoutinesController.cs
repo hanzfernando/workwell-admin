@@ -128,6 +128,7 @@ namespace WorkWell.Server.Controllers
                 var organizationId = GetOrganizationIdFromToken();
                 var uid = GetUserIdFromToken();
                 routine.OrganizationId = organizationId;
+                routine.IsUnique = false;
                 routine.CreatedBy = uid; // Assign the creator
 
                 await _routineService.AddRoutineAsync(routine);
@@ -142,6 +143,49 @@ namespace WorkWell.Server.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+        [HttpPost("unique-routine")]
+        public async Task<ActionResult<Routine>> AddUniqueRoutine([FromBody] Routine routine)
+        {
+            try
+            {
+                if (routine == null || routine.Users == null || routine.Users.Count == 0)
+                {
+                    return BadRequest("Invalid input data. Patient ID is required.");
+                }
+
+                var organizationId = GetOrganizationIdFromToken();
+                var uid = GetUserIdFromToken();
+
+                routine.OrganizationId = organizationId;
+                routine.IsUnique = true;
+                routine.CreatedBy = uid;
+
+                // Extract the patient ID
+                string patientId = routine.Users.First();
+
+                // Add the routine and get the created routine object
+                var createdRoutine = await _routineService.AddRoutineAsync(routine, isUnique: true, patientId);
+
+                if (createdRoutine == null)
+                {
+                    return NotFound("Routine creation failed.");
+                }
+
+                return Ok(createdRoutine); // ✅ Return the created routine
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+
+
 
         // PUT: api/routines/{routineId} (update an existing routine)
         [HttpPut("{routineId}")]

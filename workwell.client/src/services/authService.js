@@ -56,7 +56,7 @@ const logIn = async (email, password) => {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-        const idToken = await user.getIdToken();
+        const idToken = await user.getIdToken(true);
         return { idToken };
     } catch (error) {
         console.error('Error logging in:', error);

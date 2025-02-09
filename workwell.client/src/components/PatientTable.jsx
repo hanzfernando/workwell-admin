@@ -2,12 +2,12 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for routing
 import ic_eye from '../assets/ic_eye.svg';
 import { useAuthContext } from '../hooks/useAuthContext'; // Import the AuthContext }
-
+import UserRole from '../utils/Roles'
 const PatientTable = ({ patients, onViewRoutine }) => {
     const navigate = useNavigate(); // Hook for navigation
     const { user } = useAuthContext(); // Get the user object from the AuthContext
-
     // Handle the "View Logs" button click
+
     const handleViewLogs = (userId) => {
         navigate(`/userlogs/${userId}`); // Redirect to the UserLogsPage with the userId
     };
@@ -58,7 +58,7 @@ const PatientTable = ({ patients, onViewRoutine }) => {
 
                                         {/* View Logs Button */}
 
-                                        { user.Role === 'admin' && // Only show the View Logs button if the user is an admin
+                                        {user.role === UserRole.Admin &&
                                             <button
                                                 onClick={() => handleViewLogs(patient.uid)} // Pass the user's UID to handleViewLogs
                                                 className="bg-accent-aqua text-white py-1 px-2 rounded-lg hover:bg-teal-500"

@@ -102,6 +102,8 @@ builder.Services.AddScoped<SelfAssessmentService>();
 builder.Services.AddScoped<JournalService>();
 builder.Services.AddScoped<OrganizationService>();
 builder.Services.AddScoped<SuperAdminService>();
+builder.Services.AddScoped<ConstraintService>();
+builder.Services.AddScoped<KeyPointService>();
 
 var app = builder.Build();
 //app.UseHttpsRedirection();

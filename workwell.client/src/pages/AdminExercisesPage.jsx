@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useExerciseContext } from '../hooks/useExerciseContext'; // Custom hook to access ExerciseContext
 import ExerciseTable from '../components/ExerciseTable';
 import AddExerciseModal from '../components/AddExerciseModal';
-import { addExercise } from '../services/exerciseService';
+import { saveExercise } from '../services/exerciseService';
 
 const AdminExercisesPage = () => {
     const { state: orgState, dispatch } = useExerciseContext(); // Use orgState from context
@@ -23,7 +23,7 @@ const AdminExercisesPage = () => {
     // Add a new exercise
     const handleAddExercise = async (newExercise) => {
         try {
-            const addedExercise = await addExercise(newExercise); // API call to add exercise
+            const addedExercise = await saveExercise(newExercise); // API call to add exercise
             if (addedExercise) {
                 dispatch({ type: 'CREATE_EXERCISE', payload: addedExercise }); // Dispatch to context
             }

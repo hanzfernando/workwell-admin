@@ -25,6 +25,9 @@ namespace WorkWell.Server.Models
         public string? OrganizationId { get; set; }
 
         [FirestoreProperty]
+        public bool IsUnique { get; set; } = false;
+
+        [FirestoreProperty]
         public List<RoutineExercise> Exercises { get; set; } = new List<RoutineExercise>();
 
         [FirestoreProperty]

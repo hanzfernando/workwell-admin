@@ -4,10 +4,15 @@ import { useExerciseContext } from '../hooks/useExerciseContext';
 import { useAuthContext } from '../hooks/useAuthContext';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { addUniqueRoutine } from '../services/routineService';
+import { useRoutineContext } from '../hooks/useRoutineContext';
+import { usePatientContext } from '../hooks/usePatientContext';
 
-const AddRoutineModal = ({ isOpen, onClose, onAddRoutine }) => {
+const AddRoutineModal = ({ isOpen, onClose, onAddRoutine, isUnique = false, patientId = null, onRoutineAdded }) => {
     const { state: { exercises } } = useExerciseContext();
     const { user } = useAuthContext();
+    const { dispatch: routineDispatch } = useRoutineContext();
+    const { dispatch: patientDispatch } = usePatientContext(); 
 
     const [routineName, setRoutineName] = useState('');
     const [targetArea, setTargetArea] = useState('');
@@ -16,7 +21,6 @@ const AddRoutineModal = ({ isOpen, onClose, onAddRoutine }) => {
     const [endDate, setEndDate] = useState(null); // State for EndDate
 
     const [errorMessage, setErrorMessage] = useState(''); // State for error messages
-
     if (!isOpen) return null;
 
     const exercisesForTargetArea = exercises.filter(
@@ -47,7 +51,7 @@ const AddRoutineModal = ({ isOpen, onClose, onAddRoutine }) => {
         setSelectedExercises(updatedExercises);
     };
 
-    const handleAddRoutine = () => {
+    const handleAddRoutine = async () => {
         // Validation for routine name, target area, and exercises
         if (!routineName || !targetArea || selectedExercises.length === 0 || !startDate || !endDate) {
             setErrorMessage('Please fill all fields and make selections.');
@@ -67,7 +71,7 @@ const AddRoutineModal = ({ isOpen, onClose, onAddRoutine }) => {
         const newRoutine = {
             name: routineName,
             targetArea,
-            createdBy: user.uid,
+            createdBy: user.userId,
             startDate: formattedStartDate,
             endDate: formattedEndDate,
             exercises: selectedExercises.map(({ exerciseId, reps, duration }) => ({
@@ -76,8 +80,38 @@ const AddRoutineModal = ({ isOpen, onClose, onAddRoutine }) => {
                 duration: duration || 0,
             })),
         };
+        if (isUnique && patientId) {
+            newRoutine.isUnique = true;
+            newRoutine.Users = [patientId];
 
-        onAddRoutine(newRoutine);
+            try {
+                const createdRoutine = await addUniqueRoutine(newRoutine);
+
+                if (createdRoutine) {
+                    
+                    routineDispatch({ type: 'CREATE_ROUTINE', payload: createdRoutine });
+                
+                    patientDispatch({
+                        type: 'ADD_ROUTINE_TO_USER',
+                        payload: { userId: patientId, routineId: createdRoutine.routineId }
+                    });
+
+                    if (onRoutineAdded) {
+                        onRoutineAdded(createdRoutine.routineId);
+                    }
+
+
+                    console.log("Routine added & user updated:", createdRoutine);
+                }
+            } catch (error) {
+                console.error("Error adding unique routine:", error);
+            }
+        } else {
+            newRoutine.isUnique = false;
+            onAddRoutine(newRoutine);
+        }
+
+
 
         // Reset state
         setRoutineName('');

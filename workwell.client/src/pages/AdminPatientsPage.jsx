@@ -13,8 +13,10 @@ const AdminPatientsPage = () => {
     const { state: { patients }, dispatch } = usePatientContext(); // Get patients from context
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredPatients, setFilteredPatients] = useState([]);
-    const [selectedPatient, setSelectedPatient] = useState(null); // Track the selected patient
-    const [isViewUserRoutineModalOpen, setIsViewUserRoutineModalOpen] = useState(false); // Control the modal state
+    const [selectedPatient, setSelectedPatient] = useState(null);
+    const [patientRoutineIds, setPatientRoutineIds] = useState([]); // Store routines separately
+    const [isViewUserRoutineModalOpen, setIsViewUserRoutineModalOpen] = useState(false);
+
     const [isAddPatientModalOpen, setIsAddPatientModalOpen] = useState(false);
 
     // Fetch all patients on mount (only if context is empty)
@@ -50,8 +52,10 @@ const AdminPatientsPage = () => {
 
     const handleViewRoutine = (patient) => {
         setSelectedPatient(patient);
-        setIsViewUserRoutineModalOpen(true); // Open the modal when a patient is selected
+        setPatientRoutineIds(patient.routines || []);
+        setIsViewUserRoutineModalOpen(true);
     };
+
 
     const handleCloseModal = () => {
         setIsViewUserRoutineModalOpen(false); // Close the modal
@@ -82,6 +86,11 @@ const AdminPatientsPage = () => {
             console.error('Error adding patient.');
         }
     };
+
+    const handleRoutineAdded = (routineId) => {
+        setPatientRoutineIds(prev => [...prev, routineId]);
+    };
+
  
     //console.log("0 Patients", patients[0]);
     //console.log("All Patients", patients);
@@ -121,7 +130,8 @@ const AdminPatientsPage = () => {
                     isOpen={isViewUserRoutineModalOpen}
                     onClose={handleCloseModal}
                     userId={selectedPatient.uid}
-                    patientRoutineIds={selectedPatient.routines} // Pass the patient's routine IDs
+                    patientRoutineIds={patientRoutineIds} // Pass the patient's routine IDs
+                    onRoutineAdded={handleRoutineAdded}
                 />
             )}
 

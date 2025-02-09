@@ -4,13 +4,18 @@ import { useRoutineContext } from '../hooks/useRoutineContext';
 import { useExerciseContext } from '../hooks/useExerciseContext'; // Import the exercise context
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for routing
 import ic_eye from '../assets/ic_eye.svg';
+import ic_plus from '../assets/ic_plus.svg';
+import AddRoutineModal from './AddRoutineModal';
+import UserRole from '../utils/Roles';
+import { useAuthContext } from '../hooks/useAuthContext';
 
-const ViewUserRoutineModal = ({ isOpen, onClose, userId, patientRoutineIds }) => {
+const ViewUserRoutineModal = ({ isOpen, onClose, userId, patientRoutineIds, onRoutineAdded }) => {
     const { state: { routines } } = useRoutineContext();
     const { state: { exercises } } = useExerciseContext(); // Access exercises from context
     const [patientRoutines, setPatientRoutines] = useState([]); // Routines for the patient
     const [expandedRoutineId, setExpandedRoutineId] = useState(null); // Track expanded routine
-
+    const [isAddRoutineOpen, setIsAddRoutineOpen] = useState(false); // Control AddRoutineModal visibility
+    const { user } = useAuthContext();
     const navigate = useNavigate(); // Hook for navigation
 
     // Filter routines for the selected patient based on routineId
@@ -33,12 +38,14 @@ const ViewUserRoutineModal = ({ isOpen, onClose, userId, patientRoutineIds }) =>
         setExpandedRoutineId(prevState => (prevState === routineId ? null : routineId)); // Toggle expansion
     };
 
-
-
     // Helper function to get exercise details
     const getExerciseDetails = (exerciseId) => {
         const exercise = exercises.find(ex => ex.exerciseId === exerciseId);
         return exercise ? exercise.name : 'Unknown Exercise'; // Default if exercise not found
+    };
+
+    const handleOpenAddRoutine = () => {
+        setIsAddRoutineOpen(true);
     };
 
     if (!isOpen) {
@@ -56,7 +63,22 @@ const ViewUserRoutineModal = ({ isOpen, onClose, userId, patientRoutineIds }) =>
                     <span className="text-2xl">&times;</span>
                 </button>
 
-                <h2 className="text-xl font-semibold mb-4">Patient's Routines</h2>
+                <div className="flex gap-4 items-center mb-4">
+                    <h2 className="text-xl font-semibold">Patient's Routines</h2>
+
+                    {user.role === UserRole.Admin && 
+                        
+                        <button
+                            onClick={handleOpenAddRoutine}
+                            className="bg-accent-aqua p-2 rounded-lg hover:bg-teal-500 flex items-center justify-center w-8 h-8"
+                        >
+                        <img src={ic_plus} alt="Add Routine" className="w-4 h-4" />
+                        </button>
+                    }
+                </div>
+
+
+                
 
                 {patientRoutines.length > 0 ? (
                     <table className="min-w-full divide-y divide-gray-200 mb-4">
@@ -149,6 +171,17 @@ const ViewUserRoutineModal = ({ isOpen, onClose, userId, patientRoutineIds }) =>
                     </table>
                 ) : (
                     <p className="text-sm text-gray-500">No routines found for this patient.</p>
+                )}
+
+                {isAddRoutineOpen && user.role === UserRole.Admin && (
+                    <AddRoutineModal
+                        isOpen={isAddRoutineOpen}
+                        onClose={() => setIsAddRoutineOpen(false)}
+                        onAddRoutine={() => { }}
+                        patientId={userId}
+                        isUnique={true}
+                        onRoutineAdded={onRoutineAdded}
+                    />
                 )}
             </div>
         </div>

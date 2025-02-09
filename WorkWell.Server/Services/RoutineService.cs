@@ -18,13 +18,39 @@ namespace WorkWell.Server.Services
         }
 
         // Add a new routine
-        public async Task AddRoutineAsync(Routine routine)
+        public async Task<Routine?> AddRoutineAsync(Routine routine, bool isUnique = false, string? patientId = null)
         {
             try
             {
                 var docRef = _firestoreDb.Collection("routines").Document();
                 routine.RoutineId = docRef.Id;
+
+                // Save the new routine in Firestore
                 await docRef.SetAsync(routine);
+
+                // If routine is unique, ensure the user (patient) gets assigned
+                if (isUnique && !string.IsNullOrEmpty(patientId))
+                {
+                    var userDocRef = _firestoreDb.Collection("users").Document(patientId);
+                    var userSnapshot = await userDocRef.GetSnapshotAsync();
+
+                    if (!userSnapshot.Exists)
+                    {
+                        throw new Exception($"User with ID {patientId} not found.");
+                    }
+
+                    var user = userSnapshot.ConvertTo<User>();
+
+                    // Add the new Routine ID to the user's routines list
+                    if (!user.Routines.Contains(routine.RoutineId))
+                    {
+                        user.Routines.Add(routine.RoutineId);
+
+                        await userDocRef.UpdateAsync("Routines", user.Routines);
+                    }
+                }
+
+                return routine; // ✅ Return the created routine instead of the user
             }
             catch (Exception ex)
             {
@@ -32,6 +58,10 @@ namespace WorkWell.Server.Services
                 throw new Exception("Failed to add routine. Please try again later.");
             }
         }
+
+
+
+
 
         // Get a specific routine by ID and ensure it was created by the requesting user
         public async Task<Routine?> GetRoutineAsync(string routineId, string organizationId, string uid)
@@ -143,11 +173,35 @@ namespace WorkWell.Server.Services
                     throw new UnauthorizedAccessException("Routine does not belong to your organization.");
                 }
 
-                // Update the routine's Users field
+                // Get users currently assigned to this routine
+                var previousUserIds = routine.Users ?? new List<string>();
+
+                // Find users who are being removed
+                var removedUserIds = previousUserIds.Except(userIds).ToList();
+
+                // Update the routine's Users field (assign new user list)
                 routine.Users = userIds;
                 await routineRef.SetAsync(routine, SetOptions.Overwrite);
 
-                // Maintain reverse mapping in user documents
+                // Remove routine from users who were removed
+                foreach (var removedUserId in removedUserIds)
+                {
+                    var userRef = _firestoreDb.Collection("users").Document(removedUserId);
+                    var userSnapshot = await userRef.GetSnapshotAsync();
+
+                    if (userSnapshot.Exists)
+                    {
+                        var user = userSnapshot.ConvertTo<User>();
+
+                        if (user.Routines.Contains(routineId))
+                        {
+                            user.Routines.Remove(routineId);
+                            await userRef.UpdateAsync("Routines", user.Routines);
+                        }
+                    }
+                }
+
+                // Assign routine to newly assigned users
                 foreach (var userId in userIds)
                 {
                     var userRef = _firestoreDb.Collection("users").Document(userId);
@@ -160,7 +214,7 @@ namespace WorkWell.Server.Services
                     if (!user.Routines.Contains(routineId))
                     {
                         user.Routines.Add(routineId);
-                        await userRef.SetAsync(user, SetOptions.Overwrite);
+                        await userRef.UpdateAsync("Routines", user.Routines);
                     }
                 }
             }
@@ -170,5 +224,6 @@ namespace WorkWell.Server.Services
                 throw new Exception("Failed to assign users to routine. Please try again later.");
             }
         }
+
     }
 }

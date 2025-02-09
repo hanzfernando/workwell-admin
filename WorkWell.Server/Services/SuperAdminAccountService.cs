@@ -30,7 +30,7 @@ namespace WorkWell.Server.Services
                     FirebaseApp.Create(new AppOptions()
                     {
                         Credential = Google.Apis.Auth.OAuth2.GoogleCredential
-                            .FromFile("config/workwell-f3985-firebase-adminsdk-kxhb6-7c506c0e59.json")
+                            .FromFile("config/workwell-f3985-firebase-adminsdk-kxhb6-6adf386842.json")
                     });
                 }
 

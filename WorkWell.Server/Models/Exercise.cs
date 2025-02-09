@@ -24,11 +24,55 @@ namespace WorkWell.Server.Models
         public required TargetArea TargetArea { get; set; }
 
         [FirestoreProperty]
-        public required string OrganizationId { get; set; }
+        public string? OrganizationId { get; set; }
+
+        [FirestoreProperty]
+        public List<string> Constraints { get; set; } = new();
 
         [FirestoreProperty]  
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
+
+    [FirestoreData]
+    public class Constraints
+    {
+        [FirestoreProperty]
+        public string? ConstraintId { get; set; }
+
+        [FirestoreProperty]
+        public required double AlignedThreshold { get; set; }
+
+        [FirestoreProperty]
+        public required double RestingThreshold { get; set; }
+
+        [FirestoreProperty]
+        public required string RestingComparator { get; set; }
+
+        [FirestoreProperty]
+        public List<string> Keypoints { get; set; } = new();
+
+    }
+
+    [FirestoreData]
+    public class KeyPoints
+    {
+        [FirestoreProperty]
+        //[JsonPropertyName("keypointId")]
+        public string? KeypointId { get; set; }
+
+        [FirestoreProperty]
+        //[JsonPropertyName("primaryKeypoint")]
+        public required string Keypoint { get; set; }
+
+        [FirestoreProperty]
+        //[JsonPropertyName("secondaryKeypoint")]
+        public string? SecondaryKeypoint { get; set; }
+
+        [FirestoreProperty]
+        //[JsonPropertyName("isMidpoint")]
+        public bool IsMidpoint { get; set; } = false;
+    }
+
 
     public enum TargetArea
     {

@@ -41,7 +41,9 @@ const RoutinesPage = () => {
 
     // Filter routines based on search query
     useEffect(() => {
-        const filtered = routines.filter((routine) => {
+        const filtered = routines
+            .filter((routine) => !routine.isUnique)
+            .filter((routine) => {
             return (
                 routine.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 routine.assignedName.toLowerCase().includes(searchQuery.toLowerCase()) ||
