@@ -17,30 +17,83 @@ const AddConstraintComponent = ({ onSave, onCancel, editingConstraint }) => {
     // Populate fields if editing an existing constraint
     useEffect(() => {
         if (editingConstraint) {
-            setConstraint(editingConstraint);
+            // Check if editingConstraint already has pointA (i.e. it's already flat)
+            if (editingConstraint.pointA) {
+                setConstraint(editingConstraint);
+            } else if (editingConstraint.constraint && editingConstraint.keyPoints) {
+                // Transform composite data into the expected flat format,
+                // ensuring we preserve keypointId.
+                setConstraint({
+                    pointA: editingConstraint.keyPoints[0]
+                        ? {
+                            keypoint: editingConstraint.keyPoints[0].keypoint || '',
+                            secondaryKeypoint: editingConstraint.keyPoints[0].secondaryKeypoint || '',
+                            isMidpoint: editingConstraint.keyPoints[0].isMidpoint || false,
+                            keypointId: editingConstraint.keyPoints[0].keypointId, // Preserve keypointId
+                        }
+                        : { keypoint: '', secondaryKeypoint: '', isMidpoint: false, keypointId: undefined },
+                    pointB: editingConstraint.keyPoints[1]
+                        ? {
+                            keypoint: editingConstraint.keyPoints[1].keypoint || '',
+                            secondaryKeypoint: editingConstraint.keyPoints[1].secondaryKeypoint || '',
+                            isMidpoint: editingConstraint.keyPoints[1].isMidpoint || false,
+                            keypointId: editingConstraint.keyPoints[1].keypointId,
+                        }
+                        : { keypoint: '', secondaryKeypoint: '', isMidpoint: false, keypointId: undefined },
+                    pointC: editingConstraint.keyPoints[2]
+                        ? {
+                            keypoint: editingConstraint.keyPoints[2].keypoint || '',
+                            secondaryKeypoint: editingConstraint.keyPoints[2].secondaryKeypoint || '',
+                            isMidpoint: editingConstraint.keyPoints[2].isMidpoint || false,
+                            keypointId: editingConstraint.keyPoints[2].keypointId,
+                        }
+                        : { keypoint: '', secondaryKeypoint: '', isMidpoint: false, keypointId: undefined },
+                    restingThreshold: editingConstraint.constraint.restingThreshold,
+                    alignedThreshold: editingConstraint.constraint.alignedThreshold,
+                    restingComparator: editingConstraint.constraint.restingComparator,
+                    // Optionally, preserve constraintId if needed:
+                    constraintId: editingConstraint.constraint.constraintId,
+                });
+            }
         }
     }, [editingConstraint]);
 
+
+
     const handleChange = (point, field, value) => {
         setConstraint(prev => {
-            const updatedConstraint = {
-                ...prev,
-                [point]: { ...prev[point], [field]: value },
-            };
-
-            // Remove error if a valid selection is made
-            if (value) {
-                setErrors(prevErrors => {
-                    const newErrors = { ...prevErrors };
+            if (point === null) {
+                // Update a top-level field
+                return {
+                    ...prev,
+                    [field]: value
+                };
+            } else {
+                // Update a nested field for a specific point (e.g. pointA, pointB, pointC)
+                return {
+                    ...prev,
+                    [point]: {
+                        ...prev[point],
+                        [field]: value
+                    }
+                };
+            }
+        });
+        // Optionally, remove errors if a valid selection is made
+        if (value) {
+            setErrors(prevErrors => {
+                const newErrors = { ...prevErrors };
+                if (point) {
                     delete newErrors[point];
                     delete newErrors[`${point}Secondary`];
-                    return newErrors;
-                });
-            }
-
-            return updatedConstraint;
-        });
+                } else {
+                    delete newErrors[field];
+                }
+                return newErrors;
+            });
+        }
     };
+
 
     const handleThresholdChange = (field, value) => {
         let numericValue = parseFloat(value);
@@ -190,12 +243,13 @@ const AddConstraintComponent = ({ onSave, onCancel, editingConstraint }) => {
 
                 <select
                     value={constraint.restingComparator}
-                    onChange={(e) => handleChange(null, 'comparator', e.target.value)}
+                    onChange={(e) => handleChange(null, 'restingComparator', e.target.value)}
                     className="w-1/3 px-3 py-2 border rounded text-center"
                 >
                     <option value="gt">&gt;</option>
                     <option value="lt">&lt;</option>
                 </select>
+
             </div>
 
             {/* Save / Cancel Buttons */}

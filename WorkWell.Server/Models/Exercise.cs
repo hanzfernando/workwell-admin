@@ -73,6 +73,19 @@ namespace WorkWell.Server.Models
         public bool IsMidpoint { get; set; } = false;
     }
 
+    public class ConstraintDetail
+    {
+        public Constraints? Constraint { get; set; }
+        public List<KeyPoints> KeyPoints { get; set; } = new();
+    }
+
+    public class ExerciseDetail
+    {
+        public Exercise? Exercise { get; set; }
+        public List<ConstraintDetail> Constraints { get; set; } = new();
+    }
+
+
 
     public enum TargetArea
     {

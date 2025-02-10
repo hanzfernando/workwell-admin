@@ -43,6 +43,18 @@ namespace WorkWell.Server.Controllers
             return Ok(exercise);
         }
 
+        // GET: api/exercises/detail/{exerciseId}
+        [HttpGet("detail/{exerciseId}")]
+        public async Task<ActionResult<ExerciseDetail>> GetExerciseDetail(string exerciseId)
+        {
+            var detail = await _exerciseService.GetExerciseDetailAsync(exerciseId);
+            if (detail == null)
+            {
+                return NotFound("Exercise detail not found.");
+            }
+            return Ok(detail);
+        }
+
         // GET: api/exercises
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Exercise>>> GetAllExercises()
@@ -76,31 +88,21 @@ namespace WorkWell.Server.Controllers
             return CreatedAtAction(nameof(GetExercise), new { exerciseId = exercise.ExerciseId }, exercise);
         }
 
-        // PUT: api/exercises/{id}
+        // PUT: api/exercises/{exerciseId}
         [HttpPut("{exerciseId}")]
-        public async Task<ActionResult> UpdateExercise(string exerciseId, [FromBody] Exercise exercise)
+        public async Task<ActionResult<Exercise>> UpdateExercise(string exerciseId, [FromBody] Exercise exercise)
         {
-            if (exerciseId != exercise.ExerciseId)
+            if (exercise == null || exercise.ExerciseId != exerciseId)
             {
-                return BadRequest("Exercise ID mismatch.");
+                return BadRequest("Invalid exercise data.");
             }
 
-            var organizationId = GetOrganizationIdFromToken(); // Get organizationId from token
-
-            var existingExercise = await _exerciseService.GetExerciseAsync(exerciseId, organizationId);
-            if (existingExercise == null)
+            var updatedExercise = await _exerciseService.UpdateExerciseAsync(exercise);
+            if (updatedExercise == null)
             {
-                return NotFound("Exercise not found or you do not have access.");
+                return NotFound("Exercise not found.");
             }
-
-            // Check for invalid enum parsing
-            if (!Enum.IsDefined(typeof(TargetArea), exercise.TargetArea))
-            {
-                return BadRequest($"Invalid exercise type: {exercise.TargetArea}");
-            }
-
-            await _exerciseService.UpdateExerciseAsync(exercise);
-            return NoContent();
+            return Ok(updatedExercise);
         }
 
         // DELETE: api/exercises/{id}

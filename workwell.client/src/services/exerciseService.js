@@ -1,106 +1,4 @@
-﻿//import { backendLink } from '../utils/ngrokLink.js';
-//import { getToken } from '../utils/authUtil.js';
-
-//const BASE_URL = `${backendLink}/api/exercises`;
-//// const BASE_URL = "http://localhost:7054/api/exercises";
-
-//const getExercise = async (exerciseId) => {
-//    try {
-//        const response = await fetch(`${BASE_URL}/${exerciseId}`, {
-//            headers: {
-//                Authorization: `Bearer ${getToken()}`,
-//            },
-//        });
-//        if (!response.ok) {
-//            throw new Error(`Error fetching exercise with ID ${exerciseId}: ${response.statusText}`);
-//        }
-//        return await response.json();
-//    } catch (error) {
-//        console.error(error);
-//        return null;
-//    }
-//};
-
-//const getExercises = async () => {
-//    try {
-//        const response = await fetch(BASE_URL, {
-//            headers: {
-//                Authorization: `Bearer ${getToken()}`,
-//            },
-//        });
-//        if (!response.ok) {
-//            throw new Error(`Error fetching all exercises: ${response.statusText}`);
-//        }
-//        return await response.json();
-//    } catch (error) {
-//        console.error(error);
-//        return [];
-//    }
-//};
-
-//const addExercise = async (exercise) => {
-//    try {
-//        const response = await fetch(BASE_URL, {
-//            method: 'POST',
-//            headers: {
-//                'Content-Type': 'application/json',
-//                Authorization: `Bearer ${getToken()}`,
-//            },
-//            body: JSON.stringify(exercise),
-//        });
-//        if (!response.ok) {
-//            const message = await response.text();
-//            throw new Error(`Error adding exercise: ${message}`);
-//        }
-//        return await response.json(); // Return the created exercise
-//    } catch (error) {
-//        console.error(error);
-//        return null;
-//    }
-//};
-
-//const updateExercise = async (exerciseId, exercise) => {
-//    try {
-//        const response = await fetch(`${BASE_URL}/${exerciseId}`, {
-//            method: 'PUT',
-//            headers: {
-//                'Content-Type': 'application/json',
-//                Authorization: `Bearer ${getToken()}`,
-//            },
-//            body: JSON.stringify(exercise),
-//        });
-//        if (!response.ok) {
-//            const message = await response.text();
-//            throw new Error(`Error updating exercise: ${message}`);
-//        }
-//        return true; // Return true if update is successful
-//    } catch (error) {
-//        console.error(error);
-//        return false;
-//    }
-//};
-
-//const deleteExercise = async (exerciseId) => {
-//    try {
-//        const response = await fetch(`${BASE_URL}/${exerciseId}`, {
-//            method: 'DELETE',
-//            headers: {
-//                Authorization: `Bearer ${getToken()}`,
-//            },
-//        });
-//        if (!response.ok) {
-//            throw new Error(`Error deleting exercise with ID ${exerciseId}: ${response.statusText}`);
-//        }
-//        return true; // Return true if delete is successful
-//    } catch (error) {
-//        console.error(error);
-//        return false;
-//    }
-//};
-
-//export { getExercise, getExercises, addExercise, updateExercise, deleteExercise };
-
-import { backendLink } from '../utils/ngrokLink.js';
+﻿import { backendLink } from '../utils/ngrokLink.js';
 import { getToken } from '../utils/authUtil.js';
 
 const EXERCISE_URL = `${backendLink}/api/exercises`;
@@ -255,7 +153,24 @@ const addExerciseWithConstraints = async (exercise, constraints) => {
     }
 };
 
-// 🔹 Update Exercise
+
+// Get full exercise detail (including constraints and keypoints)
+const getExerciseDetail = async (exerciseId) => {
+    try {
+        const response = await fetch(`${EXERCISE_URL}/detail/${exerciseId}`, {
+            headers: { Authorization: `Bearer ${getToken()}` },
+        });
+        if (!response.ok) {
+            throw new Error(`Error fetching exercise detail: ${response.statusText}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+};
+
+// Update exercise document
 const updateExercise = async (exerciseId, exercise) => {
     try {
         const response = await fetch(`${EXERCISE_URL}/${exerciseId}`, {
@@ -266,28 +181,69 @@ const updateExercise = async (exerciseId, exercise) => {
             },
             body: JSON.stringify(exercise),
         });
-
         if (!response.ok) {
             const message = await response.text();
             throw new Error(`Error updating exercise: ${message}`);
         }
-
-        return true;
+        return await response.json();
     } catch (error) {
         console.error(error);
-        return false;
+        return null;
     }
 };
 
-// 🔹 Delete Exercise
-const deleteExercise = async (exerciseId) => {
+// Update constraint document
+const updateConstraint = async (constraintId, constraint) => {
     try {
-        const response = await fetch(`${EXERCISE_URL}/${exerciseId}`, {
+        const response = await fetch(`${CONSTRAINT_URL}/${constraintId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${getToken()}`,
+            },
+            body: JSON.stringify(constraint),
+        });
+        if (!response.ok) {
+            const message = await response.text();
+            throw new Error(`Error updating constraint: ${message}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+};
+
+// Update keypoint document
+const updateKeypoint = async (keypointId, keypoint) => {
+    try {
+        const response = await fetch(`${KEYPOINT_URL}/${keypointId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${getToken()}`,
+            },
+            body: JSON.stringify(keypoint),
+        });
+        if (!response.ok) {
+            const message = await response.text();
+            throw new Error(`Error updating keypoint: ${message}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+};
+
+// Delete constraint document
+const deleteConstraint = async (constraintId) => {
+    try {
+        const response = await fetch(`${CONSTRAINT_URL}/${constraintId}`, {
             method: 'DELETE',
             headers: { Authorization: `Bearer ${getToken()}` },
         });
-
-        if (!response.ok) throw new Error(`Error deleting exercise: ${response.statusText}`);
+        if (!response.ok) throw new Error(`Error deleting constraint: ${response.statusText}`);
         return true;
     } catch (error) {
         console.error(error);
@@ -302,5 +258,8 @@ export {
     saveConstraints,
     saveExercise,
     updateExercise,
-    deleteExercise
+    updateConstraint,
+    updateKeypoint,
+    deleteConstraint,
+    getExerciseDetail
 };

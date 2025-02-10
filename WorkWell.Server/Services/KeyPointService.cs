@@ -56,7 +56,22 @@ namespace WorkWell.Server.Services
             }
         }
 
-        // DELETE /api/keypoints/:id
+        public async Task<KeyPoints?> UpdateKeyPointAsync(KeyPoints keypoint)
+        {
+            try
+            {
+                var docRef = _firestoreDb.Collection("keypoints").Document(keypoint.KeypointId);
+                await docRef.SetAsync(keypoint, SetOptions.Overwrite);
+                return keypoint;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating keypoint: {ex.Message}");
+                throw new Exception("Failed to update keypoint. Please try again later.");
+            }
+        }
+
+        // DELETE: Delete a keypoint document
         public async Task DeleteKeyPointAsync(string keypointId)
         {
             try

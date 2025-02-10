@@ -51,7 +51,24 @@ namespace WorkWell.Server.Controllers
             return Ok(constraint);
         }
 
-        // DELETE: api/constraints/{id}
+        // PUT: api/constraints/{constraintId}
+        [HttpPut("{constraintId}")]
+        public async Task<ActionResult<Constraints>> UpdateConstraint(string constraintId, [FromBody] Constraints constraint)
+        {
+            if (constraint == null || constraint.ConstraintId != constraintId)
+            {
+                return BadRequest("Invalid constraint data.");
+            }
+
+            var updatedConstraint = await _constraintService.UpdateConstraintAsync(constraint);
+            if (updatedConstraint == null)
+            {
+                return NotFound("Constraint not found.");
+            }
+            return Ok(updatedConstraint);
+        }
+
+        // DELETE: api/constraints/{constraintId}
         [HttpDelete("{constraintId}")]
         public async Task<ActionResult> DeleteConstraint(string constraintId)
         {

@@ -48,12 +48,20 @@ namespace WorkWell.Server.Controllers
             return Ok(keypoint);
         }
 
-        // DELETE: api/keypoints/{id}
-        [HttpDelete("{keypointId}")]
-        public async Task<ActionResult> DeleteKeyPoint(string keypointId)
+        [HttpPut("{keypointId}")]
+        public async Task<ActionResult<KeyPoints>> UpdateKeyPoint(string keypointId, [FromBody] KeyPoints keypoint)
         {
-            await _keyPointService.DeleteKeyPointAsync(keypointId);
-            return NoContent();
+            if (keypoint == null || keypoint.KeypointId != keypointId)
+            {
+                return BadRequest("Invalid keypoint data.");
+            }
+
+            var updatedKeypoint = await _keyPointService.UpdateKeyPointAsync(keypoint);
+            if (updatedKeypoint == null)
+            {
+                return NotFound("KeyPoint not found.");
+            }
+            return Ok(updatedKeypoint);
         }
     }
 }

@@ -10,10 +10,14 @@ namespace WorkWell.Server.Services
     public class ExerciseService
     {
         private readonly FirestoreDb _firestoreDb;
+        private readonly ConstraintService _constraintService;
+        private readonly KeyPointService _keyPointService;
 
-        public ExerciseService(FirestoreDb firestoreDb)
+        public ExerciseService(FirestoreDb firestoreDb, ConstraintService constraintService, KeyPointService keyPointService)
         {
             _firestoreDb = firestoreDb;
+            _constraintService = constraintService;
+            _keyPointService = keyPointService;
         }
 
         // POST /api/exercises
@@ -84,16 +88,17 @@ namespace WorkWell.Server.Services
 
 
         // PUT /api/exercises/:id
-        public async Task UpdateExerciseAsync(Exercise exercise)
+        public async Task<Exercise?> UpdateExerciseAsync(Exercise exercise)
         {
             try
             {
                 var docRef = _firestoreDb.Collection("exercises").Document(exercise.ExerciseId);
                 await docRef.SetAsync(exercise, SetOptions.Overwrite);
+                return exercise;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error updating exercise with ID {exercise.ExerciseId}: {ex.Message}");
+                Console.WriteLine($"Error updating exercise: {ex.Message}");
                 throw new Exception("Failed to update exercise. Please try again later.");
             }
         }
@@ -111,6 +116,47 @@ namespace WorkWell.Server.Services
                 Console.WriteLine($"Error deleting exercise with ID {exerciseId}: {ex.Message}");
                 throw new Exception("Failed to delete exercise. Please try again later.");
             }
+        }
+
+        public async Task<Exercise?> GetExerciseAsync(string exerciseId)
+        {
+            var docRef = _firestoreDb.Collection("exercises").Document(exerciseId);
+            var snapshot = await docRef.GetSnapshotAsync();
+            if (!snapshot.Exists)
+                return null;
+            return snapshot.ConvertTo<Exercise>();
+        }
+
+        public async Task<ExerciseDetail?> GetExerciseDetailAsync(string exerciseId)
+        {
+            var exercise = await GetExerciseAsync(exerciseId);
+            if (exercise == null)
+                return null;
+
+            var constraintDetails = new List<ConstraintDetail>();
+            foreach (var constraintId in exercise.Constraints)
+            {
+                var constraint = await _constraintService.GetConstraintAsync(constraintId);
+                if (constraint != null)
+                {
+                    var keypoints = new List<KeyPoints>();
+                    foreach (var keypointId in constraint.Keypoints)
+                    {
+                        var keypoint = await _keyPointService.GetKeyPointAsync(keypointId);
+                        if (keypoint != null)
+                        {
+                            keypoints.Add(keypoint);
+                        }
+                    }
+                    constraintDetails.Add(new ConstraintDetail { Constraint = constraint, KeyPoints = keypoints });
+                }
+            }
+
+            return new ExerciseDetail
+            {
+                Exercise = exercise,
+                Constraints = constraintDetails
+            };
         }
     }
 }
