@@ -87,7 +87,9 @@ const AddExerciseModal = ({ isOpen, onClose, onAddExercise }) => {
                     restingThreshold: constraint.restingThreshold,
                     alignedThreshold: constraint.alignedThreshold,
                     restingComparator: constraint.restingComparator,
+                    alignedComparator: constraint.alignedComparator, 
                 };
+
 
                 console.log("Saving Constraint:", constraintData);
 
@@ -188,6 +190,7 @@ const AddExerciseModal = ({ isOpen, onClose, onAddExercise }) => {
                             <option value="Neck">Neck</option>
                             <option value="Shoulder">Shoulder</option>
                             <option value="LowerBack">Lower Back</option>
+                            <option value="Thigh">Thigh</option>
                         </select>
                     </div>
 
@@ -231,7 +234,8 @@ const AddExerciseModal = ({ isOpen, onClose, onAddExercise }) => {
                                 {constraint.pointC.isMidpoint && <p><strong>Secondary C:</strong> {constraint.pointC.secondaryKeypoint}</p>}
                                 <p><strong>Resting Threshold:</strong> {constraint.restingThreshold}</p>
                                 <p><strong>Aligned Threshold:</strong> {constraint.alignedThreshold}</p>
-                                <p><strong>Comparator:</strong> {constraint.restingComparator}</p>
+                                <p><strong>Resting Comparator:</strong> {constraint.restingComparator}</p>
+                                <p><strong>Aligned Comparator:</strong> {constraint.alignedComparator}</p>
                             </div>
                         ))}
                     </div>

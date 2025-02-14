@@ -46,6 +46,9 @@ namespace WorkWell.Server.Models
         public required double RestingThreshold { get; set; }
 
         [FirestoreProperty]
+        public string? AlignedComparator { get; set; }
+
+        [FirestoreProperty]
         public required string RestingComparator { get; set; }
 
         [FirestoreProperty]

@@ -49,12 +49,14 @@ const EditExerciseModal = ({ isOpen, onClose, onUpdate, exerciseId }) => {
                             restingThreshold: c.constraint.restingThreshold,
                             alignedThreshold: c.constraint.alignedThreshold,
                             restingComparator: c.constraint.restingComparator,
+                            alignedComparator: c.constraint.alignedComparator || '', 
                             constraintId: c.constraint.constraintId,
                             pointA: c.keyPoints[0],
                             pointB: c.keyPoints[1],
                             pointC: c.keyPoints[2]
                         };
                     }
+
                     return c; // Fallback in case the structure doesn't match.
                 });
                 setConstraints(transformedConstraints);
@@ -128,17 +130,18 @@ const EditExerciseModal = ({ isOpen, onClose, onUpdate, exerciseId }) => {
 
                 // Build the updated constraint object using flat properties.
                 const updatedConstraint = {
-                    constraintId: composite.constraintId, // flat structure now
+                    constraintId: composite.constraintId,
                     alignedThreshold: composite.alignedThreshold,
                     restingThreshold: composite.restingThreshold,
                     restingComparator: composite.restingComparator,
-                    // Use "Keypoints" (with capital K) to match the C# model.
+                    alignedComparator: composite.alignedComparator,
                     Keypoints: [
                         composite.pointA?.keypointId,
                         composite.pointB?.keypointId,
                         composite.pointC?.keypointId,
                     ].filter(id => id !== undefined)
                 };
+
 
                 if (updatedConstraint.constraintId) {
                     await updateConstraint(updatedConstraint.constraintId, updatedConstraint);
@@ -267,7 +270,10 @@ const EditExerciseModal = ({ isOpen, onClose, onUpdate, exerciseId }) => {
                                     <strong>Aligned Threshold:</strong> {constraintDetail?.alignedThreshold ?? 'N/A'}
                                 </p>
                                 <p>
-                                    <strong>Comparator:</strong> {constraintDetail?.restingComparator ?? 'N/A'}
+                                    <strong>Resting Comparator:</strong> {constraintDetail?.restingComparator}
+                                </p>
+                                <p>
+                                    <strong>Aligned Comparator:</strong> {constraintDetail?.alignedComparator}
                                 </p>
                                 {/* Render the keyPoints */}
                                 {constraintDetail?.pointA && (
