@@ -1,35 +1,42 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import RoutineLogTable from '../components/RoutineLogTable'; // Reuse your table component
-import { getPatient } from '../services/patientService'; // Use getPatient to fetch user details
-import { useRoutineLogContext } from '../hooks/useRoutineLogContext'; // Use context to get routine logs
+import RoutineLogTable from '../components/RoutineLogTable';
+import MedicalHistoryComponent from '../components/MedicalHistoryComponent';
+import DiagnosisComponent from '../components/DiagnosisComponent';
+import AppointmentTable from '../components/AppointmentTable';
+import { getPatient } from '../services/patientService';
+import { useRoutineLogContext } from '../hooks/useRoutineLogContext';
+
+const tabs = [
+    { id: 'medical-history', label: 'Medical History' },
+    { id: 'diagnosis', label: 'Diagnosis' },
+    { id: 'routine-logs', label: 'Routine Logs' },
+    { id: 'appointments', label: 'Appointments' }
+];
 
 const UserLogsPage = () => {
-    const { uid } = useParams(); // Get UID from URL parameters
-    const { state: { routineLogs } } = useRoutineLogContext(); // Access routine logs from context
+    const { uid } = useParams();
+    const { state: { routineLogs } } = useRoutineLogContext();
+    const [user, setUser] = useState(null);
+    const [activeTab, setActiveTab] = useState('medical-history');
 
-    const [user, setUser] = useState(null); // User information
-
-    // Fetch user information based on UID
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const userData = await getPatient(uid); // Use the service function to fetch user data
+                const userData = await getPatient(uid);
+                //console.log(userData)
                 setUser(userData);
             } catch (error) {
                 console.error('Error fetching user:', error);
             }
         };
-
         fetchUser();
     }, [uid]);
 
-    // If user data is still loading, show a loading message
     if (!user) {
         return <div>Loading user information...</div>;
     }
 
-    // Filter routine logs based on user UID
     const filteredLogs = routineLogs.filter(log => log.uid === uid);
 
     return (
@@ -45,17 +52,34 @@ const UserLogsPage = () => {
                     </div>
                     <div>
                         <p><strong>Age:</strong> {user.age}</p>
-                        <p><strong>Medical Condition:</strong> {user.medicalCondition || 'None'}</p>                 
+                        <p><strong>Contact:</strong> {user.contact}</p>
+                        <p><strong>Medical Condition:</strong> {user.medicalCondition || 'None'}</p>
                     </div>
                 </div>
             </div>
 
-            {/* Routine Logs */}
+            {/* Tabs Navigation */}
+            <div className="bg-white p-4 rounded-lg shadow-lg mb-6">
+                <div className="flex border-b">
+                    {tabs.map(tab => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={`py-2 px-4 font-semibold ${activeTab === tab.id ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-600'
+                                }`}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* Tab Content */}
             <div className="bg-white p-6 rounded-lg shadow-lg">
-                <h2 className="text-2xl font-semibold mb-4">Routine Logs</h2>
-                <RoutineLogTable
-                    routineLogs={filteredLogs} // Pass filtered logs for this user
-                />
+                {activeTab === 'medical-history' && <MedicalHistoryComponent patient={user} />}
+                {activeTab === 'diagnosis' && <DiagnosisComponent patient={user} />}
+                {activeTab === 'routine-logs' && <RoutineLogTable routineLogs={filteredLogs} />}
+                {activeTab === 'appointments' && <AppointmentTable patient={user} />}
             </div>
         </div>
     );

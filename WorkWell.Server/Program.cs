@@ -104,6 +104,8 @@ builder.Services.AddScoped<OrganizationService>();
 builder.Services.AddScoped<SuperAdminService>();
 builder.Services.AddScoped<ConstraintService>();
 builder.Services.AddScoped<KeyPointService>();
+builder.Services.AddScoped<MedicalHistoryService>();
+builder.Services.AddScoped<DiagnosisService>();
 
 var app = builder.Build();
 //app.UseHttpsRedirection();
