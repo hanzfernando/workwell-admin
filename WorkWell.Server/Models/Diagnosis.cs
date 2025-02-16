@@ -39,6 +39,8 @@ namespace WorkWell.Server.Models
 
         [FirestoreProperty]
         public DateTime TreatmentPlanStartDate { get; set; }
+        [FirestoreProperty]
+        public DateTime FollowUpPlan { get; set; }
 
     }
 }

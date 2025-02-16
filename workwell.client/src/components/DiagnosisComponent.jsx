@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import icPlus from '../assets/ic_plus.svg';
-import AddDiagnosis from './AddDiagnosis';
-import EditDiagnosis from './EditDiagnosis';
+import AddDiagnosisModal from './AddDiagnosisModal.jsx';
+import EditDiagnosisModal from './EditDiagnosisModal.jsx';
 import { getDiagnoses } from '../services/diagnosisService';
 
 const DiagnosisComponent = ({ patient }) => {
@@ -49,7 +49,7 @@ const DiagnosisComponent = ({ patient }) => {
             ) : error ? (
                 <p className="text-red-500">{error}</p>
             ) : diagnoses.length > 0 ? (
-                <div className="bg-white p-6 rounded-lg shadow-md">
+               
                     <div className="space-y-4">
                         {diagnoses.map((diagnosis) => (
                             <div key={diagnosis.diagnosisId} className="p-4 border rounded-lg shadow-sm bg-gray-100">
@@ -79,13 +79,13 @@ const DiagnosisComponent = ({ patient }) => {
                             </div>
                         ))}
                     </div>
-                </div>
+                
             ) : (
                 <p>No diagnoses recorded.</p>
             )}
 
-            {showModal && <AddDiagnosis patient={patient} onClose={() => setShowModal(false)} refreshDiagnoses={fetchDiagnoses} />}
-            {editModal && <EditDiagnosis diagnosisData={selectedDiagnosis} onClose={() => setEditModal(false)} refreshDiagnoses={fetchDiagnoses} />}
+            {showModal && <AddDiagnosisModal patient={patient} onClose={() => setShowModal(false)} refreshDiagnoses={fetchDiagnoses} />}
+            {editModal && <EditDiagnosisModal diagnosisData={selectedDiagnosis} onClose={() => setEditModal(false)} refreshDiagnoses={fetchDiagnoses} />}
         </div>
     );
 };

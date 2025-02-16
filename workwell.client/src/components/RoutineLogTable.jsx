@@ -23,7 +23,7 @@ const RoutineLogTable = ({ routineLogs }) => {
     return (
         <>
             <div>
-                <h2 className="text-2xl font-semibold mb-4">Appointments</h2>
+                <h2 className="text-2xl font-semibold mb-4">Routine Logs</h2>
             </div>
             <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">

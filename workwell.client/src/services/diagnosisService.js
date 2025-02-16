@@ -1,7 +1,7 @@
 import { backendLink } from '../utils/ngrokLink.js';
 import { getToken } from '../utils/authUtil.js';
 
-const BASE_URL = `${backendLink}/api/Diagnosis`;
+const BASE_URL = `${backendLink}/api/diagnosis`;
 
 export const getDiagnoses = async (uid) => {
     try {

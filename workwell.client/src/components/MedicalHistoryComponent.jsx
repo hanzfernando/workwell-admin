@@ -50,10 +50,10 @@ const MedicalHistoryComponent = ({ patient }) => {
             ) : error ? (
                 <p className="text-red-500">{error}</p>
             ) : medicalHistory.length > 0 ? (
-                <div className="bg-white p-6 rounded-lg shadow-md">
+                
                     <div className="space-y-4">
                         {medicalHistory.map((history) => (
-                            <div key={history.id} className="p-4 border rounded-lg shadow-sm bg-gray-100">
+                            <div key={history.medicalHistoryId} className="p-4 border rounded-lg shadow-sm bg-gray-100">
                                 <div className="flex justify-between items-center">
                                     <h3 className="text-lg font-semibold text-gray-800">
                                         Medical History Record
@@ -78,7 +78,7 @@ const MedicalHistoryComponent = ({ patient }) => {
                             </div>
                         ))}
                     </div>
-                </div>
+                
             ) : (
                 <p>No medical history recorded.</p>
             )}

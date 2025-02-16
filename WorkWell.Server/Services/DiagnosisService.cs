@@ -37,9 +37,16 @@ namespace WorkWell.Server.Services
         {
             var docRef = _db.Collection(CollectionName).Document();
             diagnosis.DiagnosisId = docRef.Id; // Assign Firestore's generated ID
+
+            // 🔹 Convert all DateTime fields to UTC before storing in Firestore
+            diagnosis.DiagnosisDate = DateTime.SpecifyKind(diagnosis.DiagnosisDate, DateTimeKind.Utc);
+            diagnosis.TreatmentPlanStartDate = DateTime.SpecifyKind(diagnosis.TreatmentPlanStartDate, DateTimeKind.Utc);
+            diagnosis.FollowUpPlan = DateTime.SpecifyKind(diagnosis.FollowUpPlan, DateTimeKind.Utc);
+
             await docRef.SetAsync(diagnosis);
             return diagnosis;
         }
+
 
         public async Task<Diagnosis?> UpdateDiagnosisAsync(string diagnosisId, Diagnosis updatedDiagnosis)
         {
@@ -48,11 +55,17 @@ namespace WorkWell.Server.Services
 
             if (!snapshot.Exists)
             {
-                return null; // Diagnosis not found
+                return null; // Diagnosis record not found
             }
+
+            // 🔹 Ensure DateTime fields are in UTC before updating Firestore
+            updatedDiagnosis.DiagnosisDate = DateTime.SpecifyKind(updatedDiagnosis.DiagnosisDate, DateTimeKind.Utc);
+            updatedDiagnosis.TreatmentPlanStartDate = DateTime.SpecifyKind(updatedDiagnosis.TreatmentPlanStartDate, DateTimeKind.Utc);
+            updatedDiagnosis.FollowUpPlan = DateTime.SpecifyKind(updatedDiagnosis.FollowUpPlan, DateTimeKind.Utc);
 
             await docRef.SetAsync(updatedDiagnosis, SetOptions.Overwrite);
             return updatedDiagnosis;
         }
+
     }
 }
