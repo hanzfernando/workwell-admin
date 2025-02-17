@@ -106,6 +106,7 @@ builder.Services.AddScoped<ConstraintService>();
 builder.Services.AddScoped<KeyPointService>();
 builder.Services.AddScoped<MedicalHistoryService>();
 builder.Services.AddScoped<DiagnosisService>();
+builder.Services.AddScoped<VisitationLogService>();
 
 var app = builder.Build();
 //app.UseHttpsRedirection();

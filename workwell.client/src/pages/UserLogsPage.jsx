@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import RoutineLogTable from '../components/RoutineLogTable';
 import MedicalHistoryComponent from '../components/MedicalHistoryComponent';
 import DiagnosisComponent from '../components/DiagnosisComponent';
-import AppointmentTable from '../components/AppointmentTable';
+import AppointmentTable from '../components/VisitationLogComponent';
 import { getPatient } from '../services/patientService';
 import { useRoutineLogContext } from '../hooks/useRoutineLogContext';
 

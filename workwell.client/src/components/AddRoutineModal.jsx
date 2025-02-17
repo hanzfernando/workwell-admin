@@ -23,9 +23,11 @@ const AddRoutineModal = ({ isOpen, onClose, onAddRoutine, isUnique = false, pati
     const [errorMessage, setErrorMessage] = useState(''); // State for error messages
     if (!isOpen) return null;
 
-    const exercisesForTargetArea = exercises.filter(
-        (exercise) => exercise.targetArea === targetArea
-    );
+    //const exercisesForTargetArea = exercises.filter(
+    //    (exercise) => exercise.targetArea === targetArea
+    //);
+
+    const exercisesForTargetArea = exercises;
 
     const handleExerciseSelection = (exerciseId) => {
         setSelectedExercises((prevSelectedExercises) => {
