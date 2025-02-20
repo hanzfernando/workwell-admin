@@ -52,3 +52,23 @@ export const getAllAdmins = async () => {
         throw error;
     }
 };
+
+export const updateAdmin = async (uid, updatedData) => {
+    const token = await getToken();
+
+    const response = await fetch(`${BASE_URL}/updateAdmin/${uid}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(updatedData),
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to update admin.');
+    }
+
+    return await response.json();
+};

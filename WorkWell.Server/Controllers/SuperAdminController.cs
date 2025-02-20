@@ -70,6 +70,25 @@ namespace WorkWell.Server.Controllers
             }
         }
 
+        [HttpPut("updateAdmin/{uid}")]
+        public async Task<IActionResult> UpdateAdmin(string uid, [FromBody] AdminUpdateRequest request)
+        {
+            if (uid != request.Uid)
+                return BadRequest(new { success = false, message = "Admin ID mismatch." });
+
+            try
+            {
+                var updatedAdmin = await _superAdminService.UpdateAdminAsync(request);
+                return Ok(new { success = true, data = updatedAdmin });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+
+
 
         [HttpGet("admins")]
         public async Task<IActionResult> GetAllAdmins()

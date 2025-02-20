@@ -1,16 +1,35 @@
 ﻿import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import AddConstraintComponent from '../components/AddConstraintComponent.jsx';
-import { saveKeypoints, saveConstraints } from '../services/exerciseService'; // Import services
+import { saveKeypoints, saveConstraints } from '../services/exerciseService';
+import { uploadVideo } from '../services/videoService'; // Import video upload service
+import img_keypoints from '../assets/img_pose_landmarks.png';
 
 const AddExerciseModal = ({ isOpen, onClose, onAddExercise }) => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [targetArea, setTargetArea] = useState('');
     const [constraints, setConstraints] = useState([]);
+    const [videoFile, setVideoFile] = useState(null);
+    const [videoPreview, setVideoPreview] = useState(null); // For video preview
+    const [uploading, setUploading] = useState(false);
     const [showConstraintForm, setShowConstraintForm] = useState(false);
     const [editIndex, setEditIndex] = useState(null);
     const [editingConstraint, setEditingConstraint] = useState(null);
+
+    // Handle video file change and set preview
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        setVideoFile(file);
+
+        // Generate preview URL
+        if (file && file.type.startsWith('video/')) {
+            const previewURL = URL.createObjectURL(file);
+            setVideoPreview(previewURL);
+        } else {
+            setVideoPreview(null);
+        }
+    };
 
     const handleSaveConstraint = (newConstraint) => {
         if (editIndex !== null) {
@@ -35,22 +54,36 @@ const AddExerciseModal = ({ isOpen, onClose, onAddExercise }) => {
         setConstraints(constraints.filter((_, i) => i !== index));
     };
 
-    const simulateSavingToBackend = async () => {
+    // Main function to handle video upload and exercise creation
+    const handleSaveExercise = async () => {
         if (!name || !targetArea) {
             alert('Name and Target Area are required.');
             return;
         }
 
-        console.log("Constraints Before Saving:", constraints);
+        if (!videoFile) {
+            alert('Please upload a video file.');
+            return;
+        }
+
+        setUploading(true);
+        let videoId = null;
 
         try {
-            let constraintIds = [];
+            // Step 1: Upload Video
+            const videoResponse = await uploadVideo(videoFile);
+            if (videoResponse?.videoId) {
+                videoId = videoResponse.videoId;
+                console.log('Video uploaded successfully:', videoResponse);
+            } else {
+                throw new Error('Failed to upload video.');
+            }
 
-            // Step 1: Save Keypoints and Constraints
+            // Step 2: Save Keypoints and Constraints
+            let constraintIds = [];
             for (let constraint of constraints) {
                 let keypointIds = [];
 
-                // Save KeyPoints One at a Time
                 for (let point of ['pointA', 'pointB', 'pointC']) {
                     const keypoint = {
                         keypoint: constraint[point].keypoint,
@@ -58,93 +91,56 @@ const AddExerciseModal = ({ isOpen, onClose, onAddExercise }) => {
                         isMidpoint: constraint[point].isMidpoint,
                     };
 
-                    console.log("Saving Keypoint:", keypoint);
-
-                    try {
-                        // Call API to save single Keypoint and store its ID
-                        const keypointResponse = await saveKeypoints(keypoint);
-                        console.log(keypointResponse)
-
-                        if (!keypointResponse || !keypointResponse.keypointId) {
-                            throw new Error("Failed to get KeyPoint ID from response.");
-                        }
-                        keypointIds.push(keypointResponse.keypointId);
-                    } catch (error) {
-                        console.error("Failed to save keypoint:", error);
-                        return; // Stop execution if keypoint fails
+                    const keypointResponse = await saveKeypoints(keypoint);
+                    if (!keypointResponse?.keypointId) {
+                        throw new Error('Failed to save keypoint.');
                     }
+                    keypointIds.push(keypointResponse.keypointId);
                 }
 
-                // Ensure we have exactly 3 KeyPoints before proceeding
-                if (keypointIds.length !== 3) {
-                    console.error("Error: Not all keypoints were saved successfully.");
-                    return;
-                }
-
-                // Save Constraint using the saved Keypoint IDs
                 const constraintData = {
                     keypoints: keypointIds,
                     restingThreshold: constraint.restingThreshold,
                     alignedThreshold: constraint.alignedThreshold,
                     restingComparator: constraint.restingComparator,
-                    alignedComparator: constraint.alignedComparator, 
+                    alignedComparator: constraint.alignedComparator,
                 };
 
-
-                console.log("Saving Constraint:", constraintData);
-
-                try {
-                    // Call API to save Constraint
-                    const constraintResponse = await saveConstraints(constraintData);
-                    console.log(constraintResponse)
-
-                    if (!constraintResponse || !constraintResponse.constraintId) {
-                        throw new Error("Failed to get Constraint ID from response.");
-                    }
-
-                    constraintIds.push(constraintResponse.constraintId);
-                } catch (error) {
-                    console.error("Failed to save constraint:", error);
-                    return; // Stop execution if constraint fails
+                const constraintResponse = await saveConstraints(constraintData);
+                if (!constraintResponse?.constraintId) {
+                    throw new Error('Failed to save constraint.');
                 }
+
+                constraintIds.push(constraintResponse.constraintId);
             }
 
-            // Step 2: Save Exercise with Constraint IDs
+            // Step 3: Create Exercise with VideoId and Constraint IDs
             const newExercise = {
                 name,
                 description,
                 targetArea,
+                videoId,
                 constraints: constraintIds,
             };
 
-            console.log("Saving Exercise:", newExercise);
+            console.log('Saving Exercise:', newExercise);
+            onAddExercise(newExercise);
 
-            try {
-                //const exerciseResponse = await saveExercise(newExercise);
-                //if (!exerciseResponse || !exerciseResponse.exerciseId) {
-                //    throw new Error("Failed to save exercise.");
-                //}
-
-                //console.log("Exercise Saved Successfully! ID:", exerciseResponse.exerciseId);
-
-                // Step 3: Reset State
-                onAddExercise(newExercise);
-                setName('');
-                setDescription('');
-                setTargetArea('');
-                setConstraints([]);
-                setShowConstraintForm(false);
-                setEditIndex(null);
-                setEditingConstraint(null);
-                onClose();
-            } catch (error) {
-                console.error("Failed to save exercise:", error);
-            }
+            // Reset form after successful creation
+            setName('');
+            setDescription('');
+            setTargetArea('');
+            setConstraints([]);
+            setVideoFile(null);
+            setVideoPreview(null); // Clear video preview
+            onClose();
         } catch (error) {
-            console.error("Unexpected error:", error);
+            console.error('Failed to save exercise:', error);
+            alert(error.message);
+        } finally {
+            setUploading(false);
         }
     };
-
 
     if (!isOpen) return null;
 
@@ -194,17 +190,41 @@ const AddExerciseModal = ({ isOpen, onClose, onAddExercise }) => {
                         </select>
                     </div>
 
-                    {/* List of Constraints Section */}
+                    {/* Video Upload Section */}
+                    <div>
+                        <label className="block text-sm font-medium mb-2">Upload Video</label>
+                        <input
+                            type="file"
+                            accept="video/mp4"
+                            onChange={handleFileChange}
+                            className="w-full px-3 py-2 border rounded focus:outline-none focus:border-teal-500"
+                        />
+                        {videoPreview && (
+                            <div className="mt-4">
+                                <h4 className="text-md font-semibold">Video Preview</h4>
+                                <video controls className="w-full rounded-lg shadow-md">
+                                    <source src={videoPreview} type="video/mp4" />
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+                        )}
+                        {uploading && <p className="text-sm text-blue-500 mt-2">Uploading video...</p>}
+                    </div>
+
+                    {/* Constraints Section */}
                     <div className="mt-4">
+                        <h4 className="text-md font-semibold">Keypoint Guide</h4>
+
+                        <img src={img_keypoints} alt="Pose Landmarks" className="w-1/2 m-auto rounded-lg shadow-md" /> 
                         <div className="flex items-center justify-between">
                             <h4 className="text-md font-semibold">List of Constraints</h4>
                             <button
                                 onClick={() => {
-                                    setShowConstraintForm((prev) => !prev);
+                                    setShowConstraintForm(!showConstraintForm);
                                     setEditIndex(null);
                                     setEditingConstraint(null);
                                 }}
-                                className="text-xl font-bold text-gray-600 hover:text-gray-800"
+                                className="text-xl font-bold text-white bg-accent-aqua p-1 w-8 rounded-lg hover:bg-teal-500 mr-2"
                             >
                                 {showConstraintForm ? '−' : '+'}
                             </button>
@@ -222,32 +242,59 @@ const AddExerciseModal = ({ isOpen, onClose, onAddExercise }) => {
                             />
                         )}
 
-                        {/* Constraint Boxes */}
                         {constraints.map((constraint, index) => (
                             <div key={index} className="border p-3 rounded mt-2 bg-white">
                                 <h5 className="font-semibold">Constraint {index + 1}</h5>
                                 <p><strong>Point A:</strong> {constraint.pointA.keypoint}</p>
-                                {constraint.pointA.isMidpoint && <p><strong>Secondary A:</strong> {constraint.pointA.secondaryKeypoint}</p>}
                                 <p><strong>Point B:</strong> {constraint.pointB.keypoint}</p>
-                                {constraint.pointB.isMidpoint && <p><strong>Secondary B:</strong> {constraint.pointB.secondaryKeypoint}</p>}
                                 <p><strong>Point C:</strong> {constraint.pointC.keypoint}</p>
-                                {constraint.pointC.isMidpoint && <p><strong>Secondary C:</strong> {constraint.pointC.secondaryKeypoint}</p>}
                                 <p><strong>Resting Threshold:</strong> {constraint.restingThreshold}</p>
                                 <p><strong>Aligned Threshold:</strong> {constraint.alignedThreshold}</p>
-                                <p><strong>Resting Comparator:</strong> {constraint.restingComparator}</p>
-                                <p><strong>Aligned Comparator:</strong> {constraint.alignedComparator}</p>
+                                <div className="flex space-x-2 mt-2">
+                                    <button
+                                        className="bg-blue-500 text-white px-3 py-1 rounded"
+                                        onClick={() => handleEditConstraint(index)}
+                                    >
+                                        Edit
+                                    </button>
+                                    <button
+                                        className="bg-red-500 text-white px-3 py-1 rounded"
+                                        onClick={() => handleDeleteConstraint(index)}
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
                             </div>
                         ))}
                     </div>
+
+
                 </div>
 
                 <div className="mt-4 flex justify-end space-x-4">
-                    <button onClick={onClose} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancel</button>
-                    <button onClick={simulateSavingToBackend} className="bg-accent-aqua text-white px-4 py-2 rounded hover:bg-teal-600">Save Exercise</button>
+                    <button
+                        onClick={onClose}
+                        className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={handleSaveExercise}
+                        disabled={uploading}
+                        className={`bg-accent-aqua text-white px-4 py-2 rounded hover:bg-teal-600 ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                        {uploading ? 'Saving...' : 'Save Exercise'}
+                    </button>
                 </div>
             </div>
         </div>
     );
+};
+
+AddExerciseModal.propTypes = {
+    isOpen: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+    onAddExercise: PropTypes.func.isRequired,
 };
 
 export default AddExerciseModal;

@@ -27,6 +27,9 @@ namespace WorkWell.Server.Models
         public string? OrganizationId { get; set; }
 
         [FirestoreProperty]
+        public string? VideoId { get; set; }
+
+        [FirestoreProperty]
         public List<string> Constraints { get; set; } = new();
 
         [FirestoreProperty]  

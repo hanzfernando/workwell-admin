@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -21,28 +23,60 @@ namespace WorkWell.Server.Controllers
             _videoService = videoService;
         }
 
+        // Helper method to extract Organization ID from token claims
+        private string GetOrganizationIdFromToken()
+        {
+            var organizationId = HttpContext.User.FindFirst("OrganizationId")?.Value;
+            if (string.IsNullOrEmpty(organizationId))
+            {
+                throw new UnauthorizedAccessException("Organization ID not found in token.");
+            }
+            return organizationId;
+        }
+
+        // POST: api/videos/upload
+        [HttpPost("upload")]
+        public async Task<IActionResult> UploadVideo([FromForm] IFormFile videoFile)
+        {
+            if (videoFile == null || videoFile.Length == 0)
+            {
+                return BadRequest("No video file provided.");
+            }
+
+            try
+            {
+                var organizationId = GetOrganizationIdFromToken();
+                Debug.WriteLine(videoFile);
+
+                var videoId = await _videoService.UploadVideoAsync(videoFile, organizationId);
+                if (string.IsNullOrEmpty(videoId))
+                {
+                    throw new Exception("Failed to upload video.");
+                }
+                Debug.WriteLine(videoId);
+
+
+                return Ok(new { videoId });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
         // GET: api/videos
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Video>>> GetAllVideos()
         {
             try
             {
-                // Extract OrganizationId from the user's claims
-                var organizationId = User.Claims.FirstOrDefault(c => c.Type == "OrganizationId")?.Value;
-
-                if (string.IsNullOrEmpty(organizationId))
-                {
-                    return Unauthorized("OrganizationId claim is missing in the token.");
-                }
-
-                // Fetch videos for the same organization
+                var organizationId = GetOrganizationIdFromToken();
                 var videos = await _videoService.GetAllVideosByOrganizationAsync(organizationId);
                 return Ok(videos);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                System.Console.WriteLine($"Error fetching videos: {ex.Message}");
-                return StatusCode(500, "An error occurred while fetching videos. Please try again later.");
+                return StatusCode(500, new { success = false, message = $"Error fetching videos: {ex.Message}" });
             }
         }
     }

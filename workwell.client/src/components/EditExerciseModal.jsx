@@ -1,6 +1,10 @@
 ﻿import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import AddConstraintComponent from '../components/AddConstraintComponent.jsx';
+import VideoPlayer from '../components/VideoPlayer.jsx';
+import { uploadVideo } from '../services/videoService.js';
+import { useVideoContext } from '../hooks/useVideoContext.jsx'
+import img_keypoints from '../assets/img_pose_landmarks.png';
 import {
     getExerciseDetail,
     updateExercise,
@@ -12,23 +16,21 @@ import {
 } from '../services/exerciseService';
 
 const EditExerciseModal = ({ isOpen, onClose, onUpdate, exerciseId }) => {
-    // Local state for the exercise detail (composite data from the API)
+    const { state: videoState } = useVideoContext();
     const [exerciseDetail, setExerciseDetail] = useState(null);
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [targetArea, setTargetArea] = useState('');
-    // Constraints are stored as composite objects:
-    // Each element has a "constraint" object and a "keyPoints" array.
     const [constraints, setConstraints] = useState([]);
-    // Track IDs of constraints removed during editing.
+    const [videoId, setVideoId] = useState(null);
+    const [videoFile, setVideoFile] = useState(null);
+    const [uploading, setUploading] = useState(false);
     const [removedConstraintIds, setRemovedConstraintIds] = useState([]);
     const [showConstraintForm, setShowConstraintForm] = useState(false);
     const [editIndex, setEditIndex] = useState(null);
     const [editingConstraint, setEditingConstraint] = useState(null);
+    const [videoDetails, setVideoDetails] = useState(null);
 
-    // Fetch full exercise detail on mount or when exerciseId changes.
-    // API response structure is assumed to be:
-    // { exercise: { ... }, constraints: [ { constraint: { ... }, keyPoints: [ ... ] }, ... ] }
     useEffect(() => {
         const fetchDetail = async () => {
             const detail = await getExerciseDetail(exerciseId);
@@ -37,35 +39,27 @@ const EditExerciseModal = ({ isOpen, onClose, onUpdate, exerciseId }) => {
                 setName(detail.exercise.name);
                 setDescription(detail.exercise.description);
                 setTargetArea(detail.exercise.targetArea);
-                // Transform the constraints into flat objects if needed.
-                const transformedConstraints = (detail.constraints || []).map(c => {
-                    // If the data is already flat (has pointA), assume it's in the correct format.
-                    if (c.pointA) {
-                        return c;
-                    }
-                    // Otherwise, if composite data is present, transform it.
-                    if (c.constraint && c.keyPoints && c.keyPoints.length >= 3) {
-                        return {
-                            restingThreshold: c.constraint.restingThreshold,
-                            alignedThreshold: c.constraint.alignedThreshold,
-                            restingComparator: c.constraint.restingComparator,
-                            alignedComparator: c.constraint.alignedComparator || '', 
-                            constraintId: c.constraint.constraintId,
-                            pointA: c.keyPoints[0],
-                            pointB: c.keyPoints[1],
-                            pointC: c.keyPoints[2]
-                        };
-                    }
-
-                    return c; // Fallback in case the structure doesn't match.
-                });
+                setVideoId(detail.exercise.videoId);
+                const transformedConstraints = (detail.constraints || []).map(c => ({
+                    restingThreshold: c.constraint.restingThreshold,
+                    alignedThreshold: c.constraint.alignedThreshold,
+                    restingComparator: c.constraint.restingComparator,
+                    alignedComparator: c.constraint.alignedComparator || '',
+                    constraintId: c.constraint.constraintId,
+                    pointA: c.keyPoints[0],
+                    pointB: c.keyPoints[1],
+                    pointC: c.keyPoints[2]
+                }));
                 setConstraints(transformedConstraints);
+                // Find video details using cloudinaryId
+                const videoInfo = videoState.videos.find(video => video.videoId === detail.exercise.videoId);
+                console.log(videoInfo);
+                setVideoDetails(videoInfo || null);
             }
         };
-        fetchDetail();
-    }, [exerciseId]);
+        if (exerciseId) fetchDetail();
+    }, [exerciseId, videoState.videos]);
 
-    // Called when a constraint is saved (added or updated) via the AddConstraintComponent.
     const handleSaveConstraint = (newConstraint) => {
         if (editIndex !== null) {
             const updatedConstraints = [...constraints];
@@ -79,56 +73,53 @@ const EditExerciseModal = ({ isOpen, onClose, onUpdate, exerciseId }) => {
         setEditingConstraint(null);
     };
 
-    // Called when the user clicks the "Edit Constraint" button.
-    const handleEditConstraint = (index) => {
-        setEditIndex(index);
-        setEditingConstraint(constraints[index]);
-        setShowConstraintForm(true);
-    };
-
-    // Called when the user deletes a constraint.
     const handleDeleteConstraint = (index) => {
         const removed = constraints[index];
-        // If the removed constraint exists on the backend, track its ID for deletion.
-        if (removed && removed.constraintId) {
+        if (removed?.constraintId) {
             setRemovedConstraintIds(prev => [...prev, removed.constraintId]);
         }
-        // Remove it from the constraints list.
         setConstraints(constraints.filter((_, i) => i !== index));
     };
 
-    // Called when saving the entire exercise update.
-    const simulateUpdatingToBackend = async () => {
+    const handleVideoUpload = async () => {
+        if (!videoFile) return;
+        setUploading(true);
+        try {
+            const response = await uploadVideo(videoFile);
+            if (response?.videoId) {
+                setVideoId(response.videoId);
+                alert('Video uploaded successfully!');
+            } else {
+                alert('Failed to upload video.');
+            }
+        } catch (error) {
+            console.error('Video upload error:', error);
+            alert('Error uploading video.');
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    const handleUpdateExercise = async () => {
         if (!name || !targetArea) {
             alert('Name and Target Area are required.');
             return;
         }
 
         try {
-            // 1. Process each constraint in the flat structure.
-            for (let i = 0; i < constraints.length; i++) {
-                const composite = constraints[i];
-
-                // Process each keypoint (pointA, pointB, pointC) using a for-of loop
+            for (let composite of constraints) {
                 for (const pointKey of ['pointA', 'pointB', 'pointC']) {
                     const kp = composite[pointKey];
-                    if (kp) {
-                        if (kp.keypointId) {
-                            // Existing keypoint: update it.
-                            await updateKeypoint(kp.keypointId, kp);
-                        } else {
-                            // New keypoint: add it and update kp.keypointId.
-                            const keypointResponse = await saveKeypoints(kp);
-                            if (keypointResponse && keypointResponse.keypointId) {
-                                kp.keypointId = keypointResponse.keypointId;
-                            } else {
-                                console.error(`Failed to add keypoint for ${pointKey}`);
-                            }
+                    if (kp?.keypointId) {
+                        await updateKeypoint(kp.keypointId, kp);
+                    } else {
+                        const keypointResponse = await saveKeypoints(kp);
+                        if (keypointResponse?.keypointId) {
+                            kp.keypointId = keypointResponse.keypointId;
                         }
                     }
                 }
 
-                // Build the updated constraint object using flat properties.
                 const updatedConstraint = {
                     constraintId: composite.constraintId,
                     alignedThreshold: composite.alignedThreshold,
@@ -139,47 +130,42 @@ const EditExerciseModal = ({ isOpen, onClose, onUpdate, exerciseId }) => {
                         composite.pointA?.keypointId,
                         composite.pointB?.keypointId,
                         composite.pointC?.keypointId,
-                    ].filter(id => id !== undefined)
+                    ].filter(Boolean)
                 };
-
 
                 if (updatedConstraint.constraintId) {
                     await updateConstraint(updatedConstraint.constraintId, updatedConstraint);
                 } else {
-                    // Add new constraint.
                     const constraintResponse = await saveConstraints(updatedConstraint);
-                    if (constraintResponse && constraintResponse.constraintId) {
+                    if (constraintResponse?.constraintId) {
                         composite.constraintId = constraintResponse.constraintId;
-                    } else {
-                        console.error("Failed to add new constraint.");
                     }
                 }
             }
 
-            // 2. Process removed constraints: For each ID, call delete.
             for (const constraintId of removedConstraintIds) {
                 await deleteConstraint(constraintId);
             }
 
-            // 3. Build the updated exercise object.
             const updatedExercise = {
                 ...exerciseDetail.exercise,
                 name,
                 description,
                 targetArea,
-                // The exercise model stores only an array of constraint IDs.
-                constraints: constraints.map(composite => composite.constraintId)
+                videoId,
+                constraints: constraints.map(c => c.constraintId)
             };
 
-            // 4. Update the exercise on the backend.
-            const updatedResponse = await updateExercise(updatedExercise.exerciseId, updatedExercise);
-            if (!updatedResponse) {
-                throw new Error("Failed to update exercise.");
+            const updatedResponse = await updateExercise(exerciseId, updatedExercise);
+            if (updatedResponse) {
+                onUpdate(updatedResponse);
+                onClose();
+            } else {
+                alert('Failed to update exercise.');
             }
-            onUpdate(updatedResponse);
-            onClose();
         } catch (error) {
-            console.error("Failed to update exercise:", error);
+            console.error('Error updating exercise:', error);
+            alert('Failed to update exercise.');
         }
     };
 
@@ -196,7 +182,6 @@ const EditExerciseModal = ({ isOpen, onClose, onUpdate, exerciseId }) => {
                 </div>
 
                 <div className="space-y-4">
-                    {/* Basic Exercise Fields */}
                     <div>
                         <label className="block text-sm font-medium mb-2">Name</label>
                         <input
@@ -232,8 +217,39 @@ const EditExerciseModal = ({ isOpen, onClose, onUpdate, exerciseId }) => {
                         </select>
                     </div>
 
-                    {/* Constraints Section */}
+                    {/* Video Section */}
+                    <div>
+                        <h3 className="font-semibold text-lg">Current Video</h3>
+                        {videoDetails ? (
+                            <VideoPlayer publicId={videoDetails.cloudinaryId} />
+                        ) : (
+                            <p>No video associated with this exercise.</p>
+                        )}
+
+                        <div className="mt-2">
+                            <label className="block text-sm font-medium mb-2">Replace Video</label>
+                            <input
+                                type="file"
+                                accept="video/*"
+                                onChange={(e) => setVideoFile(e.target.files[0])}
+                                className="w-full px-3 py-2 border rounded focus:outline-none focus:border-teal-500"
+                            />
+                            <button
+                                onClick={handleVideoUpload}
+                                disabled={!videoFile || uploading}
+                                className={`mt-2 bg-blue-500 text-white px-4 py-2 rounded ${uploading ? 'opacity-50' : 'hover:bg-blue-600'}`}
+                            >
+                                {uploading ? 'Uploading...' : 'Upload New Video'}
+                            </button>
+                        </div>
+                    </div>
+
+                    {/*Constraint Section*/}
                     <div className="mt-4">
+                        <h4 className="text-md font-semibold">Keypoint Guide</h4>
+
+                        <img src={img_keypoints} alt="Pose Landmarks" className="w-1/2 m-auto rounded-lg shadow-md" />
+
                         <div className="flex items-center justify-between">
                             <h4 className="text-md font-semibold">List of Constraints</h4>
                             <button
@@ -242,7 +258,7 @@ const EditExerciseModal = ({ isOpen, onClose, onUpdate, exerciseId }) => {
                                     setEditIndex(null);
                                     setEditingConstraint(null);
                                 }}
-                                className="text-xl font-bold text-gray-600 hover:text-gray-800"
+                                className="text-xl font-bold text-white bg-accent-aqua p-1 w-8 rounded-lg hover:bg-teal-500 mr-2"
                             >
                                 {showConstraintForm ? '−' : '+'}
                             </button>
@@ -343,10 +359,11 @@ const EditExerciseModal = ({ isOpen, onClose, onUpdate, exerciseId }) => {
                         Cancel
                     </button>
                     <button
-                        onClick={simulateUpdatingToBackend}
-                        className="bg-accent-aqua text-white px-4 py-2 rounded hover:bg-teal-600"
+                        onClick={handleUpdateExercise}
+                        disabled={uploading}
+                        className={`bg-accent-aqua text-white px-4 py-2 rounded ${uploading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-teal-600'}`}
                     >
-                        Save Changes
+                        {uploading ? 'Updating...' : 'Save Changes'}
                     </button>
                 </div>
             </div>

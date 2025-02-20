@@ -1,4 +1,5 @@
 ﻿using Google.Cloud.Firestore;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using WorkWell.Server.Utils;
 
@@ -46,6 +47,19 @@ namespace WorkWell.Server.Models
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string OrganizationId { get; set; } = string.Empty;
+    }
+
+    public class AdminUpdateRequest
+    {
+
+        public required string Uid { get; set; }
+        public required string Email { get; set; }
+        public required string OrganizationId { get; set; }
+        public required string FirstName { get; set; }
+        public required string LastName { get; set; }
+
+
+        public string? Password { get; set; } // Optional for password updates
     }
 
 }

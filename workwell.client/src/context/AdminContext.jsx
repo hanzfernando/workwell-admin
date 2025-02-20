@@ -14,10 +14,22 @@ const adminReducer = (state, action) => {
     switch (action.type) {
         case 'SET_ADMINS':
             return { ...state, admins: action.payload, loading: false, error: null };
+
         case 'ADD_ADMIN':
             return { ...state, admins: [...state.admins, action.payload], error: null };
+
+        case 'UPDATE_ADMIN':
+            return {
+                ...state,
+                admins: state.admins.map((admin) =>
+                    admin.uid === action.payload.uid ? { ...admin, ...action.payload } : admin
+                ),
+                error: null
+            };
+
         case 'ERROR':
             return { ...state, error: action.payload, loading: false };
+
         default:
             return state;
     }

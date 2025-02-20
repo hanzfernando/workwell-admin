@@ -1,7 +1,10 @@
-﻿using Google.Cloud.Firestore;
+﻿using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using Google.Cloud.Firestore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WorkWell.Server.Config;
 using WorkWell.Server.Models;
 
 namespace WorkWell.Server.Services
@@ -9,36 +12,64 @@ namespace WorkWell.Server.Services
     public class VideoService
     {
         private readonly FirestoreDb _firestoreDb;
+        private readonly Cloudinary _cloudinary;
 
-        public VideoService(FirestoreDb firestoreDb)
+
+        public VideoService(FirestoreDb firestoreDb, IConfiguration configuration)
         {
             _firestoreDb = firestoreDb;
+
+            // Use the CloudinaryConfig class to get the account
+            var cloudinaryConfig = new CloudinaryConfig();
+            _cloudinary = new Cloudinary(cloudinaryConfig.GetCloudinaryAccount(configuration));
         }
 
-        // GET /api/videos filtered by OrganizationId
-        public async Task<IEnumerable<Video>> GetAllVideosByOrganizationAsync(string organizationId)
+        public async Task<string?> UploadVideoAsync(IFormFile videoFile, string organizationId)
         {
             try
             {
-                // Query Firestore collection for videos belonging to the specified organization
-                var query = _firestoreDb
-                    .Collection("videos")
-                    .WhereEqualTo("OrganizationId", organizationId);
-
-                var snapshot = await query.GetSnapshotAsync();
-
-                return snapshot.Documents.Select(doc =>
+                // Upload video to Cloudinary
+                using var stream = videoFile.OpenReadStream();
+                var uploadParams = new VideoUploadParams
                 {
-                    var video = doc.ConvertTo<Video>();
-                    video.VideoId = doc.Id; // Set the document ID
-                    return video;
-                });
+                    File = new FileDescription(videoFile.FileName, stream),
+                    Folder = "exercise_videos"
+                };
+
+                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+                if (uploadResult.Error != null)
+                {
+                    throw new Exception(uploadResult.Error.Message);
+                }
+
+                // Create Video record
+                var video = new Models.Video
+                {
+                    VideoId = Guid.NewGuid().ToString(),
+                    CloudinaryId = uploadResult.PublicId,
+                    VideoUrl = uploadResult.SecureUrl.ToString(),
+                    OrganizationId = organizationId
+                };
+
+                // Store video in Firestore
+                var docRef = _firestoreDb.Collection("videos").Document(video.VideoId);
+                await docRef.SetAsync(video);
+
+                return video.VideoId;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                System.Console.WriteLine($"Error fetching videos for organization {organizationId}: {ex.Message}");
-                throw new System.Exception("Failed to fetch videos. Please try again later.");
+                Console.WriteLine($"Error uploading video: {ex.Message}");
+                throw;
             }
+        }
+
+        public async Task<IEnumerable<Models.Video>> GetAllVideosByOrganizationAsync(string organizationId)
+        {
+            var query = _firestoreDb.Collection("videos").WhereEqualTo("OrganizationId", organizationId);
+            var snapshot = await query.GetSnapshotAsync();
+
+            return snapshot.Documents.Select(doc => doc.ConvertTo<Models.Video>()).ToList();
         }
     }
 }

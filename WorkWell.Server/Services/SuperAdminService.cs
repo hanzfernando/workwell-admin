@@ -94,6 +94,38 @@ namespace WorkWell.Server.Services
             }
         }
 
+        public async Task<Admin> UpdateAdminAsync(AdminUpdateRequest request)
+        {
+            // Update Firestore document
+            var docRef = _firestoreDb.Collection("users").Document(request.Uid);
+            await docRef.UpdateAsync(new Dictionary<string, object>
+            {
+                { "FirstName", request.FirstName },
+                { "LastName", request.LastName }
+            });
+
+            // Update password if provided
+            if (!string.IsNullOrEmpty(request.Password))
+            {
+                await FirebaseAuth.DefaultInstance.UpdateUserAsync(new UserRecordArgs
+                {
+                    Uid = request.Uid,
+                    Password = request.Password
+                });
+            }
+
+            return new Admin
+            {
+                Uid = request.Uid,
+                Email = request.Email,
+                OrganizationId = request.OrganizationId,
+                FirstName = request.FirstName,
+                LastName = request.LastName
+            };
+        }
+
+
+
 
         public async Task<List<Admin>> GetAllAdminsAsync()
         {

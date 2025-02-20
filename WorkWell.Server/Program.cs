@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using WorkWell.Server.Config;
 
 var MyOrigin = "AllowFrontend";
 var builder = WebApplication.CreateBuilder(args);
@@ -107,6 +108,8 @@ builder.Services.AddScoped<KeyPointService>();
 builder.Services.AddScoped<MedicalHistoryService>();
 builder.Services.AddScoped<DiagnosisService>();
 builder.Services.AddScoped<VisitationLogService>();
+builder.Services.AddSingleton<CloudinaryConfig>();
+
 
 var app = builder.Build();
 //app.UseHttpsRedirection();

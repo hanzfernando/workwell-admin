@@ -85,7 +85,7 @@ const RoutineLogDetailsModal = ({ isOpen, onClose, routineLog }) => {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white w-11/12 max-w-3xl p-6 rounded-lg shadow-lg">
+            <div className="bg-white w-11/12 max-w-3xl p-6 rounded-lg shadow-lg overflow-y-auto max-h-[80vh]">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-2xl font-semibold">Routine Log Details</h2>
                     <button className="text-gray-500 hover:text-gray-700" onClick={onClose}>

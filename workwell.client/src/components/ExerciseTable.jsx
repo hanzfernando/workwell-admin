@@ -61,13 +61,13 @@ const ExerciseTable = ({ exercises, onDelete }) => {
                                             <img src={ic_edit} alt="Edit Exercise" className="h-6 w-6" />
                                             
                                         </button>
-                                        <button
-                                            className="bg-red-500 p-1 rounded-lg w-8 hover:bg-red-600"
-                                            onClick={() => onDelete(exercise.exerciseId)}
-                                        >
-                                            <img src={ic_trash} alt="Delete Exercise" className="h-6 w-6" />
+                                        {/*<button*/}
+                                        {/*    className="bg-red-500 p-1 rounded-lg w-8 hover:bg-red-600"*/}
+                                        {/*    onClick={() => onDelete(exercise.exerciseId)}*/}
+                                        {/*>*/}
+                                        {/*    <img src={ic_trash} alt="Delete Exercise" className="h-6 w-6" />*/}
 
-                                        </button>
+                                        {/*</button>*/}
                                     </td>
                                 </tr>
                             ))
