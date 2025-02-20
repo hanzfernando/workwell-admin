@@ -91,14 +91,19 @@ const AdminPatientsPage = () => {
         setPatientRoutineIds(prev => [...prev, routineId]);
     };
 
+    // AdminPatientsPage.jsx
+    const handleRoutineUpdated = (routineId, action) => {
+        if (action === 'remove') {
+            setPatientRoutineIds((prev) => prev.filter((id) => id !== routineId)); // Remove routine ID
+        }
+    };
+
+
  
     //console.log("0 Patients", patients[0]);
     //console.log("All Patients", patients);
     return (
-        <div>
-            <div className="font-medium text-lg">
-                <h1>Hello, {user.displayName}</h1>
-            </div>
+        <div>            
             <div className="bg-white w-full h-full mt-4 p-4 rounded-lg">
                 <div className="flex justify-between items-center pb-4 mb-4 border-b">
                     <h2 className="text-xl font-semibold">Patients</h2>
@@ -130,9 +135,11 @@ const AdminPatientsPage = () => {
                     isOpen={isViewUserRoutineModalOpen}
                     onClose={handleCloseModal}
                     userId={selectedPatient.uid}
-                    patientRoutineIds={patientRoutineIds} // Pass the patient's routine IDs
+                    patientRoutineIds={patientRoutineIds}
                     onRoutineAdded={handleRoutineAdded}
+                    onRoutineUpdated={handleRoutineUpdated} // Pass the new callback
                 />
+
             )}
 
             {/* Add Patient Modal */}

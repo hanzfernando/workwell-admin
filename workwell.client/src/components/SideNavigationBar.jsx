@@ -40,7 +40,7 @@ const SideNavigationBar = () => {
             {/* Profile Section */}
             <div className="flex items-center w-full pb-4 mb-4 border-b border-gray-300">
                 {/* Placeholder avatar */}
-                <div className="w-12 h-12 rounded-full mr-3 bg-accent-aqua"></div>
+                {/*<div className="w-12 h-12 rounded-full mr-3 bg-accent-aqua"></div>*/}
                 {/* Display user's name */}
                 <span className="text-lg font-medium">
                     {user?.displayName}
@@ -79,7 +79,7 @@ const SideNavigationBar = () => {
             {/* Logout Button */}
             <button
                 onClick={handleLogout}
-                className="block p-2 text-red-600 hover:bg-red-100 rounded"
+                className="block p-2 text-red-600 hover:bg-red-100 rounded border border-red-400"
             >
                 Logout
             </button>

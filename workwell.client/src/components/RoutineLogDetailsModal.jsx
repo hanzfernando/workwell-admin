@@ -5,6 +5,7 @@ import { useJournalContext } from '../hooks/useJournalContext';
 import { useExerciseContext } from '../hooks/useExerciseContext'; // Import the exercise context
 import { useRoutineContext } from '../hooks/useRoutineContext'; // Import the routine context
 import VideoPlayer from '../components/VideoPlayer';
+import { updateRoutineLogComment } from '../services/routineLogService'; // Import API call function
 
 const RoutineLogDetailsModal = ({ isOpen, onClose, routineLog }) => {
     const { state: selfAssessmentState } = useSelfAssessmentContext();
@@ -18,6 +19,9 @@ const RoutineLogDetailsModal = ({ isOpen, onClose, routineLog }) => {
     const [journal, setJournal] = useState(null);
     const [routineDetails, setRoutineDetails] = useState(null); // Routine details
     const [routineExercises, setRoutineExercises] = useState([]); // Exercises of the routine
+
+    const [comment, setComment] = useState(routineLog?.comment || '');
+    const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
         if (
@@ -55,6 +59,27 @@ const RoutineLogDetailsModal = ({ isOpen, onClose, routineLog }) => {
             }
         }
     }, [isOpen, routineLog, selfAssessmentState, videoState, journalState, routines, exercises]);
+
+    useEffect(() => {
+        if (routineLog) {
+            setComment(routineLog.comment || ""); // Reset comment when new routineLog is selected
+        }
+    }, [routineLog]);
+
+
+
+    const handleSaveComment = async () => {
+        setIsSaving(true);
+        try {
+            await updateRoutineLogComment(routineLog.routineLogId, comment);
+            alert('Comment saved successfully.');
+        } catch (error) {
+            console.error('Failed to save comment:', error);
+            alert('Failed to save comment.');
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     if (!isOpen || !routineLog) return null;
 
@@ -149,6 +174,33 @@ const RoutineLogDetailsModal = ({ isOpen, onClose, routineLog }) => {
                 {/*        Close*/}
                 {/*    </button>*/}
                 {/*</div>*/}
+
+                {/* Comment Section */}
+                {/* Comment Section */}
+                <div className="mt-4">
+                    <h3 className="font-semibold text-lg">Doctor's Comment</h3>
+                    <textarea
+                        className="w-full border rounded p-2 mt-2"
+                        rows="3"
+                        placeholder="Enter comment here..."
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                    />
+                    <button
+                        className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                        onClick={handleSaveComment}
+                    >
+                        Save Comment
+                    </button>
+                </div>
+
+                <div className="flex justify-end mt-6">
+                    <button className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600" onClick={onClose}>
+                        Close
+                    </button>
+                </div>
+
+
             </div>
         </div>
     );

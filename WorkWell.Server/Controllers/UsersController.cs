@@ -28,6 +28,41 @@ public class UsersController : ControllerBase
         return organizationIdClaim.Value;
     }
 
+    [HttpPut("{uid}")]
+    public async Task<IActionResult> UpdateUser(string uid, [FromBody] User updatedUser)
+    {
+        try
+        {
+            var organizationId = GetOrganizationIdFromToken();
+
+            // Ensure user belongs to the same organization
+            var existingUser = await _userService.GetUserAsync(uid, organizationId);
+            if (existingUser == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            updatedUser.OrganizationId = organizationId; // Ensure the organization ID is preserved
+
+            var result = await _userService.UpdateUserAsync(uid, updatedUser);
+            if (result == null)
+            {
+                return NotFound("Failed to update user.");
+            }
+
+            return Ok(result);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+
+
     // GET: api/users
     [HttpGet("patients")] // Ensuring clarity in endpoint
     public async Task<ActionResult<IEnumerable<User>>> GetUsers()

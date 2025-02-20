@@ -69,11 +69,11 @@ const MedicalHistoryComponent = ({ patient }) => {
                                     </button>
                                 </div>
                                 <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
-                                    <p><strong>Past Injuries:</strong> {history.pastInjuries || "None"}</p>
-                                    <p><strong>Chronic Conditions:</strong> {history.chronicConditions || "None"}</p>
+                                    <p><strong>Previous Injuries:</strong> {history.pastInjuries || "None"}</p>
+                                    <p><strong>Medical Conditions:</strong> {history.chronicConditions || "None"}</p>
                                     <p><strong>Previous Treatments:</strong> {history.previousTreatments || "None"}</p>
-                                    <p><strong>Surgeries:</strong> {history.surgeries || "None"}</p>
-                                    <p className="md:col-span-2"><strong>Family History:</strong> {history.familyMedicalHistory || "None"}</p>
+                                    <p><strong>Previous Surgeries:</strong> {history.surgeries || "None"}</p>
+                                    <p className="md:col-span-2"><strong>Family Medical History(related to condition):</strong> {history.familyMedicalHistory || "None"}</p>
                                 </div>
                             </div>
                         ))}

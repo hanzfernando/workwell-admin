@@ -78,9 +78,9 @@ const AssignRoutineModal = ({ isOpen, onClose, routine, onAssign }) => {
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                                         Age
                                     </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                        Medical Condition
-                                    </th>
+                                    {/*<th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">*/}
+                                    {/*    Medical Condition*/}
+                                    {/*</th>*/}
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                                         Select
                                     </th>
@@ -92,7 +92,7 @@ const AssignRoutineModal = ({ isOpen, onClose, routine, onAssign }) => {
                                         <td className="px-6 py-4 text-sm text-gray-700">{patient.firstName}</td>
                                         <td className="px-6 py-4 text-sm text-gray-700">{patient.lastName}</td>
                                         <td className="px-6 py-4 text-sm text-gray-700">{patient.age}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-700">{patient.medicalCondition}</td>
+                                        {/*<td className="px-6 py-4 text-sm text-gray-700">{patient.medicalCondition}</td>*/}
                                         <td className="px-6 py-4 text-center">
                                             <input
                                                 type="checkbox"
@@ -122,7 +122,7 @@ const AssignRoutineModal = ({ isOpen, onClose, routine, onAssign }) => {
                     </button>
                     <button
                         onClick={handleAssign}
-                        className="px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600"
+                        className="px-4 py-2 bg-accent-aqua text-white rounded hover:bg-teal-600"
                     >
                         Assign
                     </button>

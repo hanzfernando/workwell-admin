@@ -34,7 +34,7 @@ const DiagnosisComponent = ({ patient }) => {
     return (
         <div>
             <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-semibold">Diagnosis</h2>
+                <h2 className="text-2xl font-semibold">Diagnosis and Prescription</h2>
                 <button
                     onClick={() => setShowModal(true)}
                     className="flex items-center bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition"
@@ -49,43 +49,66 @@ const DiagnosisComponent = ({ patient }) => {
             ) : error ? (
                 <p className="text-red-500">{error}</p>
             ) : diagnoses.length > 0 ? (
-               
-                    <div className="space-y-4">
-                        {diagnoses.map((diagnosis) => (
-                            <div key={diagnosis.diagnosisId} className="p-4 border rounded-lg shadow-sm bg-gray-100">
-                                <div className="flex justify-between items-center">
-                                    <h3 className="text-lg font-semibold text-gray-800">Diagnosis Record</h3>
-                                    <button
-                                        onClick={() => {
-                                            setSelectedDiagnosis(diagnosis);
-                                            setEditModal(true);
-                                        }}
-                                        className="bg-blue-500 text-white px-3 py-1 rounded-md text-sm shadow-md hover:bg-blue-600 transition"
-                                    >
-                                        Edit
-                                    </button>
-                                </div>
-                                <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
+                <div className="space-y-4">
+                    {diagnoses.map((diagnosis) => (
+                        <div key={diagnosis.diagnosisId} className="p-4 border rounded-lg shadow-sm bg-gray-100">
+                            <div className="flex justify-between items-center mb-2">
+                                <h3 className="text-lg font-semibold text-gray-800">Diagnosis and Prescription Record</h3>
+                                <button
+                                    onClick={() => {
+                                        setSelectedDiagnosis(diagnosis);
+                                        setEditModal(true);
+                                    }}
+                                    className="bg-blue-500 text-white px-3 py-1 rounded-md text-sm shadow-md hover:bg-blue-600 transition"
+                                >
+                                    Edit
+                                </button>
+                            </div>
+
+                            {/* Diagnosis Section */}
+                            <div className="border-b pb-4 mb-4">
+                                <h4 className="text-md font-semibold text-gray-700 mb-2">Diagnosis Details</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
                                     <p><strong>Symptoms:</strong> {diagnosis.symptoms}</p>
                                     <p><strong>Diagnosis Result:</strong> {diagnosis.diagnosisResult}</p>
                                     <p><strong>Severity Level:</strong> {diagnosis.severityLevel}</p>
                                     <p><strong>Diagnosis Date:</strong> {new Date(diagnosis.diagnosisDate).toLocaleDateString()}</p>
-                                    <p className="md:col-span-2"><strong>Recommended Ergonomic Adjustments:</strong> {diagnosis.recommendedErgonomicAdjustments}</p>
-                                    <p><strong>Physical Therapy Recommendations:</strong> {diagnosis.physicalTherapyRecommendations}</p>
-                                    <p><strong>Medication Prescriptions:</strong> {diagnosis.medicationPrescriptions}</p>
+                                </div>
+                            </div>
+
+                            {/* Prescription Section */}
+                            <div>
+                                <h4 className="text-md font-semibold text-gray-700 mb-2">Prescription & Treatment Plan</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
+                                    <p><strong>Ergonomic Adjustments:</strong> {diagnosis.recommendedErgonomicAdjustments}</p>
+                                    <p><strong>Physical Therapy:</strong> {diagnosis.physicalTherapyRecommendations}</p>
+                                    <p><strong>Medication:</strong> {diagnosis.medicationPrescriptions}</p>
                                     <p><strong>Treatment Start Date:</strong> {new Date(diagnosis.treatmentPlanStartDate).toLocaleDateString()}</p>
                                     <p><strong>Follow-Up Date:</strong> {new Date(diagnosis.followUpPlan).toLocaleDateString()}</p>
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                
+                        </div>
+                    ))}
+                </div>
             ) : (
                 <p>No diagnoses recorded.</p>
             )}
 
-            {showModal && <AddDiagnosisModal patient={patient} onClose={() => setShowModal(false)} refreshDiagnoses={fetchDiagnoses} />}
-            {editModal && <EditDiagnosisModal diagnosisData={selectedDiagnosis} onClose={() => setEditModal(false)} refreshDiagnoses={fetchDiagnoses} />}
+            {showModal && (
+                <AddDiagnosisModal
+                    patient={patient}
+                    onClose={() => setShowModal(false)}
+                    refreshDiagnoses={fetchDiagnoses}
+                />
+            )}
+
+            {editModal && (
+                <EditDiagnosisModal
+                    diagnosisData={selectedDiagnosis}
+                    onClose={() => setEditModal(false)}
+                    refreshDiagnoses={fetchDiagnoses}
+                />
+            )}
         </div>
     );
 };

@@ -222,32 +222,56 @@ namespace WorkWell.Server.Controllers
             }
         }
 
-        // DELETE: api/routines/{routineId} (delete a routine)
         [HttpDelete("{routineId}")]
-        public async Task<ActionResult> DeleteRoutine(string routineId)
+        public async Task<IActionResult> DeleteRoutine(string routineId)
         {
             try
             {
                 var organizationId = GetOrganizationIdFromToken();
-                var uid = GetUserIdFromToken();
-                var routine = await _routineService.GetRoutineAsync(routineId, organizationId, uid);
-                if (routine == null)
+
+                // Step 1: Clear assigned users by passing an empty array
+                await _routineService.AssignUsersToRoutineAsync(routineId, new List<string>(), organizationId);
+
+                // Step 2: Proceed with routine deletion
+                var result = await _routineService.DeleteRoutineAsync(routineId, organizationId);
+
+                if (!result)
                 {
-                    return NotFound("Routine not found or not accessible.");
+                    return NotFound(new { message = "Routine not found or already deleted." });
                 }
 
-                await _routineService.DeleteRoutineAsync(routineId);
                 return NoContent();
             }
             catch (UnauthorizedAccessException ex)
             {
-                return Unauthorized(ex.Message);
+                return Unauthorized(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, new { message = ex.Message });
             }
         }
+
+        [HttpPatch("{routineId}/remove-user/{userId}")]
+        public async Task<IActionResult> RemoveUserFromRoutine(string routineId, string userId)
+        {
+            try
+            {
+                var organizationId = GetOrganizationIdFromToken();
+                var result = await _routineService.RemoveUserFromRoutineAsync(routineId, userId, organizationId);
+
+                if (!result)
+                    return NotFound(new { message = "Routine or user not found." });
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+
 
         // PATCH: api/routines/{routineId}/assign-users (assign users to a routine)
         [HttpPatch("{routineId}/assign-users")]

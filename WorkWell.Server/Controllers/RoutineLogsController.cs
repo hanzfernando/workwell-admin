@@ -59,5 +59,27 @@ namespace WorkWell.Server.Controllers
 
             return Ok(routineLog);
         }
+
+        // PATCH: api/RoutineLogs/{routineLogId}/comment
+        [HttpPatch("{routineLogId}/comment")]
+        public async Task<IActionResult> UpdateRoutineLogComment(string routineLogId, [FromBody] string comment)
+        {
+            var organizationId = User.FindFirst("OrganizationId")?.Value;
+
+            if (string.IsNullOrEmpty(organizationId))
+            {
+                return Unauthorized("OrganizationId is missing in the token.");
+            }
+
+            bool updated = await _routineLogService.UpdateRoutineLogCommentAsync(routineLogId, organizationId, comment);
+
+            if (!updated)
+            {
+                return NotFound($"RoutineLog with ID {routineLogId} not found or does not belong to your organization.");
+            }
+
+            return Ok(new { message = "Comment updated successfully" });
+        }
+
     }
 }

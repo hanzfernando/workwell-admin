@@ -39,11 +39,23 @@ const routineReducer = (state, action) => {
             };
 
 
+        case 'REMOVE_USER_FROM_ROUTINE':
+            return {
+                ...state,
+                routines: state.routines.map((routine) =>
+                    routine.routineId === action.payload.routineId
+                        ? { ...routine, users: routine.users.filter(uid => uid !== action.payload.userId) }
+                        : routine
+                ),
+            };
+
+
         case 'DELETE_ROUTINE':
             return {
                 ...state,
-                routines: state.routines.filter(routine => routine.id !== action.payload)
-            }
+                routines: state.routines.filter(routine => routine.routineId !== action.payload) // Ensure correct key
+            };
+
         default:
             return state;
     }

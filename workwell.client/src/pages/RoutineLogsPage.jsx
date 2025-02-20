@@ -60,10 +60,7 @@ const RoutineLogsPage = () => {
     };
 
     return (
-        <div>
-            <div className="font-medium text-lg">
-                <h1>Routine Logs</h1>
-            </div>
+        <div>          
             <div className="bg-white w-full h-full mt-4 p-4 rounded-lg">
                 <div className="flex justify-between items-center pb-4 mb-4 border-b">
                     <h2 className="text-xl font-semibold">All Routine Logs</h2>

@@ -7,7 +7,7 @@ const RoutineLogTable = ({ routineLogs }) => {
     const { state: { patients } } = usePatientContext();
     const [selectedRoutineLog, setSelectedRoutineLog] = useState(null); // State to hold selected routine log
     const [isModalOpen, setIsModalOpen] = useState(false);
-
+    console.log(routineLogs)
     // Helper function to get patient's full name based on uid
     const getPatientNameByUid = (uid) => {
         const patient = patients.find((p) => p.uid === uid); // Find the patient by UID
@@ -15,10 +15,14 @@ const RoutineLogTable = ({ routineLogs }) => {
     };
 
     const onViewRoutineLogDetail = (routineLog) => {
-        const patientName = getPatientNameByUid(routineLog.uid); // Augment routineLog with patientName
+        const patientName = getPatientNameByUid(routineLog.uid); // Get Patient Name
         setSelectedRoutineLog({ ...routineLog, patientName }); // Set the selected log
-        setIsModalOpen(true); // Open the modal
+
+        setTimeout(() => {
+            setIsModalOpen(true); // Open the modal AFTER state is updated
+        }, 0);
     };
+
 
     return (
         <>
@@ -76,9 +80,13 @@ const RoutineLogTable = ({ routineLogs }) => {
             {/* Routine Log Details Modal */}
             <RoutineLogDetailsModal
                 isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)} // Close the modal
-                routineLog={selectedRoutineLog} // Pass the selected routine log
+                onClose={() => {
+                    setIsModalOpen(false);
+                    setSelectedRoutineLog(null); // Reset routine log when modal closes
+                }}
+                routineLog={selectedRoutineLog}
             />
+
         </>
     );
 };

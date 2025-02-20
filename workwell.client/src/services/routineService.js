@@ -109,20 +109,24 @@ const deleteRoutine = async (routineId) => {
     try {
         const response = await fetch(`${BASE_URL}/${routineId}`, {
             method: 'DELETE',
-            headers: {              
-                Authorization: `Bearer ${getToken()}`, // Add Authorization header
-
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${getToken()}`,
             },
         });
+
         if (!response.ok) {
-            throw new Error(`Error deleting routine with ID ${routineId}: ${response.statusText}`);
+            const message = await response.text();
+            throw new Error(`Failed to delete routine: ${message}`);
         }
-        return true; // Return true if delete is successful
+
+        return true;
     } catch (error) {
-        console.error(error);
-        return false;
+        console.error('Error deleting routine:', error);
+        throw error;
     }
 };
+
 const assignUsersToRoutine = async (routineId, userIds) => {
     try {
         const response = await fetch(`${BASE_URL}/${routineId}/assign-users`, {
@@ -147,6 +151,34 @@ const assignUsersToRoutine = async (routineId, userIds) => {
     }
 };
 
+const removeUserFromRoutine = async (routineId, userId) => {
+    try {
+        const response = await fetch(`/api/routines/${routineId}/remove-user/${userId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${getToken()}`,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to remove user from routine. Status: ${response.status}`);
+        }
+
+        // Only parse JSON if there is content
+        if (response.status !== 204 && response.headers.get('content-type')?.includes('application/json')) {
+            return await response.json();
+        }
+
+        // Return success for empty response
+        return { success: true };
+    } catch (error) {
+        console.error('Error removing user from routine:', error);
+        throw error;
+    }
+};
 
 
-export { getRoutine, getAllRoutines, addRoutine, addUniqueRoutine, updateRoutine, deleteRoutine, assignUsersToRoutine };
+
+
+export { getRoutine, getAllRoutines, addRoutine, addUniqueRoutine, updateRoutine, deleteRoutine, assignUsersToRoutine, removeUserFromRoutine };

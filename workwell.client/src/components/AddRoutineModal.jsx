@@ -299,7 +299,10 @@ const AddRoutineModal = ({ isOpen, onClose, onAddRoutine, isUnique = false, pati
 AddRoutineModal.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
-    onAddRoutine: PropTypes.func.isRequired,
+    patientId: PropTypes.string,
+    isUnique: PropTypes.bool,
+    onAddRoutine: PropTypes.func,
+    onRoutineAdded: PropTypes.func
 };
 
 export default AddRoutineModal;

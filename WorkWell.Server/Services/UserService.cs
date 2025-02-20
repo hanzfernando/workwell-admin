@@ -12,6 +12,28 @@ public class UserService
         _firestoreDb = firestoreDb;
     }
 
+    public async Task<User?> UpdateUserAsync(string uid, User updatedUser)
+    {
+        try
+        {
+            var userRef = _firestoreDb.Collection("users").Document(uid);
+            var snapshot = await userRef.GetSnapshotAsync();
+
+            if (!snapshot.Exists) return null;
+
+            updatedUser.Uid = uid; // Ensure UID is not changed
+
+            await userRef.SetAsync(updatedUser, SetOptions.Overwrite);
+            return updatedUser;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error updating user {uid}: {ex.Message}");
+            throw new Exception("Failed to update user.");
+        }
+    }
+
+
     // GET /api/users - Filtered by organizationId
     public async Task<IEnumerable<User>> GetAllUsersAsync(string organizationId)
     {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthContext } from '../hooks/useAuthContext';
 import RoutineTable from '../components/RoutineTable';
-import { getAllRoutines, assignUsersToRoutine, addRoutine } from '../services/routineService';
+import { getAllRoutines, assignUsersToRoutine, addRoutine, deleteRoutine } from '../services/routineService';
 import RoutineDetailsModal from '../components/RoutineDetailsModal'; // Import the modal
 import AssignRoutineModal from '../components/AssignRoutineModal';
 import AddRoutineModal from '../components/AddRoutineModal';
@@ -46,10 +46,11 @@ const RoutinesPage = () => {
             .filter((routine) => {
             return (
                 routine.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                routine.assignedName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                //routine.assignedName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 routine.targetArea.toLowerCase().includes(searchQuery.toLowerCase())
             );
-        });
+            });
+
         setFilteredRoutines(filtered);
     }, [searchQuery, routines]);
 
@@ -97,6 +98,28 @@ const RoutinesPage = () => {
         setIsAssignModalOpen(false); // Close the assign routine modal
         setRoutineToAssign(null); // Clear selected routine for assignment
     };
+
+    const handleDeleteRoutine = async (routine) => {
+        try {
+            // Step 1: Clear assigned users
+            await assignUsersToRoutine(routine.routineId, []);
+
+            // Step 2: Delete the routine
+            await deleteRoutine(routine.routineId);
+
+            alert(`Routine "${routine.name}" deleted successfully.`);
+            dispatch({ type: 'DELETE_ROUTINE', payload: routine.routineId });
+
+            // Refresh state after deletion
+            setFilteredRoutines((prev) =>
+                prev.filter((r) => r.routineId !== routine.routineId)
+            );
+        } catch (error) {
+            console.error('Failed to delete routine:', error);
+            alert('Failed to delete routine.');
+        }
+    };
+
 
     const handleRoutineAssigned = async (routine, userIds) => {
         console.log(userIds);
@@ -186,10 +209,7 @@ const RoutinesPage = () => {
 
 
     return (
-        <div>
-            <div className="font-medium text-lg">
-                <h1>Hello, {user.displayName}</h1>
-            </div>
+        <div>         
             <div className="bg-white w-full h-full mt-4 p-4 rounded-lg">
                 <div className="flex justify-between items-center pb-4 mb-4 border-b">
                     <h2 className="text-xl font-semibold">Routines</h2>
@@ -209,10 +229,12 @@ const RoutinesPage = () => {
                         />
                     </div>
                 </div>
+
                 <RoutineTable
-                    routines={filteredRoutines}
+                    routines={routines}
                     onViewRoutine={handleViewRoutine}
-                    onAssignRoutine={handleAssignRoutine} // Pass handler for assigning
+                    onAssignRoutine={handleAssignRoutine}
+                    onDeleteRoutine={handleDeleteRoutine}
                 />
             </div>
 

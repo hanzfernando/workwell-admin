@@ -140,22 +140,73 @@ namespace WorkWell.Server.Services
             }
         }
 
-        // Delete a routine
-        public async Task DeleteRoutineAsync(string routineId)
+        public async Task<bool> DeleteRoutineAsync(string routineId, string organizationId)
         {
-            try
+            var routineRef = _firestoreDb.Collection("routines").Document(routineId);
+            var snapshot = await routineRef.GetSnapshotAsync();
+
+            if (!snapshot.Exists) return false;
+
+            var routine = snapshot.ConvertTo<Routine>();
+
+            if (routine.OrganizationId != organizationId)
+                throw new UnauthorizedAccessException("You are not authorized to delete this routine.");
+
+            // 🔑 Remove routine from all assigned users.
+            foreach (var userId in routine.Users ?? new List<string>())
             {
-                var docRef = _firestoreDb.Collection("routines").Document(routineId);
-                await docRef.DeleteAsync();
+                var userRef = _firestoreDb.Collection("users").Document(userId);
+                var userSnapshot = await userRef.GetSnapshotAsync();
+
+                if (userSnapshot.Exists)
+                {
+                    var user = userSnapshot.ConvertTo<User>();
+                    user.Routines = user.Routines?.Where(rid => rid != routineId).ToList() ?? new List<string>();
+                    await userRef.UpdateAsync("Routines", user.Routines);
+                }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error deleting routine with ID {routineId}: {ex.Message}");
-                throw new Exception("Failed to delete routine. Please try again later.");
-            }
+
+            // 🔑 Clear users before deletion.
+            await routineRef.UpdateAsync("Users", new List<string>());
+
+            // 🔑 Delete the routine.
+            await routineRef.DeleteAsync();
+            return true;
         }
 
-        // Assign users to a routine
+
+        public async Task<bool> RemoveUserFromRoutineAsync(string routineId, string userId, string organizationId)
+        {
+            var routineRef = _firestoreDb.Collection("routines").Document(routineId);
+            var routineSnapshot = await routineRef.GetSnapshotAsync();
+
+            if (!routineSnapshot.Exists) return false;
+
+            var routine = routineSnapshot.ConvertTo<Routine>();
+
+            // Ensure the routine belongs to the organization.
+            if (routine.OrganizationId != organizationId)
+                throw new UnauthorizedAccessException("You are not authorized to modify this routine.");
+
+            // Remove user from routine's Users array.
+            routine.Users = routine.Users?.Where(uid => uid != userId).ToList() ?? new List<string>();
+            await routineRef.UpdateAsync("Users", routine.Users);
+
+            // 🔑 Remove routine from the user's Routines array.
+            var userRef = _firestoreDb.Collection("users").Document(userId);
+            var userSnapshot = await userRef.GetSnapshotAsync();
+
+            if (userSnapshot.Exists)
+            {
+                var user = userSnapshot.ConvertTo<User>();
+                user.Routines = user.Routines?.Where(rid => rid != routineId).ToList() ?? new List<string>();
+                await userRef.UpdateAsync("Routines", user.Routines);
+            }
+
+            return true;
+        }
+
+
         public async Task AssignUsersToRoutineAsync(string routineId, List<string> userIds, string organizationId)
         {
             try
@@ -163,27 +214,26 @@ namespace WorkWell.Server.Services
                 var routineRef = _firestoreDb.Collection("routines").Document(routineId);
                 var routineSnapshot = await routineRef.GetSnapshotAsync();
 
-                if (!routineSnapshot.Exists) throw new Exception("Routine not found.");
+                if (!routineSnapshot.Exists)
+                    throw new Exception("Routine not found.");
 
                 var routine = routineSnapshot.ConvertTo<Routine>();
 
-                // Ensure the routine belongs to the requesting user's organization
+                // Ensure the routine belongs to the organization
                 if (routine.OrganizationId != organizationId)
-                {
                     throw new UnauthorizedAccessException("Routine does not belong to your organization.");
-                }
 
-                // Get users currently assigned to this routine
+                // Current assigned users
                 var previousUserIds = routine.Users ?? new List<string>();
 
-                // Find users who are being removed
+                // Find users being removed
                 var removedUserIds = previousUserIds.Except(userIds).ToList();
 
-                // Update the routine's Users field (assign new user list)
+                // Update routine's Users field (empty array if clearing)
                 routine.Users = userIds;
                 await routineRef.SetAsync(routine, SetOptions.Overwrite);
 
-                // Remove routine from users who were removed
+                // Remove routine from users who were previously assigned
                 foreach (var removedUserId in removedUserIds)
                 {
                     var userRef = _firestoreDb.Collection("users").Document(removedUserId);
@@ -201,13 +251,14 @@ namespace WorkWell.Server.Services
                     }
                 }
 
-                // Assign routine to newly assigned users
+                // Assign routine to newly assigned users (if any)
                 foreach (var userId in userIds)
                 {
                     var userRef = _firestoreDb.Collection("users").Document(userId);
                     var userSnapshot = await userRef.GetSnapshotAsync();
 
-                    if (!userSnapshot.Exists) throw new Exception($"User with ID {userId} not found.");
+                    if (!userSnapshot.Exists)
+                        throw new Exception($"User with ID {userId} not found.");
 
                     var user = userSnapshot.ConvertTo<User>();
 
@@ -224,6 +275,7 @@ namespace WorkWell.Server.Services
                 throw new Exception("Failed to assign users to routine. Please try again later.");
             }
         }
+
 
     }
 }

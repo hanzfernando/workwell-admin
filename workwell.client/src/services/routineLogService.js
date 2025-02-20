@@ -39,4 +39,27 @@ const getRoutineLogById = async (routineLogId) => {
     }
 };
 
-export { getRoutineLogs, getRoutineLogById };
+const updateRoutineLogComment = async (routineLogId, comment) => {
+    try {
+        const response = await fetch(`${BASE_URL}/${routineLogId}/comment`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${getToken()}`,
+            },
+            body: JSON.stringify(comment),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to update comment: ${response.statusText}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+
+export { getRoutineLogs, getRoutineLogById, updateRoutineLogComment };

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for routing
 import ic_eye from '../assets/ic_eye.svg';
+import ic_stats from '../assets/ic_stats.svg';
 import { useAuthContext } from '../hooks/useAuthContext'; // Import the AuthContext }
 import UserRole from '../utils/Roles'
 const PatientTable = ({ patients, onViewRoutine }) => {
@@ -25,10 +26,7 @@ const PatientTable = ({ patients, onViewRoutine }) => {
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
                             Age
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
-                            Medical Condition
-                        </th>
+                        </th>                       
                         <th className="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
                             Email
                         </th>
@@ -44,7 +42,7 @@ const PatientTable = ({ patients, onViewRoutine }) => {
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{patient.firstName}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{patient.lastName}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{patient.age}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{patient.medicalCondition}</td>
+                                {/*<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{patient.medicalCondition}</td>*/}
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{patient.email}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-center">
                                     <div className="flex gap-2 justify-center overflow-x-auto">
@@ -61,9 +59,10 @@ const PatientTable = ({ patients, onViewRoutine }) => {
                                         {user.role === UserRole.Admin &&
                                             <button
                                                 onClick={() => handleViewLogs(patient.uid)} // Pass the user's UID to handleViewLogs
-                                                className="bg-accent-aqua text-white py-1 px-2 rounded-lg hover:bg-teal-500"
+                                                className="bg-accent-aqua text-white p-1 rounded-lg hover:bg-teal-500"
                                             >
-                                                View Logs
+                                                <img src={ic_stats} alt="View Info" className="h-6 w-6" />
+
                                             </button>
                                         }
                                         

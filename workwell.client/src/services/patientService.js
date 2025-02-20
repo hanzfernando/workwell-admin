@@ -22,6 +22,28 @@ const getPatients = async () => {
     }
 };
 
+const updatePatient = async (uid, patientData) => {
+    try {
+        const response = await fetch(`${BASE_URL}/${uid}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${getToken()}`
+            },
+            body: JSON.stringify(patientData),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update patient.');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error updating patient:', error);
+        throw error;
+    }
+};
+
 // 
 const getAllOrganizationPatients = async () => {
     try {
@@ -60,4 +82,4 @@ const getPatient = async (id) => {
     }
 };
 
-export { getPatients, getPatient, getAllOrganizationPatients };
+export { updatePatient, getPatients, getPatient, getAllOrganizationPatients };

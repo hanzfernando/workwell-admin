@@ -31,6 +31,9 @@ namespace WorkWell.Server.Models
         public required string Uid { get; set; }
 
         [FirestoreProperty]
+        public string? Comment { get; set; }
+
+        [FirestoreProperty]
         [JsonIgnore]
         public Timestamp? CreatedAt { get; set; }
 

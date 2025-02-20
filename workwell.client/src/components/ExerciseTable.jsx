@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ic_edit from '../assets/ic_edit.svg';
 import EditExerciseModal from './EditExerciseModal'; // adjust the path as needed
-
+import ic_trash from '../assets/ic_trash.svg';
 const ExerciseTable = ({ exercises, onDelete }) => {
     // Local state to control the edit modal and store the selected exercise ID
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -46,24 +46,27 @@ const ExerciseTable = ({ exercises, onDelete }) => {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                         {exercise.name}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700" style={{ whiteSpace: 'pre-wrap' }}>
                                         {exercise.description}
                                     </td>
+
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                         {exercise.targetArea}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-center">
                                         <button
-                                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mr-2"
+                                            className="bg-accent-aqua p-1 rounded-lg w-8 hover:bg-teal-500 mr-2"
                                             onClick={() => handleEdit(exercise.exerciseId)}
                                         >
-                                            Edit
+                                            <img src={ic_edit} alt="Edit Exercise" className="h-6 w-6" />
+                                            
                                         </button>
                                         <button
-                                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+                                            className="bg-red-500 p-1 rounded-lg w-8 hover:bg-red-600"
                                             onClick={() => onDelete(exercise.exerciseId)}
                                         >
-                                            Delete
+                                            <img src={ic_trash} alt="Delete Exercise" className="h-6 w-6" />
+
                                         </button>
                                     </td>
                                 </tr>

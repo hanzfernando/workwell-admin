@@ -52,5 +52,28 @@ namespace WorkWell.Server.Services
 
             return null;
         }
+
+        public async Task<bool> UpdateRoutineLogCommentAsync(string routineLogId, string organizationId, string comment)
+        {
+            DocumentReference docRef = _firestoreDb.Collection("routinelogs").Document(routineLogId);
+            DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
+
+            if (!snapshot.Exists)
+            {
+                return false;
+            }
+
+            var routineLog = snapshot.ConvertTo<RoutineLog>();
+
+            // Ensure only logs within the same organization can be updated
+            if (routineLog.OrganizationId != organizationId)
+            {
+                return false;
+            }
+
+            await docRef.UpdateAsync("Comment", comment);
+            return true;
+        }
+
     }
 }
